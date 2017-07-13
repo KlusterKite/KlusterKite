@@ -2,6 +2,8 @@ import React from 'react'
 import Relay from 'react-relay'
 import { browserHistory } from 'react-router'
 
+import { Link } from 'react-router';
+
 import ConfigurationOperations from '../../components/ConfigurationOperations/ConfigurationOperations';
 import ConfigurationForm from '../../components/ConfigurationForm/ConfigurationForm'
 import FeedsList from '../../components/FeedsList/FeedList'
@@ -149,11 +151,16 @@ class ConfigurationPage extends React.Component {
     const activeConfiguration = this.props.api.activeConfiguration && this.props.api.activeConfiguration.configurations && this.props.api.activeConfiguration.configurations.edges && this.props.api.activeConfiguration.configurations.edges[0].node;
     const nodeManagement = this.props.api.klusterKiteNodesApi.clusterManagement;
 
-    console.log('activeConfiguration', activeConfiguration);
-
     const canEdit = !model || model.state === 'Draft';
     return (
       <div>
+        {nodeManagement.currentMigration &&
+          <div className="alert alert-warning" role="alert">
+            <span className="glyphicon glyphicon-alert" aria-hidden="true"></span>
+            {' '}
+            Migration is in progress! Please <Link to={'/klusterkite/Migration/'}>finish it</Link>.
+          </div>
+        }
         <ConfigurationForm
           onSubmit={this.onSubmit}
 //          onDelete={this.onDelete}
@@ -256,6 +263,9 @@ export default Relay.createContainer(
           },
           klusterKiteNodesApi {
             clusterManagement {
+              currentMigration {
+                state
+              }
               ${ConfigurationOperations.getFragment('nodeManagement')}
             }
           }

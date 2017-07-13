@@ -35,7 +35,7 @@ export class MigrationLogs extends React.Component {
                     <td>{node.started && DateFormat.formatTime(new Date(node.finished))}</td>
                     <td>{node.migratorTemplateName}</td>
                     <td>{node.resourceName}</td>
-                    <td>{node.errorMessage}</td>
+                    <td>{node.message}</td>
                   </tr>
                 );
               })}
@@ -61,7 +61,7 @@ export default Relay.createContainer(
               type
               sourcePoint
               destinationPoint
-              errorMessage
+              message
               errorStackTrace
               migratorTemplateCode
               migratorTemplateName

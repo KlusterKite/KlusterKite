@@ -35,7 +35,7 @@ interface IKlusterKiteMonitoring_ClusterTree {
   id: ID
 
   # Gets the list of nodes
-  nodes(filter: KlusterKiteMonitoring_Pair_System_String_Node__Filter_Input, sort: [KlusterKiteMonitoring_Pair_System_String_Node__Sort], offset: Int, id: String, limit: Int): IKlusterKiteMonitoring_Pair_System_String_Node__Connection
+  nodes(id: String, filter: KlusterKiteMonitoring_Pair_System_String_Node__Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteMonitoring_Pair_System_String_Node__Sort]): IKlusterKiteMonitoring_Pair_System_String_Node__Connection
 
   # Gets the sum of queue size across tree
   queueSizeSum: Int
@@ -73,7 +73,7 @@ interface IKlusterKiteMonitoring_Node {
   queueSizeSum: Int
 
   # the actor's children
-  children(filter: KlusterKiteMonitoring_Node_Filter_Input, sort: [KlusterKiteMonitoring_Node_Sort], offset: Int, id: String, limit: Int): IKlusterKiteMonitoring_Node_Connection
+  children(id: String, filter: KlusterKiteMonitoring_Node_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteMonitoring_Node_Sort]): IKlusterKiteMonitoring_Node_Connection
 }
 
 # The list of connected KlusterKiteMonitoring_Node
@@ -261,13 +261,13 @@ interface IKlusterKiteNodeApi_Configuration {
   settings: IKlusterKiteNodeApi_ConfigurationSettings
 
   # the list of compatible node templates
-  compatibleTemplatesBackward(filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_CompatibleTemplate_Connection
+  compatibleTemplatesBackward(id: Int, filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort]): IKlusterKiteNodeApi_CompatibleTemplate_Connection
 
   # the list of compatible node templates
-  compatibleTemplatesForward(filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_CompatibleTemplate_Connection
+  compatibleTemplatesForward(id: Int, filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort]): IKlusterKiteNodeApi_CompatibleTemplate_Connection
 
   # the list of migration logs
-  migrationLogs(filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_MigrationLogRecord_Connection
+  migrationLogs(id: Int, filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort]): IKlusterKiteNodeApi_MigrationLogRecord_Connection
 }
 
 # The list of connected KlusterKiteNodeApi_Configuration
@@ -293,13 +293,13 @@ interface IKlusterKiteNodeApi_ConfigurationSettings {
   id: ID
 
   # the list of available packages with their versions
-  packages(filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, sort: [KlusterKiteNodeApi_PackageDescription_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_PackageDescription_Connection
+  packages(id: String, filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageDescription_Sort]): IKlusterKiteNodeApi_PackageDescription_Connection
 
   # the list of configured node templates
-  nodeTemplates(filter: KlusterKiteNodeApi_NodeTemplate_Filter_Input, sort: [KlusterKiteNodeApi_NodeTemplate_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_NodeTemplate_Connection
+  nodeTemplates(id: String, filter: KlusterKiteNodeApi_NodeTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_NodeTemplate_Sort]): IKlusterKiteNodeApi_NodeTemplate_Connection
 
   # the list of configured cluster migrator templates
-  migratorTemplates(filter: KlusterKiteNodeApi_MigratorTemplate_Filter_Input, sort: [KlusterKiteNodeApi_MigratorTemplate_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_MigratorTemplate_Connection
+  migratorTemplates(id: String, filter: KlusterKiteNodeApi_MigratorTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorTemplate_Sort]): IKlusterKiteNodeApi_MigratorTemplate_Connection
 
   # the list of seed addresses
   seedAddresses: [String]
@@ -434,7 +434,7 @@ interface IKlusterKiteNodeApi_Migration {
   finished: Date
 
   # the list of migration logs
-  logs(filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_MigrationLogRecord_Connection
+  logs(id: Int, filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort]): IKlusterKiteNodeApi_MigrationLogRecord_Connection
 
   # the previous configuration id
   fromConfigurationId: Int
@@ -472,7 +472,7 @@ interface IKlusterKiteNodeApi_MigrationActorConfigurationState {
   id: ID
 
   # the list of template states
-  states(filter: KlusterKiteNodeApi_MigratorTemplateConfigurationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorTemplateConfigurationState_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_MigratorTemplateConfigurationState_Connection
+  states(id: String, filter: KlusterKiteNodeApi_MigratorTemplateConfigurationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorTemplateConfigurationState_Sort]): IKlusterKiteNodeApi_MigratorTemplateConfigurationState_Connection
 }
 
 # The MigrationActor state with active migration
@@ -483,7 +483,7 @@ interface IKlusterKiteNodeApi_MigrationActorMigrationState {
   position: KlusterKiteNodeApi_EnMigrationActorMigrationPosition
 
   # the list of migration states
-  templateStates(filter: KlusterKiteNodeApi_MigratorTemplateMigrationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorTemplateMigrationState_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_MigratorTemplateMigrationState_Connection
+  templateStates(id: String, filter: KlusterKiteNodeApi_MigratorTemplateMigrationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorTemplateMigrationState_Sort]): IKlusterKiteNodeApi_MigratorTemplateMigrationState_Connection
 }
 
 interface IKlusterKiteNodeApi_MigrationLogRecord {
@@ -493,7 +493,7 @@ interface IKlusterKiteNodeApi_MigrationLogRecord {
   __id: Int
 
   # the log record type
-  type: Int
+  type: KlusterKiteNodeApi_EnMigrationLogRecordType
 
   # the migration id
   migrationId: Int
@@ -534,8 +534,8 @@ interface IKlusterKiteNodeApi_MigrationLogRecord {
   # the destination migration point
   destinationPoint: String
 
-  # the resource name
-  errorMessage: String
+  # the message
+  message: String
 
   # the error stack trace
   errorStackTrace: String
@@ -576,7 +576,7 @@ interface IKlusterKiteNodeApi_MigratorConfigurationState {
   lastDefinedPoint: String
 
   # the state of defined resources
-  resources(filter: KlusterKiteNodeApi_ResourceConfigurationState_Filter_Input, sort: [KlusterKiteNodeApi_ResourceConfigurationState_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_ResourceConfigurationState_Connection
+  resources(id: String, filter: KlusterKiteNodeApi_ResourceConfigurationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ResourceConfigurationState_Sort]): IKlusterKiteNodeApi_ResourceConfigurationState_Connection
 }
 
 # The list of connected KlusterKiteNodeApi_MigratorConfigurationState
@@ -611,7 +611,7 @@ interface IKlusterKiteNodeApi_MigratorMigrationState {
   position: KlusterKiteNodeApi_EnMigratorPosition
 
   # the list of resources states
-  resources(filter: KlusterKiteNodeApi_ResourceMigrationState_Filter_Input, sort: [KlusterKiteNodeApi_ResourceMigrationState_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_ResourceMigrationState_Connection
+  resources(id: String, filter: KlusterKiteNodeApi_ResourceMigrationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ResourceMigrationState_Sort]): IKlusterKiteNodeApi_ResourceMigrationState_Connection
 
   # the migration direction
   direction: KlusterKiteNodeApi_EnMigrationDirection
@@ -657,10 +657,10 @@ interface IKlusterKiteNodeApi_MigratorTemplate {
   priority: Float
 
   # The list of package requirements
-  packageRequirements(filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, sort: [KlusterKiteNodeApi_PackageRequirement_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_PackageRequirement_Connection
+  packageRequirements(id: String, filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageRequirement_Sort]): IKlusterKiteNodeApi_PackageRequirement_Connection
 
   # The list of packages to install for current template
-  packagesToInstall(filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
+  packagesToInstall(id: String, filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort]): IKlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
 }
 
 # The list of connected KlusterKiteNodeApi_MigratorTemplate
@@ -692,7 +692,7 @@ interface IKlusterKiteNodeApi_MigratorTemplateConfigurationState {
   template: IKlusterKiteNodeApi_MigratorTemplate
 
   # the migrator states
-  migratorsStates(filter: KlusterKiteNodeApi_MigratorConfigurationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorConfigurationState_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_MigratorConfigurationState_Connection
+  migratorsStates(id: String, filter: KlusterKiteNodeApi_MigratorConfigurationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorConfigurationState_Sort]): IKlusterKiteNodeApi_MigratorConfigurationState_Connection
 }
 
 # The list of connected KlusterKiteNodeApi_MigratorTemplateConfigurationState
@@ -730,7 +730,7 @@ interface IKlusterKiteNodeApi_MigratorTemplateMigrationState {
   position: KlusterKiteNodeApi_EnMigratorPosition
 
   # the list of states of migrators
-  migrators(filter: KlusterKiteNodeApi_MigratorMigrationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorMigrationState_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_MigratorMigrationState_Connection
+  migrators(id: String, filter: KlusterKiteNodeApi_MigratorMigrationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorMigrationState_Sort]): IKlusterKiteNodeApi_MigratorMigrationState_Connection
 }
 
 # The list of connected KlusterKiteNodeApi_MigratorTemplateMigrationState
@@ -759,7 +759,7 @@ interface IKlusterKiteNodeApi_MutationResult_Migration_ {
   result: IKlusterKiteNodeApi_Migration
 
   # The list of mutation errors
-  errors(filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, sort: [KlusterKiteNodeApi_ErrorDescription_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_ErrorDescription_Connection
+  errors(id: Int, filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ErrorDescription_Sort]): IKlusterKiteNodeApi_ErrorDescription_Connection
 }
 
 # The standard mutation result
@@ -770,7 +770,7 @@ interface IKlusterKiteNodeApi_MutationResult_System_Boolean_ {
   result: Boolean
 
   # The list of mutation errors
-  errors(filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, sort: [KlusterKiteNodeApi_ErrorDescription_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_ErrorDescription_Connection
+  errors(id: Int, filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ErrorDescription_Sort]): IKlusterKiteNodeApi_ErrorDescription_Connection
 }
 
 # Description of node configuration
@@ -793,7 +793,7 @@ interface IKlusterKiteNodeApi_NodeDescription {
   leaderInRoles: [String]
 
   # the list of descriptions of installed modules
-  modules(filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, sort: [KlusterKiteNodeApi_PackageDescription_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_PackageDescription_Connection
+  modules(id: String, filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageDescription_Sort]): IKlusterKiteNodeApi_PackageDescription_Connection
 
   # The node's address
   nodeAddress: IKlusterKiteNodeApi_AkkaAddress
@@ -861,10 +861,10 @@ interface IKlusterKiteNodeApi_NodeTemplate {
   priority: Float
 
   # The list of package requirements
-  packageRequirements(filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, sort: [KlusterKiteNodeApi_PackageRequirement_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_PackageRequirement_Connection
+  packageRequirements(id: String, filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageRequirement_Sort]): IKlusterKiteNodeApi_PackageRequirement_Connection
 
   # The list of packages to install for current template
-  packagesToInstall(filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
+  packagesToInstall(id: String, filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort]): IKlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
 
   # A value indicating whether no other nodes from previous configurations are compatible
   forceUpdate: Boolean
@@ -989,7 +989,7 @@ interface IKlusterKiteNodeApi_Pair_System_String_List_PackageDescription__ {
   key: String
 
   # Gets a dictionary value
-  value(filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, sort: [KlusterKiteNodeApi_PackageDescription_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_PackageDescription_Connection
+  value(id: String, filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageDescription_Sort]): IKlusterKiteNodeApi_PackageDescription_Connection
 }
 
 # The list of connected KlusterKiteNodeApi_Pair_System_String_List_PackageDescription__
@@ -1144,7 +1144,7 @@ interface IKlusterKiteNodeApi_Role {
   deniedScope: [String]
 
   # The list of users assigned to this role
-  users(filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
+  users(id: Int, filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort]): IKlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
 }
 
 # The list of connected KlusterKiteNodeApi_Role
@@ -1173,25 +1173,25 @@ interface IKlusterKiteNodeApi_Root {
   clusterManagement: IKlusterKiteNodeApi_ClusterManagement
 
   # The packages in the Nuget repository
-  nugetPackages(filter: KlusterKiteNodeApi_NugetPackageFamily_Filter_Input, sort: [KlusterKiteNodeApi_NugetPackageFamily_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_NugetPackageFamily_Connection
+  nugetPackages(id: String, filter: KlusterKiteNodeApi_NugetPackageFamily_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_NugetPackageFamily_Sort]): IKlusterKiteNodeApi_NugetPackageFamily_Connection
 
   # The list of known active nodes
-  getActiveNodeDescriptions(filter: KlusterKiteNodeApi_NodeDescription_Filter_Input, sort: [KlusterKiteNodeApi_NodeDescription_Sort], offset: Int, id: Uid, limit: Int): IKlusterKiteNodeApi_NodeDescription_Connection
+  getActiveNodeDescriptions(id: Uid, filter: KlusterKiteNodeApi_NodeDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_NodeDescription_Sort]): IKlusterKiteNodeApi_NodeDescription_Connection
 
   # Current cluster node template usage for debug purposes
   getTemplateStatistics: IKlusterKiteNodeApi_TemplatesStatistics
 
   # the cluster migration management
-  migrations(filter: KlusterKiteNodeApi_Migration_Filter_Input, sort: [KlusterKiteNodeApi_Migration_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_Migration_Connection
+  migrations(id: Int, filter: KlusterKiteNodeApi_Migration_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Migration_Sort]): IKlusterKiteNodeApi_Migration_Connection
 
   # KlusterKite managing system security roles
-  configurations(filter: KlusterKiteNodeApi_Configuration_Filter_Input, sort: [KlusterKiteNodeApi_Configuration_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_Configuration_Connection
+  configurations(id: Int, filter: KlusterKiteNodeApi_Configuration_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Configuration_Sort]): IKlusterKiteNodeApi_Configuration_Connection
 
   # KlusterKite managing system security roles
-  roles(filter: KlusterKiteNodeApi_Role_Filter_Input, sort: [KlusterKiteNodeApi_Role_Sort], offset: Int, id: Uid, limit: Int): IKlusterKiteNodeApi_Role_Connection
+  roles(id: Uid, filter: KlusterKiteNodeApi_Role_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Role_Sort]): IKlusterKiteNodeApi_Role_Connection
 
   # KlusterKite managing system users
-  users(filter: KlusterKiteNodeApi_User_Filter_Input, sort: [KlusterKiteNodeApi_User_Sort], offset: Int, id: Uid, limit: Int): IKlusterKiteNodeApi_User_Connection
+  users(id: Uid, filter: KlusterKiteNodeApi_User_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_User_Sort]): IKlusterKiteNodeApi_User_Connection
 }
 
 # Overall debug data of current cluster node template use
@@ -1199,7 +1199,7 @@ interface IKlusterKiteNodeApi_TemplatesStatistics {
   id: ID
 
   # node templates statistics data
-  templates(filter: KlusterKiteNodeApi_TemplatesStatisticsData_Filter_Input, sort: [KlusterKiteNodeApi_TemplatesStatisticsData_Sort], offset: Int, id: String, limit: Int): IKlusterKiteNodeApi_TemplatesStatisticsData_Connection
+  templates(id: String, filter: KlusterKiteNodeApi_TemplatesStatisticsData_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_TemplatesStatisticsData_Sort]): IKlusterKiteNodeApi_TemplatesStatisticsData_Connection
 }
 
 # Statistics data for template
@@ -1251,7 +1251,7 @@ interface IKlusterKiteNodeApi_User {
   id: ID
 
   # The list of roles assigned to this user
-  roles(filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort], offset: Int, id: Int, limit: Int): IKlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
+  roles(id: Int, filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort]): IKlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
 
   # The user uid
   uid: Uid
@@ -1293,7 +1293,7 @@ interface IKlusterKiteNodeApi_User_Edge {
 # Global cluster actors tree scan result
 type KlusterKiteMonitoring_ClusterTree implements IKlusterKiteMonitoring_ClusterTree, Node {
   # Gets the list of nodes
-  nodes(filter: KlusterKiteMonitoring_Pair_System_String_Node__Filter_Input, sort: [KlusterKiteMonitoring_Pair_System_String_Node__Sort], offset: Int, id: String, limit: Int): KlusterKiteMonitoring_Pair_System_String_Node__Connection
+  nodes(id: String, filter: KlusterKiteMonitoring_Pair_System_String_Node__Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteMonitoring_Pair_System_String_Node__Sort]): KlusterKiteMonitoring_Pair_System_String_Node__Connection
 
   # Gets the sum of queue size across tree
   queueSizeSum: Int
@@ -1354,7 +1354,7 @@ type KlusterKiteMonitoring_Node implements IKlusterKiteMonitoring_Node, Node {
   queueSizeSum: Int
 
   # the actor's children
-  children(filter: KlusterKiteMonitoring_Node_Filter_Input, sort: [KlusterKiteMonitoring_Node_Sort], offset: Int, id: String, limit: Int): KlusterKiteMonitoring_Node_Connection
+  children(id: String, filter: KlusterKiteMonitoring_Node_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteMonitoring_Node_Sort]): KlusterKiteMonitoring_Node_Connection
   id: ID
 }
 
@@ -2114,13 +2114,13 @@ type KlusterKiteNodeApi_Configuration implements IKlusterKiteNodeApi_Configurati
   settings: KlusterKiteNodeApi_ConfigurationSettings
 
   # the list of compatible node templates
-  compatibleTemplatesBackward(filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_CompatibleTemplate_Connection
+  compatibleTemplatesBackward(id: Int, filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort]): KlusterKiteNodeApi_CompatibleTemplate_Connection
 
   # the list of compatible node templates
-  compatibleTemplatesForward(filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_CompatibleTemplate_Connection
+  compatibleTemplatesForward(id: Int, filter: KlusterKiteNodeApi_CompatibleTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_CompatibleTemplate_Sort]): KlusterKiteNodeApi_CompatibleTemplate_Connection
 
   # the list of migration logs
-  migrationLogs(filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_MigrationLogRecord_Connection
+  migrationLogs(id: Int, filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort]): KlusterKiteNodeApi_MigrationLogRecord_Connection
   id: ID
 }
 
@@ -2463,13 +2463,13 @@ enum KlusterKiteNodeApi_Configuration_Sort {
 # The configuration settings description
 type KlusterKiteNodeApi_ConfigurationSettings implements IKlusterKiteNodeApi_ConfigurationSettings, Node {
   # the list of available packages with their versions
-  packages(filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, sort: [KlusterKiteNodeApi_PackageDescription_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_PackageDescription_Connection
+  packages(id: String, filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageDescription_Sort]): KlusterKiteNodeApi_PackageDescription_Connection
 
   # the list of configured node templates
-  nodeTemplates(filter: KlusterKiteNodeApi_NodeTemplate_Filter_Input, sort: [KlusterKiteNodeApi_NodeTemplate_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_NodeTemplate_Connection
+  nodeTemplates(id: String, filter: KlusterKiteNodeApi_NodeTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_NodeTemplate_Sort]): KlusterKiteNodeApi_NodeTemplate_Connection
 
   # the list of configured cluster migrator templates
-  migratorTemplates(filter: KlusterKiteNodeApi_MigratorTemplate_Filter_Input, sort: [KlusterKiteNodeApi_MigratorTemplate_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_MigratorTemplate_Connection
+  migratorTemplates(id: String, filter: KlusterKiteNodeApi_MigratorTemplate_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorTemplate_Sort]): KlusterKiteNodeApi_MigratorTemplate_Connection
 
   # the list of seed addresses
   seedAddresses: [String]
@@ -2511,63 +2511,162 @@ type KlusterKiteNodeApi_CurrentUserApi implements IKlusterKiteNodeApi_CurrentUse
 }
 
 enum KlusterKiteNodeApi_EnConfigurationState {
+  # This is the draft of configuration and can be edited
   Draft
+
+  # This is the new configuration, ready to be applied
   Ready
+
+  # This is the current active configuration
   Active
+
+  # This configuration was faulted and cluster rollbacked to the latest stable configuration (or some other)
   Faulted
+
+  # This configuration is obsolete
   Obsolete
+
+  # This configuration was once published, but now is replaced with the new one
+  Archived
 }
 
 enum KlusterKiteNodeApi_EnMigrationActorMigrationPosition {
+  # All resources are at the source configuration position
   Source
+
+  # All resources are at the destination configuration position
   Destination
+
+  # Some resources are at the source position, others are at destination. Also
+  # some resource can be between source and destination positions and can be migrated.
   PartiallyMigrated
+
+  # The two configurations doesn't require resource migration
   NoMigrationNeeded
+
+  # There are resources that neither in source nor in destination position and can't be migrated automatically
   Broken
 }
 
 enum KlusterKiteNodeApi_EnMigrationDirection {
+  # The cluster is upgrading
   Upgrade
+
+  # The cluster is downgrading
   Downgrade
+
+  # The cluster resources don't need upgrade. They are up to date.
   Stay
+
+  # The migration direction can-not be evaluated. The migration is corrupted.
   Undefined
 }
 
+enum KlusterKiteNodeApi_EnMigrationLogRecordType {
+  # The successful operation
+  Operation
+
+  # Some error
+  Error
+
+  # The faulted operation
+  OperationError
+
+  # The new migration from this configuration was started
+  StartedFromConfiguration
+
+  # The migration from this configuration was finished
+  FinishedFromConfiguration
+
+  # The migration from this configuration was canceled
+  CanceledFromConfiguration
+
+  # The new migration to this configuration was started
+  StartedToConfiguration
+
+  # The migration to this configuration was finished
+  FinishedToConfiguration
+
+  # The migration to this configuration was canceled
+  CanceledToConfiguration
+}
+
 enum KlusterKiteNodeApi_EnMigrationSide {
+  # The source configuration
   Source
+
+  # The destination configuration
   Destination
 }
 
 enum KlusterKiteNodeApi_EnMigrationState {
+  # The migration is in preparing state. The configuration compatibility check is in process
   Preparing
+
+  # The migration is ready to run
   Ready
+
+  # The migration failed
   Failed
+
+  # The migration is completed
   Completed
+
+  # The migration is rollbacked
   Rollbacked
 }
 
 enum KlusterKiteNodeApi_EnMigrationSteps {
+  # The initial migration position, nothing is done
   Start
+
+  # The nodes are in the update state
   NodesUpdating
+
+  # The nodes were successfully updated
   NodesUpdated
+
+  # The resources are in the update stage
   ResourcesUpdating
+
+  # The resources were successfully updated
   ResourcesUpdated
+
+  # The migration is finished
   Finish
+
+  # The migration is broken
   Broken
 }
 
 enum KlusterKiteNodeApi_EnMigratorPosition {
+  # This entity was introduced in the destination configuration
   New
+
+  # This entity is located in both source and destination configuration
   Merged
+
+  # This entity is not present in the destination configuration
   Obsolete
 }
 
 enum KlusterKiteNodeApi_EnResourcePosition {
+  # The resource is not created yet
   NotCreated
+
+  # The resource is in the source point migration
   Source
+
+  # The migration position of the resource is neither source nor destination
   Undefined
+
+  # The resource is in the destination point migration
   Destination
+
+  # The resource is not modified during current migration
   SourceAndDestination
+
+  # The resource is no more supported in the target configuration
   Obsolete
 }
 
@@ -3023,7 +3122,7 @@ type KlusterKiteNodeApi_Migration implements IKlusterKiteNodeApi_Migration, Node
   finished: Date
 
   # the list of migration logs
-  logs(filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_MigrationLogRecord_Connection
+  logs(id: Int, filter: KlusterKiteNodeApi_MigrationLogRecord_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigrationLogRecord_Sort]): KlusterKiteNodeApi_MigrationLogRecord_Connection
 
   # the previous configuration id
   fromConfigurationId: Int
@@ -3197,7 +3296,7 @@ enum KlusterKiteNodeApi_Migration_Sort {
 # The MigrationActor state with no active migration
 type KlusterKiteNodeApi_MigrationActorConfigurationState implements IKlusterKiteNodeApi_MigrationActorConfigurationState, Node {
   # the list of template states
-  states(filter: KlusterKiteNodeApi_MigratorTemplateConfigurationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorTemplateConfigurationState_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_MigratorTemplateConfigurationState_Connection
+  states(id: String, filter: KlusterKiteNodeApi_MigratorTemplateConfigurationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorTemplateConfigurationState_Sort]): KlusterKiteNodeApi_MigratorTemplateConfigurationState_Connection
   id: ID
 }
 
@@ -3207,7 +3306,7 @@ type KlusterKiteNodeApi_MigrationActorMigrationState implements IKlusterKiteNode
   position: KlusterKiteNodeApi_EnMigrationActorMigrationPosition
 
   # the list of migration states
-  templateStates(filter: KlusterKiteNodeApi_MigratorTemplateMigrationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorTemplateMigrationState_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_MigratorTemplateMigrationState_Connection
+  templateStates(id: String, filter: KlusterKiteNodeApi_MigratorTemplateMigrationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorTemplateMigrationState_Sort]): KlusterKiteNodeApi_MigratorTemplateMigrationState_Connection
   id: ID
 }
 
@@ -3216,7 +3315,7 @@ type KlusterKiteNodeApi_MigrationLogRecord implements IKlusterKiteNodeApi_Migrat
   __id: Int
 
   # the log record type
-  type: Int
+  type: KlusterKiteNodeApi_EnMigrationLogRecordType
 
   # the migration id
   migrationId: Int
@@ -3257,8 +3356,8 @@ type KlusterKiteNodeApi_MigrationLogRecord implements IKlusterKiteNodeApi_Migrat
   # the destination migration point
   destinationPoint: String
 
-  # the resource name
-  errorMessage: String
+  # the message
+  message: String
 
   # the error stack trace
   errorStackTrace: String
@@ -3309,22 +3408,10 @@ input KlusterKiteNodeApi_MigrationLogRecord_Filter_Input {
   id_gte: Int
 
   # type exactly equals to the parameter, type: the log record type
-  type: Int
+  type: KlusterKiteNodeApi_EnMigrationLogRecordType
 
   # type not equals to the parameter, type: the log record type
-  type_not: Int
-
-  # type is less then the parameter, type: the log record type
-  type_lt: Int
-
-  # type is less then or equal to the parameter, type: the log record type
-  type_lte: Int
-
-  # type is greater then the parameter, type: the log record type
-  type_gt: Int
-
-  # type is greater then or equal to the parameter, type: the log record type
-  type_gte: Int
+  type_not: KlusterKiteNodeApi_EnMigrationLogRecordType
 
   # migrationId exactly equals to the parameter, migrationId: the migration id
   migrationId: Int
@@ -3880,65 +3967,65 @@ input KlusterKiteNodeApi_MigrationLogRecord_Filter_Input {
   # destinationPoint lowercased doesn't end with the parameter value, destinationPoint: the destination migration point
   destinationPoint_l_not_ends_with: String
 
-  # errorMessage exactly equals to the parameter, errorMessage: the resource name
-  errorMessage: String
+  # message exactly equals to the parameter, message: the message
+  message: String
 
-  # errorMessage not equals to the parameter, errorMessage: the resource name
-  errorMessage_not: String
+  # message not equals to the parameter, message: the message
+  message_not: String
 
-  # errorMessage is a substring of the parameter, errorMessage: the resource name
-  errorMessage_in: String
+  # message is a substring of the parameter, message: the message
+  message_in: String
 
-  # errorMessage is not a substring of the parameter, errorMessage: the resource name
-  errorMessage_not_in: String
+  # message is not a substring of the parameter, message: the message
+  message_not_in: String
 
-  # errorMessage contains the parameter as substring, errorMessage: the resource name
-  errorMessage_contains: String
+  # message contains the parameter as substring, message: the message
+  message_contains: String
 
-  # errorMessage doesn't contain the parameter as substring, errorMessage: the resource name
-  errorMessage_not_contains: String
+  # message doesn't contain the parameter as substring, message: the message
+  message_not_contains: String
 
-  # errorMessage starts with the parameter value, errorMessage: the resource name
-  errorMessage_starts_with: String
+  # message starts with the parameter value, message: the message
+  message_starts_with: String
 
-  # errorMessage doesn't start with the parameter value, errorMessage: the resource name
-  errorMessage_not_starts_with: String
+  # message doesn't start with the parameter value, message: the message
+  message_not_starts_with: String
 
-  # errorMessage ends with the parameter value, errorMessage: the resource name
-  errorMessage_ends_with: String
+  # message ends with the parameter value, message: the message
+  message_ends_with: String
 
-  # errorMessage doesn't end with the parameter value, errorMessage: the resource name
-  errorMessage_not_ends_with: String
+  # message doesn't end with the parameter value, message: the message
+  message_not_ends_with: String
 
-  # errorMessage lowercased equals the parameter, errorMessage: the resource name
-  errorMessage_l: String
+  # message lowercased equals the parameter, message: the message
+  message_l: String
 
-  # errorMessage lowercased doesn't equal the parameter, errorMessage: the resource name
-  errorMessage_l_not: String
+  # message lowercased doesn't equal the parameter, message: the message
+  message_l_not: String
 
-  # errorMessage lowercased is a substring of the parameter, errorMessage: the resource name
-  errorMessage_l_in: String
+  # message lowercased is a substring of the parameter, message: the message
+  message_l_in: String
 
-  # errorMessage lowercased is not a substring of the parameter, errorMessage: the resource name
-  errorMessage_l_not_in: String
+  # message lowercased is not a substring of the parameter, message: the message
+  message_l_not_in: String
 
-  # errorMessage lowercased contains the parameter as substring, errorMessage: the resource name
-  errorMessage_l_contains: String
+  # message lowercased contains the parameter as substring, message: the message
+  message_l_contains: String
 
-  # errorMessage lowercased doesn't contain the parameter as substring, errorMessage: the resource name
-  errorMessage_l_not_contains: String
+  # message lowercased doesn't contain the parameter as substring, message: the message
+  message_l_not_contains: String
 
-  # errorMessage lowercased starts with the parameter value, errorMessage: the resource name
-  errorMessage_l_starts_with: String
+  # message lowercased starts with the parameter value, message: the message
+  message_l_starts_with: String
 
-  # errorMessage lowercased doesn't start with the parameter value, errorMessage: the resource name
-  errorMessage_l_not_starts_with: String
+  # message lowercased doesn't start with the parameter value, message: the message
+  message_l_not_starts_with: String
 
-  # errorMessage lowercased ends with the parameter value, errorMessage: the resource name
-  errorMessage_l_ends_with: String
+  # message lowercased ends with the parameter value, message: the message
+  message_l_ends_with: String
 
-  # errorMessage lowercased doesn't end with the parameter value, errorMessage: the resource name
-  errorMessage_l_not_ends_with: String
+  # message lowercased doesn't end with the parameter value, message: the message
+  message_l_not_ends_with: String
 
   # errorStackTrace exactly equals to the parameter, errorStackTrace: the error stack trace
   errorStackTrace: String
@@ -4006,7 +4093,7 @@ input KlusterKiteNodeApi_MigrationLogRecord_Input {
   id: Int
 
   # the log record type
-  type: Int
+  type: KlusterKiteNodeApi_EnMigrationLogRecordType
 
   # the migration id
   migrationId: Int
@@ -4047,8 +4134,8 @@ input KlusterKiteNodeApi_MigrationLogRecord_Input {
   # the destination migration point
   destinationPoint: String
 
-  # the resource name
-  errorMessage: String
+  # the message
+  message: String
 
   # the error stack trace
   errorStackTrace: String
@@ -4083,8 +4170,8 @@ enum KlusterKiteNodeApi_MigrationLogRecord_Sort {
   sourcePoint_desc
   destinationPoint_asc
   destinationPoint_desc
-  errorMessage_asc
-  errorMessage_desc
+  message_asc
+  message_desc
   errorStackTrace_asc
   errorStackTrace_desc
 }
@@ -4104,7 +4191,7 @@ type KlusterKiteNodeApi_MigratorConfigurationState implements IKlusterKiteNodeAp
   lastDefinedPoint: String
 
   # the state of defined resources
-  resources(filter: KlusterKiteNodeApi_ResourceConfigurationState_Filter_Input, sort: [KlusterKiteNodeApi_ResourceConfigurationState_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_ResourceConfigurationState_Connection
+  resources(id: String, filter: KlusterKiteNodeApi_ResourceConfigurationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ResourceConfigurationState_Sort]): KlusterKiteNodeApi_ResourceConfigurationState_Connection
   id: ID
 }
 
@@ -4348,7 +4435,7 @@ type KlusterKiteNodeApi_MigratorMigrationState implements IKlusterKiteNodeApi_Mi
   position: KlusterKiteNodeApi_EnMigratorPosition
 
   # the list of resources states
-  resources(filter: KlusterKiteNodeApi_ResourceMigrationState_Filter_Input, sort: [KlusterKiteNodeApi_ResourceMigrationState_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_ResourceMigrationState_Connection
+  resources(id: String, filter: KlusterKiteNodeApi_ResourceMigrationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ResourceMigrationState_Sort]): KlusterKiteNodeApi_ResourceMigrationState_Connection
 
   # the migration direction
   direction: KlusterKiteNodeApi_EnMigrationDirection
@@ -4546,10 +4633,10 @@ type KlusterKiteNodeApi_MigratorTemplate implements IKlusterKiteNodeApi_Migrator
   priority: Float
 
   # The list of package requirements
-  packageRequirements(filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, sort: [KlusterKiteNodeApi_PackageRequirement_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_PackageRequirement_Connection
+  packageRequirements(id: String, filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageRequirement_Sort]): KlusterKiteNodeApi_PackageRequirement_Connection
 
   # The list of packages to install for current template
-  packagesToInstall(filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
+  packagesToInstall(id: String, filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort]): KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
   id: ID
 }
 
@@ -4902,7 +4989,7 @@ type KlusterKiteNodeApi_MigratorTemplateConfigurationState implements IKlusterKi
   template: KlusterKiteNodeApi_MigratorTemplate
 
   # the migrator states
-  migratorsStates(filter: KlusterKiteNodeApi_MigratorConfigurationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorConfigurationState_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_MigratorConfigurationState_Connection
+  migratorsStates(id: String, filter: KlusterKiteNodeApi_MigratorConfigurationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorConfigurationState_Sort]): KlusterKiteNodeApi_MigratorConfigurationState_Connection
   id: ID
 }
 
@@ -5014,7 +5101,7 @@ type KlusterKiteNodeApi_MigratorTemplateMigrationState implements IKlusterKiteNo
   position: KlusterKiteNodeApi_EnMigratorPosition
 
   # the list of states of migrators
-  migrators(filter: KlusterKiteNodeApi_MigratorMigrationState_Filter_Input, sort: [KlusterKiteNodeApi_MigratorMigrationState_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_MigratorMigrationState_Connection
+  migrators(id: String, filter: KlusterKiteNodeApi_MigratorMigrationState_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_MigratorMigrationState_Sort]): KlusterKiteNodeApi_MigratorMigrationState_Connection
   id: ID
 }
 
@@ -5125,7 +5212,7 @@ type KlusterKiteNodeApi_MutationResult_Migration_ implements IKlusterKiteNodeApi
   result: KlusterKiteNodeApi_Migration
 
   # The list of mutation errors
-  errors(filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, sort: [KlusterKiteNodeApi_ErrorDescription_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_ErrorDescription_Connection
+  errors(id: Int, filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ErrorDescription_Sort]): KlusterKiteNodeApi_ErrorDescription_Connection
   id: ID
 }
 
@@ -5141,7 +5228,7 @@ type KlusterKiteNodeApi_MutationResult_System_Boolean_ implements IKlusterKiteNo
   result: Boolean
 
   # The list of mutation errors
-  errors(filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, sort: [KlusterKiteNodeApi_ErrorDescription_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_ErrorDescription_Connection
+  errors(id: Int, filter: KlusterKiteNodeApi_ErrorDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_ErrorDescription_Sort]): KlusterKiteNodeApi_ErrorDescription_Connection
   id: ID
 }
 
@@ -5169,7 +5256,7 @@ type KlusterKiteNodeApi_NodeDescription implements IKlusterKiteNodeApi_NodeDescr
   leaderInRoles: [String]
 
   # the list of descriptions of installed modules
-  modules(filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, sort: [KlusterKiteNodeApi_PackageDescription_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_PackageDescription_Connection
+  modules(id: String, filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageDescription_Sort]): KlusterKiteNodeApi_PackageDescription_Connection
 
   # The node's address
   nodeAddress: KlusterKiteNodeApi_AkkaAddress
@@ -5449,10 +5536,10 @@ type KlusterKiteNodeApi_NodeTemplate implements IKlusterKiteNodeApi_NodeTemplate
   priority: Float
 
   # The list of package requirements
-  packageRequirements(filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, sort: [KlusterKiteNodeApi_PackageRequirement_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_PackageRequirement_Connection
+  packageRequirements(id: String, filter: KlusterKiteNodeApi_PackageRequirement_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageRequirement_Sort]): KlusterKiteNodeApi_PackageRequirement_Connection
 
   # The list of packages to install for current template
-  packagesToInstall(filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
+  packagesToInstall(id: String, filter: KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Sort]): KlusterKiteNodeApi_Pair_System_String_List_PackageDescription___Connection
 
   # A value indicating whether no other nodes from previous configurations are compatible
   forceUpdate: Boolean
@@ -6486,7 +6573,7 @@ type KlusterKiteNodeApi_Pair_System_String_List_PackageDescription__ implements 
   key: String
 
   # Gets a dictionary value
-  value(filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, sort: [KlusterKiteNodeApi_PackageDescription_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_PackageDescription_Connection
+  value(id: String, filter: KlusterKiteNodeApi_PackageDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_PackageDescription_Sort]): KlusterKiteNodeApi_PackageDescription_Connection
   id: ID
 }
 
@@ -7313,7 +7400,7 @@ type KlusterKiteNodeApi_Role implements IKlusterKiteNodeApi_Role, Node {
   deniedScope: [String]
 
   # The list of users assigned to this role
-  users(filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
+  users(id: Int, filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort]): KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
   id: ID
 }
 
@@ -7448,32 +7535,32 @@ type KlusterKiteNodeApi_Root implements IKlusterKiteNodeApi_Root, Node {
   clusterManagement: KlusterKiteNodeApi_ClusterManagement
 
   # The packages in the Nuget repository
-  nugetPackages(filter: KlusterKiteNodeApi_NugetPackageFamily_Filter_Input, sort: [KlusterKiteNodeApi_NugetPackageFamily_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_NugetPackageFamily_Connection
+  nugetPackages(id: String, filter: KlusterKiteNodeApi_NugetPackageFamily_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_NugetPackageFamily_Sort]): KlusterKiteNodeApi_NugetPackageFamily_Connection
 
   # The list of known active nodes
-  getActiveNodeDescriptions(filter: KlusterKiteNodeApi_NodeDescription_Filter_Input, sort: [KlusterKiteNodeApi_NodeDescription_Sort], offset: Int, id: Uid, limit: Int): KlusterKiteNodeApi_NodeDescription_Connection
+  getActiveNodeDescriptions(id: Uid, filter: KlusterKiteNodeApi_NodeDescription_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_NodeDescription_Sort]): KlusterKiteNodeApi_NodeDescription_Connection
 
   # Current cluster node template usage for debug purposes
   getTemplateStatistics: KlusterKiteNodeApi_TemplatesStatistics
 
   # the cluster migration management
-  migrations(filter: KlusterKiteNodeApi_Migration_Filter_Input, sort: [KlusterKiteNodeApi_Migration_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_Migration_Connection
+  migrations(id: Int, filter: KlusterKiteNodeApi_Migration_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Migration_Sort]): KlusterKiteNodeApi_Migration_Connection
 
   # KlusterKite managing system security roles
-  configurations(filter: KlusterKiteNodeApi_Configuration_Filter_Input, sort: [KlusterKiteNodeApi_Configuration_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_Configuration_Connection
+  configurations(id: Int, filter: KlusterKiteNodeApi_Configuration_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Configuration_Sort]): KlusterKiteNodeApi_Configuration_Connection
 
   # KlusterKite managing system security roles
-  roles(filter: KlusterKiteNodeApi_Role_Filter_Input, sort: [KlusterKiteNodeApi_Role_Sort], offset: Int, id: Uid, limit: Int): KlusterKiteNodeApi_Role_Connection
+  roles(id: Uid, filter: KlusterKiteNodeApi_Role_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_Role_Sort]): KlusterKiteNodeApi_Role_Connection
 
   # KlusterKite managing system users
-  users(filter: KlusterKiteNodeApi_User_Filter_Input, sort: [KlusterKiteNodeApi_User_Sort], offset: Int, id: Uid, limit: Int): KlusterKiteNodeApi_User_Connection
+  users(id: Uid, filter: KlusterKiteNodeApi_User_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_User_Sort]): KlusterKiteNodeApi_User_Connection
   id: ID
 }
 
 # Overall debug data of current cluster node template use
 type KlusterKiteNodeApi_TemplatesStatistics implements IKlusterKiteNodeApi_TemplatesStatistics, Node {
   # node templates statistics data
-  templates(filter: KlusterKiteNodeApi_TemplatesStatisticsData_Filter_Input, sort: [KlusterKiteNodeApi_TemplatesStatisticsData_Sort], offset: Int, id: String, limit: Int): KlusterKiteNodeApi_TemplatesStatisticsData_Connection
+  templates(id: String, filter: KlusterKiteNodeApi_TemplatesStatisticsData_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_TemplatesStatisticsData_Sort]): KlusterKiteNodeApi_TemplatesStatisticsData_Connection
   id: ID
 }
 
@@ -7735,7 +7822,7 @@ enum KlusterKiteNodeApi_TemplatesStatisticsData_Sort {
 # The web ui user
 type KlusterKiteNodeApi_User implements IKlusterKiteNodeApi_User, Node {
   # The list of roles assigned to this user
-  roles(filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort], offset: Int, id: Int, limit: Int): KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
+  roles(id: Int, filter: KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Filter_Input, offset: Int, limit: Int, sort: [KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Sort]): KlusterKiteNodeApi_KlusterKite_NodeManager_Client_ORM_RoleUser_Connection
 
   # The user uid
   uid: Uid
