@@ -21,6 +21,8 @@ namespace KlusterKite.API.Tests
     using KlusterKite.API.Attributes;
     using KlusterKite.API.Client;
     using KlusterKite.API.Provider;
+    using KlusterKite.API.Provider.Resolvers;
+    using KlusterKite.API.Tests.Mock;
     using KlusterKite.Security.Attributes;
 
     using Newtonsoft.Json;
@@ -125,6 +127,19 @@ namespace KlusterKite.API.Tests
             Assert.True(description.Mutations.Any(m => m.Name == "mutateNode"));
             Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "mutateNode").TypeName);
             Assert.Equal(nodeType.TypeName, description.Mutations.First(m => m.Name == "mutateNode").Arguments.First().TypeName);
+        }
+
+        /// <summary>
+        /// Testing that <see cref="ApiEnumType"/> receives it's value descriptions
+        /// </summary>
+        [Fact]
+        public void EnumDescriptionsTest()
+        {
+            var typeDescription = EnumResolver<TestObject.EnObjectType>.GeneratedType as ApiEnumType;
+            Assert.NotNull(typeDescription);
+            Assert.NotNull(typeDescription.Descriptions);
+            Assert.True(typeDescription.Descriptions.ContainsKey(nameof(TestObject.EnObjectType.Good)));
+            Assert.Equal("This is good object", typeDescription.Descriptions[nameof(TestObject.EnObjectType.Good)]);
         }
 
         /// <summary>

@@ -19,9 +19,9 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     public enum EnMigratorPosition
     {
         /// <summary>
-        /// This entity was introduce in the destination configuration
+        /// This entity was introduced in the destination configuration
         /// </summary>
-        [ApiDescription("This entity was introduce in the destination configuration")]
+        [ApiDescription("This entity was introduced in the destination configuration")]
         New,
 
         /// <summary>

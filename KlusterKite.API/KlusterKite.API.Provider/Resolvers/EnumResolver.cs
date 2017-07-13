@@ -12,6 +12,7 @@ namespace KlusterKite.API.Provider.Resolvers
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
 
@@ -46,7 +47,19 @@ namespace KlusterKite.API.Provider.Resolvers
                 throw new Exception($"{type.Name} should be enum");
             }
 
-            GeneratedType = new ApiEnumType(ApiDescriptionAttribute.GetTypeName(type), Enum.GetNames(type));
+            var names = Enum.GetNames(type);
+            var descriptions = new Dictionary<string, string>();
+            foreach (var name in names)
+            {
+                var property = type.GetTypeInfo().GetMember(name).FirstOrDefault();
+                var attribute = property?.GetCustomAttribute<ApiDescriptionAttribute>();
+                if (attribute != null)
+                {
+                    descriptions[name] = attribute.Description;
+                }
+            }
+
+            GeneratedType = new ApiEnumType(ApiDescriptionAttribute.GetTypeName(type), names, descriptions);
             hasFlags = type.GetTypeInfo().GetCustomAttribute<FlagsAttribute>() != null;
         }
 

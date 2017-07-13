@@ -30,6 +30,7 @@ namespace KlusterKite.NodeManager.Tests
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.Tests.Mock;
     using KlusterKite.Security.Attributes;
+    using KlusterKite.Web;
     using KlusterKite.Web.GraphQL.Publisher;
 
     using Newtonsoft.Json;
@@ -61,6 +62,13 @@ namespace KlusterKite.NodeManager.Tests
         /// Current bind port
         /// </summary>
         private int Port => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
+        
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            Startup.Reset();
+            base.Dispose(disposing);
+        }
 
         /// <summary>
         /// System start check
