@@ -62,13 +62,6 @@ namespace KlusterKite.NodeManager.Tests
         /// Current bind port
         /// </summary>
         private int Port => this.Sys.Settings.Config.GetInt("KlusterKite.Web.WebHostPort");
-        
-        /// <inheritdoc />
-        protected override void Dispose(bool disposing)
-        {
-            Startup.Reset();
-            base.Dispose(disposing);
-        }
 
         /// <summary>
         /// System start check
@@ -186,6 +179,13 @@ namespace KlusterKite.NodeManager.Tests
             var data = JObject.Parse(result.Content);
             var clientMutationId = data.SelectToken("data.klusterKiteNodeApi_klusterKiteNodesApi_roles_update.clientMutationId");
             Assert.Equal("0", clientMutationId?.Value<string>());
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            Startup.Reset();
+            base.Dispose(disposing);
         }
 
         /// <summary>
