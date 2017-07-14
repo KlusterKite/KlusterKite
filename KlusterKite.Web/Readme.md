@@ -32,7 +32,7 @@ Example configuration:
 ```
 
 As for now `Publisher node` can be created with use of `KlusterKite.Web.NginxConfigurator` plugin. It assuems that there is an installed dedicated `Nginx` service on this node. The `Nginx` will make actual proxing and the node will make a dynamic nginx reconfiguration from the current cluster state.
-
+ 
 An example `KlusterKite.Web.NginxConfigurator` configuration:
 ```
 {
@@ -56,3 +56,51 @@ An example `KlusterKite.Web.NginxConfigurator` configuration:
   }
 } 	
 ``` 
+
+## AspNet.Core Controllers
+
+In order to self-host the AspNet.Core Kestrel there is a `KlusterKite.Web` plugin.
+The example configuration:
+```
+ {
+  KlusterKite.Core.RestTimeout = 10s
+  KlusterKite {
+    Web {
+      Debug.Trace = false #outputs to log every start and finish request events
+      BindAddress = "http://*:8080"
+      Services {
+        //ServiceName { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node
+        //  Port = 8080 // current node listening port for server access
+        //  PublicHostName = default //public host name of this service. It doesn't supposed (but is not prohibited) that this should be real public service hostname. It's just used to distinguish services with identical url paths to be correctly published on frontend web servers. Real expected hostname should be configured in NginxConfigurator or similar publisher
+        //  Route = /directory/sub //route (aka directory) path to service
+        //  LocalHostName = $host //local hostname that proxy should path. This should be used to support virtual hosting inside single node
+        //}
+      }
+
+      // add needed configurators. If you want to remove configurator from fallback config - just put empty string with same name
+      Configurators {
+        WebTracer = "KlusterKite.Web.WebTracer, KlusterKite.Web"
+      }
+    }
+  }
+}
+```
+
+This plugin automaticaly registers in the DI all subclasses of `ApiController`.
+
+As AspNet hosting is partialy configured before DI configuration, the additional configuration of hosting could be done via [`IWebHostingConfigurator`](../Docs/Doxygen/html/interface_kluster_kite_1_1_web_1_1_i_web_hosting_configurator.html) implementations that shout be described in the `KlusterKite.Web.Configurators` configuration section (as shown above).
+
+## Authentication
+
+`KlusterKite.Web.Authentication` plugin implements `Bearer` authentication from oAuth2 protocol. Check thie [`ClusterKit.Security`](../ClusterKit.Security/Readme.md) documentation for `IClientProvider` and `ITokenManager`.
+
+## Authorization
+
+* [`AuthorizedController`](../Docs/Doxygen/html/class_kluster_kite_1_1_web_1_1_authorization_1_1_authorized_controller.html) provides the extension methods to access the current authenticated user session and additional request data.
+* [`KlusterKite.Web.Authorization.Attributes`](../Docs/Doxygen/html/namespace_kluster_kite_1_1_web_1_1_authorization_1_1_attributes.html) provides attributes that will limit access for contollers or controller methods only for certain user and/or client privileges.
+
+## GraphQl
+
+`KlusterKite.Web.GraphQL.Publisher` scans the whole cluster for the published API (see [`KlusterKite.API`](../KlusterKite.API.Readme.md)) and generates and publishes the global schema with access to every part of it.
+
+As cluster nodes can get up and down, the defined API can chcnge so will do the GraphQL schema. As root containing types can be defined in diferent APIs (such as `viewer` or `me` vere different API can provide different fields) the type of field is not stable. But it always implements the certain interfaces from the certain (and only one API). So it is strongly recomended to use interfaces in fragments definitions - not the end-types.
