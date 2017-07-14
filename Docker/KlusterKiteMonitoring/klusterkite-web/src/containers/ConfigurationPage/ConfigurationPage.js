@@ -209,6 +209,7 @@ class ConfigurationPage extends React.Component {
           <PackagesList
             configuration={model.settings}
             configurationId={this.props.params.id}
+            activeConfigurationPackages={activeConfiguration.settings.packages}
           />
         </div>
         }
@@ -257,6 +258,16 @@ export default Relay.createContainer(
                 node {
                   minorVersion
                   majorVersion
+                  settings {
+                    packages {
+                      edges {
+                        node {
+                          __id
+                          version
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

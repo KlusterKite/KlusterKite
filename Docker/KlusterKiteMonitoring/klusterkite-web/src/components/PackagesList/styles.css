@@ -1,0 +1,8 @@
+.checkbox-label {
+  font-weight: normal;
+}
+
+.checkbox-label input[type=checkbox] {
+  margin-right: 7px;
+  margin-left: 7px;
+}

@@ -4,7 +4,6 @@ import Relay from 'react-relay'
 import CancelMigration from '../../components/MigrationOperations/CancelMigration'
 import FinishMigration from '../../components/MigrationOperations/FinishMigration'
 import UpdateNodes from '../../components/MigrationOperations/UpdateNodes'
-import UpdateResources from '../../components/MigrationOperations/UpdateResources'
 
 import './styles.css';
 
@@ -127,13 +126,6 @@ export class MigrationSteps extends React.Component {
             </div>
           </div>
         }
-        <UpdateResources
-          onStateChange={this.props.onStateChange}
-          onError={this.props.onError}
-          migrationState={this.props.resourceState.migrationState}
-          canMigrateResources={this.props.resourceState.canMigrateResources}
-          operationIsInProgress={this.props.operationIsInProgress}
-        />
 
       </div>
     );
@@ -153,9 +145,6 @@ export default Relay.createContainer(
         canMigrateResources
         migrationSteps
         currentMigrationStep
-        migrationState {
-          ${UpdateResources.getFragment('migrationState')},
-        }
       }
       `,
     },
