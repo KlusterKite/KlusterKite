@@ -40,14 +40,14 @@ export default class App extends React.Component {
               }
             </Nav>
             <Nav navbar>
-              {false && hasPrivilege('KlusterKite.NodeManager.User.GetList') &&
+              {hasPrivilege('KlusterKite.NodeManager.User.GetList') &&
               <LinkContainer to="/klusterkite/Users">
                 <NavItem>Users</NavItem>
               </LinkContainer>
               }
             </Nav>
             <Nav navbar>
-              {false && hasPrivilege('KlusterKite.NodeManager.Role.GetList') &&
+              {hasPrivilege('KlusterKite.NodeManager.Role.GetList') &&
               <LinkContainer to="/klusterkite/Roles">
                 <NavItem>Roles</NavItem>
               </LinkContainer>
@@ -64,6 +64,13 @@ export default class App extends React.Component {
             <Nav pullRight>
               <LinkContainer to="/klusterkite/Logout">
                 <NavItem href="#">Logout ({username})</NavItem>
+              </LinkContainer>
+            </Nav>
+            }
+            {username &&
+            <Nav pullRight>
+              <LinkContainer to="/klusterkite/ChangePassword">
+                <NavItem href="#">Change Password</NavItem>
               </LinkContainer>
             </Nav>
             }

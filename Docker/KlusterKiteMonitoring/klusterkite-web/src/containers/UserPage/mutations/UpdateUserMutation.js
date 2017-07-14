@@ -50,7 +50,9 @@ export default class UpdateUserMutation extends Relay.Mutation {
       id: this.props.uid,
       newNode: {
         uid: this.props.uid,
-        login: this.props.login
+        login: this.props.login,
+        isBlocked: this.props.isBlocked,
+        isDeleted: this.props.isDeleted,
       }
     }
   }
@@ -60,7 +62,9 @@ export default class UpdateUserMutation extends Relay.Mutation {
       model: {
         id: this.props.nodeId,
         uid: this.props.uid,
-        login: this.props.login
+        login: this.props.login,
+        isBlocked: this.props.isBlocked,
+        isDeleted: this.props.isDeleted,
       },
     }
   }

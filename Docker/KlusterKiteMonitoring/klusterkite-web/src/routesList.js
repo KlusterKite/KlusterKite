@@ -7,6 +7,7 @@ import { Router, IndexRoute, Route, Redirect, browserHistory, applyRouterMiddlew
 import App from './containers/App/App';
 import ActorsTreePage from './containers/ActorsTreePage/ActorsTreePage';
 import AuthPage from './containers/AuthPage/AuthPage';
+import ChangePasswordPage from './containers/ChangePasswordPage/ChangePasswordPage';
 import FeedPage from './containers/FeedPage/FeedPage';
 import GetPrivilegesPage from './containers/GetPrivilegesPage/GetPrivilegesPage';
 import GraphQLPage from './containers/GraphQL/GraphQLPage';
@@ -18,6 +19,7 @@ import NotFoundPage from './containers/NotFoundPage/NotFoundPage';
 import ConfigurationConfigCopyPage from './containers/ConfigCopyPage/ConfigurationConfigCopyPage';
 import ConfigurationsListPage from './containers/ConfigurationsListPage/ConfigurationsListPage';
 import ConfigurationPage from './containers/ConfigurationPage/ConfigurationPage';
+import ResetPasswordPage from './containers/UserPage/ResetPasswordPage';
 import RolesListPage from './containers/RolesListPage/RolesListPage';
 import RolePage from './containers/RolePage/RolePage';
 import UsersListPage from './containers/UsersListPage/UsersListPage';
@@ -38,6 +40,7 @@ export default class RoutesList extends React.Component {
           <IndexRoute component={HomePage} queries={ApiQueries} />
           <Route path='/klusterkite/Login' component={AuthPage} />
           <Route path='/klusterkite/Logout' component={LogoutPage} />
+          <Route path='/klusterkite/ChangePassword' component={ChangePasswordPage} queries={ApiQueries} render={({ props }) => props ? <ChangePasswordPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/GetPrivileges' component={GetPrivilegesPage} queries={ApiQueries} />
           <Route path='/klusterkite/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
           <Route path='/klusterkite/CopyConfig/:configurationId/:mode' component={ConfigurationConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationConfigCopyPage {...props} /> : <Loading />} />
@@ -59,6 +62,7 @@ export default class RoutesList extends React.Component {
           <Route path='/klusterkite/Users' component={UsersListPage} queries={ApiQueries} render={({ props }) => props ? <UsersListPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users/create' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users/:id' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Users/ResetPassword/:id' component={ResetPasswordPage} queries={ApiQueries} render={({ props }) => props ? <ResetPasswordPage {...props} /> : <Loading />} />
           <Route path='*' components={NotFoundPage} />
         </Route>
         <Redirect from="/" to="klusterkite/" />

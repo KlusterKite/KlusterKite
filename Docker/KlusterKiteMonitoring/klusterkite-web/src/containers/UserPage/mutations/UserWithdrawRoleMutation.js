@@ -1,9 +1,9 @@
 import Relay from 'react-relay'
 
-export default class CreateUserMutation extends Relay.Mutation {
+export default class UserWithdrawRoleMutation extends Relay.Mutation {
 
   getMutation () {
-    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_users_create}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_users_withdrawRole}`
   }
 
   getFatQuery () {
@@ -36,23 +36,26 @@ export default class CreateUserMutation extends Relay.Mutation {
     }];
   }
 
+  // getConfigs () {
+  //   return [{
+  //     type: 'FIELDS_CHANGE',
+  //     fieldIDs: {
+  //       node: this.props.nodeId,
+  //     },
+  //   }]
+  // }
+
   getVariables () {
     return {
-      newNode: {
-        login: this.props.login,
-        isBlocked: this.props.isBlocked,
-        isDeleted: this.props.isDeleted,
-      }
+      userUid: this.props.userUid,
+      roleUid: this.props.roleUid,
     }
   }
 
   getOptimisticResponse () {
     return {
-      model: {
-        login: this.props.login,
-        isBlocked: this.props.isBlocked,
-        isDeleted: this.props.isDeleted,
-      },
+      userUid: this.props.userUid,
+      roleUid: this.props.roleUid,
     }
   }
 }
