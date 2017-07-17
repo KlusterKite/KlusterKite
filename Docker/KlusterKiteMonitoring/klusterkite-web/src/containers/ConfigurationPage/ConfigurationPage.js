@@ -210,6 +210,7 @@ class ConfigurationPage extends React.Component {
             configuration={model.settings}
             configurationId={this.props.params.id}
             activeConfigurationPackages={activeConfiguration.settings.packages}
+            canEdit={canEdit}
           />
         </div>
         }

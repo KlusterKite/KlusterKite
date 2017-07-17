@@ -24,6 +24,7 @@ class ActorsTree extends React.Component {
 
   static propTypes = {
     tree: React.PropTypes.arrayOf(React.PropTypes.object),
+    clusterTreeNode: React.PropTypes.object,
   };
 
   componentDidMount() {
@@ -254,5 +255,4 @@ class ActorsTree extends React.Component {
   }
 }
 
-
-export default ActorsTree;
+export default ActorsTree

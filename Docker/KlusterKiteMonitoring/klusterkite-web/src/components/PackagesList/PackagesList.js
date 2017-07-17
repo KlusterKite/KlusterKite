@@ -1,6 +1,8 @@
 import React from 'react';
 import Relay from 'react-relay'
 
+import { Link } from 'react-router';
+
 import './styles.css';
 
 export class PackagesList extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -14,8 +16,9 @@ export class PackagesList extends React.Component { // eslint-disable-line react
 
   static propTypes = {
     configurationId: React.PropTypes.string,
-    configuration: React.PropTypes.object,
+    configuration: React.PropTypes.object.isRequired,
     activeConfigurationPackages: React.PropTypes.object,
+    canEdit: React.PropTypes.bool,
   };
 
   onUpdatedChange() {
@@ -43,11 +46,16 @@ export class PackagesList extends React.Component { // eslint-disable-line react
 
     return (
       <div>
-        {packagesFiltered && packagesFiltered.length > 0 &&
         <div>
           <h3>Packages list</h3>
+          {this.props.canEdit &&
+            <Link to={`/klusterkite/Packages/${this.props.configurationId}`} className="btn btn-primary" role="button">Add/edit packages</Link>
+          }
 
-          <label className="checkbox-label"><input type="checkbox" checked={this.state.showUpdated} onChange={this.onUpdatedChange.bind(this)} /> Show changed only</label>
+          <p>
+            <label className="checkbox-label"><input type="checkbox" checked={this.state.showUpdated} onChange={this.onUpdatedChange.bind(this)} /> Show changed only</label>
+          </p>
+          {packagesFiltered && packagesFiltered.length > 0 &&
           <table className="table table-hover">
             <thead>
             <tr>
@@ -60,7 +68,9 @@ export class PackagesList extends React.Component { // eslint-disable-line react
             {packagesFiltered.map((item) =>
               <tr key={item.id}>
                 <td>
-                  {item.name}
+                  <Link to={`/klusterkite/Packages/${this.props.configurationId}`}>
+                    {item.name}
+                  </Link>
                 </td>
                 <td>
                   {item.version}
@@ -72,8 +82,8 @@ export class PackagesList extends React.Component { // eslint-disable-line react
             )}
             </tbody>
           </table>
+          }
         </div>
-        }
       </div>
     );
   }

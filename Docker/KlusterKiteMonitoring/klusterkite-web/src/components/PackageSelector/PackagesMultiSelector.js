@@ -1,7 +1,7 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
 
-import PackagesSelector from './selector';
+import PackagesSelector from './PackagesSelector';
 
 export default class PackagesMultiSelector extends React.Component {
 
@@ -72,7 +72,7 @@ export default class PackagesMultiSelector extends React.Component {
         ...prevState.values.slice(0, index),
         ...prevState.values.slice(index + 1)
       ]
-    }));
+    }), () => { this.props.onChange(this.state.values); });
   }
 
   render() {
@@ -83,7 +83,7 @@ export default class PackagesMultiSelector extends React.Component {
         <div className="col-sm-9">
         {this.state.values && this.state.values.length > 0 && this.state.values.map((item, index) => {
             let onDelete = () => this.onDelete(index);
-            if (recordsCount === index + 1) {
+            if (recordsCount === 1) {
               onDelete = null;
             }
 

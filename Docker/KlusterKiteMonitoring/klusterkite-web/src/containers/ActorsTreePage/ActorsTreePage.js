@@ -3,8 +3,8 @@ import Relay from 'react-relay'
 
 import delay from 'lodash/delay'
 
-import ActorsTreeButtons from '../../components/ActorsTree/buttons';
-import ActorsTree from '../../components/ActorsTree/tree';
+import ActorsTreeButtons from '../../components/ActorsTree/ActorsTreeButtons';
+import ActorsTree from '../../components/ActorsTree/ActorsTree';
 import InitiateScanMutation from './mutations/InitiateScanMutation'
 
 class ActorsTreePage extends React.Component {
@@ -74,7 +74,9 @@ class ActorsTreePage extends React.Component {
       <div>
         <ActorsTreeButtons handleScan={this.onInitiateScan} handleReload={this.onReload} isLoading={this.state.isScanning} />
         {this.props.api.klusterKiteMonitoringApi && this.props.api.klusterKiteMonitoringApi.getClusterTree &&  this.props.api.klusterKiteMonitoringApi.getClusterTree.nodes &&
-          <ActorsTree tree={this.props.api.klusterKiteMonitoringApi.getClusterTree.nodes.edges} />
+          <ActorsTree
+            tree={this.props.api.klusterKiteMonitoringApi.getClusterTree.nodes.edges}
+          />
         }
       </div>
     )

@@ -4,7 +4,7 @@ import { Input, Textarea } from 'formsy-react-components';
 import isEqual from 'lodash/isEqual';
 
 import Form from '../Form/Form';
-import PackagesMultiSelector from '../PackageSelector/multiselector';
+import PackagesMultiSelector from '../PackageSelector/PackagesMultiSelector';
 
 export default class NodeTemplateForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
