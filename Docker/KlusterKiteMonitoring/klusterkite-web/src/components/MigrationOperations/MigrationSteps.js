@@ -21,6 +21,9 @@ export class MigrationSteps extends React.Component {
       NodesUpdated: 'Nodes Updated',
       ResourcesUpdating: 'Updating Resources',
       ResourcesUpdated: 'Resources Updated',
+      PreNodesResourcesUpdating: 'Updating Resources (Pre)',
+      PreNodeResourcesUpdated: 'Resources Updated (Pre)',
+      PostNodesResourcesUpdating: 'Updating Resources (Post)',
     };
   }
 

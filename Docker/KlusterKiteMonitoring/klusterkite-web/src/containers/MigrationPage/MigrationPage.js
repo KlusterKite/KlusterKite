@@ -74,8 +74,6 @@ class MigrationPage extends React.Component {
   };
 
   onStateChange() {
-    console.log('onStateChange.');
-
     this.setState({
       operationIsInProgress: true,
       processErrors: null,
@@ -83,8 +81,6 @@ class MigrationPage extends React.Component {
   }
 
   onError(errors) {
-    console.log('onError', errors);
-
     this.setState({
       processErrors: errors,
     });

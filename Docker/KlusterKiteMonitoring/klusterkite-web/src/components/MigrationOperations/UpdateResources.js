@@ -43,11 +43,10 @@ export class UpdateResources extends React.Component {
 
       Relay.Store.commitUpdate(
         new UpdateResourcesMutation({
-          resources: this.state.selectedResources
+          resources: this.prepareResourceListForMigration(this.state.selectedResources)
         }),
         {
           onSuccess: (response) => {
-            console.log('response', response);
             const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate;
 
             if (responsePayload.errors &&
@@ -60,7 +59,7 @@ export class UpdateResources extends React.Component {
                 processErrors: messages,
               });
             } else {
-              console.log('result update nodes', responsePayload.result);
+              // console.log('result update nodes', responsePayload.result);
               // total success
               this.setState({
                 isProcessing: false,
@@ -82,14 +81,33 @@ export class UpdateResources extends React.Component {
     }
   };
 
-  onSelectResource = (checked, templateCode, migratorTypeName, resourceCode, target) => {
-    console.log('element checked', checked);
+  /**
+   * Prepare resource list for migration by removal unnecessary keys
+   * @param resources {Object[]} Resources List
+   * @return {Object[]} Prepared resources list
+   */
+  prepareResourceListForMigration = (resources) => {
+    let resourceList = [];
 
+    resources.forEach((item) => {
+      resourceList.push({
+        templateCode: item.templateCode,
+        migratorTypeName: item.migratorTypeName,
+        resourceCode: item.resourceCode,
+        target: item.target,
+      })
+    });
+
+    return resourceList;
+  };
+
+  onSelectResource = (checked, key, templateCode, migratorTypeName, resourceCode, target) => {
     const resource = {
       templateCode: templateCode,
       migratorTypeName: migratorTypeName,
       resourceCode: resourceCode,
       target: target,
+      key: key,
     };
 
     if (checked) {
@@ -98,11 +116,11 @@ export class UpdateResources extends React.Component {
           ...prevState.selectedResources,
           resource,
         ],
-      }), () => {console.log(this.state.selectedResources)});
+      }));
     } else {
       this.setState((prevState) => ({
-        selectedResources: prevState.selectedResources.filter(item => item.resourceCode !== resource.resourceCode),
-      }), () => {console.log(this.state.selectedResources)});
+        selectedResources: prevState.selectedResources.filter(item => item.key !== resource.key),
+      }));
     }
 
   };
@@ -140,6 +158,8 @@ export class UpdateResources extends React.Component {
 
         {this.props.migrationState && this.props.migrationState.templateStates.edges && this.props.migrationState.templateStates.edges.map((edge) => {
           const node = edge.node;
+          const migratableResources = this.props.migrationState.migratableResources.edges.map(edge => edge.node);
+
           return (
             <div key={node.code}>
               <h4 className="migration-title">{node.code}</h4>
@@ -150,8 +170,8 @@ export class UpdateResources extends React.Component {
                   <th>Code</th>
                   <th>Position</th>
                   <th>Current point</th>
-                  <th className="migration-upgrade">↑</th>
-                  <th className="migration-downgrade">↓</th>
+                  <th className="migration-upgrade" title="Upgrade selected resources">↑</th>
+                  <th className="migration-downgrade" title="Downgrade selected resources">↓</th>
                 </tr>
                 </thead>
                 {node.migrators.edges.map((migratorEdge) => {
@@ -166,6 +186,7 @@ export class UpdateResources extends React.Component {
                       {resources.map((resourceEdge) => {
                         const resourceNode = resourceEdge.node;
                         const direction = (resourceNode.position === 'Source' || resourceNode.position === 'NotCreated') ? 'Destination' : 'Source';
+                        const isMigratable = migratableResources.some(x => x.key === resourceNode.key);
 
                         return (
                           <tr key={resourceNode.code}>
@@ -174,21 +195,21 @@ export class UpdateResources extends React.Component {
                             <td className="migration-resources">{resourceNode.position}</td>
                             <td className="migration-resources">{resourceNode.currentPoint}</td>
                             <td className="migration-resources migration-upgrade">
-                              {(resourceNode.migrationToDestinationExecutor !== null || resourceNode.position === 'NotCreated') &&
+                              {isMigratable && (resourceNode.migrationToDestinationExecutor !== null || resourceNode.position === 'NotCreated') &&
                                 <input
                                   type="checkbox"
-                                  checked={this.state.selectedResources.some(item => item.target === direction && item.resourceCode === resourceNode.code)}
-                                  onChange={(element) => this.onSelectResource(element.target.checked, node.code, migratorNode.typeName, resourceNode.code, direction)}
+                                  checked={this.state.selectedResources.some(item => item.target === direction && item.key === resourceNode.key)}
+                                  onChange={(element) => this.onSelectResource(element.target.checked, resourceNode.key, node.code, migratorNode.typeName, resourceNode.code, direction)}
                                   disabled={isProcessing}
                                 />
                               }
                             </td>
                             <td className="migration-resources migration-downgrade">
-                              {resourceNode.migrationToSourceExecutor !== null &&
+                              {isMigratable && resourceNode.migrationToSourceExecutor !== null &&
                                 <input
                                   type="checkbox"
-                                  checked={this.state.selectedResources.some(item => item.target === direction && item.resourceCode === resourceNode.code)}
-                                  onChange={(element) => this.onSelectResource(element.target.checked, node.code, migratorNode.typeName, resourceNode.code, direction)}
+                                  checked={this.state.selectedResources.some(item => item.target === direction && item.key === resourceNode.key)}
+                                  onChange={(element) => this.onSelectResource(element.target.checked, resourceNode.key, node.code, migratorNode.typeName, resourceNode.code, direction)}
                                   disabled={isProcessing}
                                 />
                               }
@@ -213,7 +234,7 @@ export default Relay.createContainer(
   {
     fragments: {
       migrationState: () => Relay.QL`fragment on IKlusterKiteNodeApi_MigrationActorMigrationState {
-        templateStates {
+        templateStates   {
           edges {
             node {
               code
@@ -228,6 +249,7 @@ export default Relay.createContainer(
                     resources {
                       edges {
                         node {
+                          key
                           sourcePoint
                           destinationPoint
                           position
@@ -242,6 +264,13 @@ export default Relay.createContainer(
                   }
                 }
               }
+            }
+          }
+        }
+        migratableResources {
+          edges {
+            node {
+              key,
             }
           }
         }
