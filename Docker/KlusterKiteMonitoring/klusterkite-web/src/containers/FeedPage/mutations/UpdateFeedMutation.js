@@ -47,7 +47,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
           }
         }
         nugetFeed
-        packages {
+        packages(sort: id_asc) {
           edges {
             node {
               version
@@ -119,6 +119,8 @@ export default class UpdateFeedMutation extends Relay.Mutation {
     const oldNodes = edges.map(x => x.node);
     const typeSingular = type.substring(0, type.length - 1);
 
+    // We iterate over old edge and search for updates of every record in this.props[typeSingular]
+    // Also we change id's (from __id to id) because ID types are different in input and output
     let nodes = [];
     oldNodes.forEach(node => {
       const keys = Object.keys(node);
@@ -173,6 +175,11 @@ export default class UpdateFeedMutation extends Relay.Mutation {
       nodes = this.props[typeSingular];
     }
 
+    // packagesList is passed as a simple object array, without id's
+    if (type === 'packages' && this.props['packagesList']) {
+      nodes = this.props['packagesList'];
+    }
+
     return nodes;
   }
 
@@ -182,8 +189,6 @@ export default class UpdateFeedMutation extends Relay.Mutation {
    * @return {string[]} Updated seed addresses list
    */
   updateSeedAddresses(seedAddresses) {
-    console.log('old seedAddresses', seedAddresses);
-    console.log('new seedAddresses', this.props.seedAddresses);
     if (this.props.seedAddresses) {
       return this.props.seedAddresses;
     }

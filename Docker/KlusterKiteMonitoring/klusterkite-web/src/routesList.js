@@ -7,6 +7,10 @@ import { Router, IndexRoute, Route, Redirect, browserHistory, applyRouterMiddlew
 import App from './containers/App/App';
 import ActorsTreePage from './containers/ActorsTreePage/ActorsTreePage';
 import AuthPage from './containers/AuthPage/AuthPage';
+import ChangePasswordPage from './containers/ChangePasswordPage/ChangePasswordPage';
+import ConfigurationConfigCopyPage from './containers/ConfigCopyPage/ConfigurationConfigCopyPage';
+import ConfigurationsListPage from './containers/ConfigurationsListPage/ConfigurationsListPage';
+import ConfigurationPage from './containers/ConfigurationPage/ConfigurationPage';
 import FeedPage from './containers/FeedPage/FeedPage';
 import GetPrivilegesPage from './containers/GetPrivilegesPage/GetPrivilegesPage';
 import GraphQLPage from './containers/GraphQL/GraphQLPage';
@@ -14,17 +18,16 @@ import HomePage from './containers/Home/HomePage';
 import Loading from './components/Loading/index';
 import LogoutPage from './containers/LogoutPage/LogoutPage';
 import MigrationPage from './containers/MigrationPage/MigrationPage';
-import NotFoundPage from './containers/NotFoundPage/NotFoundPage';
-import ConfigurationConfigCopyPage from './containers/ConfigCopyPage/ConfigurationConfigCopyPage';
-import ConfigurationsListPage from './containers/ConfigurationsListPage/ConfigurationsListPage';
-import ConfigurationPage from './containers/ConfigurationPage/ConfigurationPage';
-import RolesListPage from './containers/RolesListPage/RolesListPage';
-import RolePage from './containers/RolePage/RolePage';
-import UsersListPage from './containers/UsersListPage/UsersListPage';
-import UserPage from './containers/UserPage/UserPage';
-import SeedPage from './containers/SeedPage/SeedPage';
 import MigratorTemplatePage from './containers/MigratorTemplatePage/TemplatePage';
 import NodeTemplatePage from './containers/NodeTemplatePage/TemplatePage';
+import NotFoundPage from './containers/NotFoundPage/NotFoundPage';
+import PackagesPage from './containers/PackagesPage/PackagesPage';
+import ResetPasswordPage from './containers/UserPage/ResetPasswordPage';
+import RolesListPage from './containers/RolesListPage/RolesListPage';
+import RolePage from './containers/RolePage/RolePage';
+import SeedPage from './containers/SeedPage/SeedPage';
+import UsersListPage from './containers/UsersListPage/UsersListPage';
+import UserPage from './containers/UserPage/UserPage';
 
 export default class RoutesList extends React.Component {
   render () {
@@ -38,6 +41,7 @@ export default class RoutesList extends React.Component {
           <IndexRoute component={HomePage} queries={ApiQueries} />
           <Route path='/klusterkite/Login' component={AuthPage} />
           <Route path='/klusterkite/Logout' component={LogoutPage} />
+          <Route path='/klusterkite/ChangePassword' component={ChangePasswordPage} queries={ApiQueries} render={({ props }) => props ? <ChangePasswordPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/GetPrivileges' component={GetPrivilegesPage} queries={ApiQueries} />
           <Route path='/klusterkite/ActorsTree' component={ActorsTreePage} queries={ApiQueries} />
           <Route path='/klusterkite/CopyConfig/:configurationId/:mode' component={ConfigurationConfigCopyPage} queries={ApiQueries} render={({ props }) => props ? <ConfigurationConfigCopyPage {...props} /> : <Loading />} />
@@ -52,13 +56,15 @@ export default class RoutesList extends React.Component {
           <Route path='/klusterkite/Roles/create' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Roles/:id' component={RolePage} queries={ApiQueries} render={({ props }) => props ? <RolePage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Seeds/:configurationId' component={SeedPage} queries={ApiQueries} render={({ props }) => props ? <SeedPage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/NodeTemplates/:configurationId/create' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
-          <Route path='/klusterkite/NodeTemplates/:configurationId/:id' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
           <Route path='/klusterkite/MigratorTemplates/:configurationId/create' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
           <Route path='/klusterkite/MigratorTemplates/:configurationId/:id' component={MigratorTemplatePage} queries={ApiQueries} render={({ props }) => props ? <MigratorTemplatePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/NodeTemplates/:configurationId/create' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/NodeTemplates/:configurationId/:id' component={NodeTemplatePage} queries={ApiQueries} render={({ props }) => props ? <NodeTemplatePage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Packages/:configurationId' component={PackagesPage} queries={ApiQueries} render={({ props }) => props ? <PackagesPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users' component={UsersListPage} queries={ApiQueries} render={({ props }) => props ? <UsersListPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users/create' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
           <Route path='/klusterkite/Users/:id' component={UserPage} queries={ApiQueries} render={({ props }) => props ? <UserPage {...props} /> : <Loading />} />
+          <Route path='/klusterkite/Users/ResetPassword/:id' component={ResetPasswordPage} queries={ApiQueries} render={({ props }) => props ? <ResetPasswordPage {...props} /> : <Loading />} />
           <Route path='*' components={NotFoundPage} />
         </Route>
         <Redirect from="/" to="klusterkite/" />

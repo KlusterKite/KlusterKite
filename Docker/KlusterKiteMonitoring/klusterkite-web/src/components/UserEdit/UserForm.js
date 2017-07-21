@@ -1,7 +1,9 @@
 import React from 'react';
-import { Input, CheckboxGroup } from 'formsy-react-components';
+import { Input, Checkbox } from 'formsy-react-components';
 
 import Form from '../Form/Form';
+
+import './styles.css';
 
 export default class UserForm extends React.Component {
   constructor(props) {
@@ -19,7 +21,6 @@ export default class UserForm extends React.Component {
     saveError: React.PropTypes.string,
     saveErrors: React.PropTypes.arrayOf(React.PropTypes.string),
     canEdit: React.PropTypes.bool,
-    roles: React.PropTypes.arrayOf(React.PropTypes.string)
   };
 
   submit(model) {
@@ -29,12 +30,6 @@ export default class UserForm extends React.Component {
   render() {
     const { initialValues } = this.props;
     const canEdit = this.props.canEdit;
-
-    const allRoles = this.props.roles.map(x => { return {value: x, label: x}});
-    let selectedRoles = initialValues && initialValues.roles && initialValues.roles.edges.map(x => x.node.role.name);
-    if (!selectedRoles){
-      selectedRoles = [];
-    }
 
     return (
       <div>
@@ -61,14 +56,18 @@ export default class UserForm extends React.Component {
           <fieldset>
             <Input name="uid" value={(initialValues && initialValues.uid) || ""} type="hidden" />
             <Input name="login" label="Login" value={(initialValues && initialValues.login) || ""} required elementWrapperClassName="col-sm-3" />
-            <CheckboxGroup
-              name="roles"
-              value={selectedRoles}
-              label="Roles"
-              options={allRoles}
+            <Checkbox
+              name="isBlocked"
+              value={initialValues && initialValues.isBlocked}
+              label="Is blocked?"
+            />
+            <Checkbox
+              name="isDeleted"
+              value={initialValues && initialValues.isDeleted}
+              label="Is deleted?"
             />
           </fieldset>
-          <fieldset>
+          {false && <fieldset>
             <label>Change password</label>
             <Input
               name="password"
@@ -84,6 +83,7 @@ export default class UserForm extends React.Component {
               value=""
             />
           </fieldset>
+          }
         </Form>
       </div>
     );

@@ -2,8 +2,8 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 import StubContainer from 'react-storybooks-relay-container';
 
-import ActorsTree from './tree';
-import ActorsTreeButtons from './buttons';
+import ActorsTree from './ActorsTree';
+import ActorsTreeButtons from './ActorsTreeButtons';
 
 storiesOf('Actor tree')
   .add('graph', () => {

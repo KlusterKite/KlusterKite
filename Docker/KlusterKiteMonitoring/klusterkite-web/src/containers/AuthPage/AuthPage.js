@@ -53,7 +53,6 @@ export default class AuthPage extends React.Component {
 
     if (response.status === 200) {
       response.json().then(function(data) {
-        console.log('got data', data);
         that.authenticate(data, username);
         that.redirectToGetPrivilegies();
       });

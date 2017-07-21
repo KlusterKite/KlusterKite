@@ -1,17 +1,16 @@
 import React from 'react';
-import { Input, Textarea } from 'formsy-react-components';
 import isEqual from 'lodash/isEqual';
 
 import Form from '../Form/Form';
-import PackagesMultiSelector from '../PackageSelector/PackagesMultiSelector';
+import PackagesSelector from '../PackageSelector/PackagesSelector';
 
-export default class MigratorTemplateForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class SinglePackageForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.submit = this.submit.bind(this);
 
     this.state = {
-      packagesList: []
+      model: {}
     };
   }
 
@@ -20,7 +19,6 @@ export default class MigratorTemplateForm extends React.Component { // eslint-di
     onCancel: React.PropTypes.func,
     onDelete: React.PropTypes.func,
     initialValues: React.PropTypes.object,
-    packagesList: React.PropTypes.object,
     saving: React.PropTypes.bool,
     deleting: React.PropTypes.bool,
     saved: React.PropTypes.bool,
@@ -38,16 +36,11 @@ export default class MigratorTemplateForm extends React.Component { // eslint-di
 
   onReceiveProps(nextProps, skipCheck) {
     if (nextProps.initialValues && (!isEqual(nextProps.initialValues, this.props.initialValues) || skipCheck)) {
-      const packageRequirements = nextProps.initialValues.packageRequirements.edges.map(x => x.node).map(x => {
-        return {
-          id: x.__id,
-          specificVersion: x.specificVersion
-        }
+      this.setState({
+        model: nextProps.initialValues
       });
 
-      this.setState({
-        packageRequirements: packageRequirements
-      });
+      console.log('model is' , nextProps.initialValues);
     }
   }
 
@@ -70,25 +63,43 @@ export default class MigratorTemplateForm extends React.Component { // eslint-di
   }
 
   submit(model) {
-    model.packageRequirements = this.state.packageRequirements;
-    model.priority = model.priority ? Number.parseInt(model.priority, 10) : 0;
-    this.props.onSubmit(model);
+    console.log('model', model);
+    console.log('model in state', this.state.model);
+
+    // model.packageRequirements = this.state.packageRequirements;
+    // model.containerTypes = this.stringToArray(model.containerTypes);
+    // model.maximumNeededInstances = Number.parseInt(model.maximumNeededInstances, 10);
+    // model.minimumRequiredInstances = model.minimumRequiredInstances ? Number.parseInt(model.minimumRequiredInstances, 10) : 0;
+    // model.priority = model.priority ? Number.parseInt(model.priority, 10) : 0;
+    // this.props.onSubmit(model);
   }
 
   cancel() {
     this.props.onCancel();
   }
 
+  onChange(value) {
+    console.log('value changed to ', value);
+    this.setState({
+      model: value
+    });
+  }
+
   render() {
     const { initialValues } = this.props;
+
+    const packageInitialValues = {
+      id: 'KlusterKite.API.Client',
+      specificVersion: null
+    };
 
     return (
       <div>
         {initialValues &&
-          <h2>Edit Template</h2>
+          <h2>Edit Package</h2>
         }
         {!initialValues &&
-          <h2>Create a new Template</h2>
+          <h2>Add a new Package</h2>
         }
         <Form
           onSubmit={this.submit}
@@ -102,14 +113,13 @@ export default class MigratorTemplateForm extends React.Component { // eslint-di
           saveErrors={this.props.saveErrors}
         >
           <fieldset>
-            <Input name="code" label="Code" value={(initialValues && initialValues.code) || ""} required />
-            <Input name="name" label="Name" value={(initialValues && initialValues.name) || ""} required />
             {this.props.packagesList &&
-              <PackagesMultiSelector packages={this.props.packagesList} values={this.state.packageRequirements} onChange={this.onPackageRequirementsChange.bind(this)} />
+              <PackagesSelector
+                packages={this.props.packagesList}
+                onChange={(value) => this.onChange(value)}
+                initialValues={this.props.initialValues.package}
+              />
             }
-            <Input name="priority" label="Priority" value={(initialValues && initialValues.priority) || ""} validations="isNumeric" validationError="Must be numeric" elementWrapperClassName="col-sm-2" />
-            <Textarea name="notes" label="Notes" value={(initialValues && initialValues.notes) || ""} rows={3} />
-            <Textarea name="configuration" label="Configuration" value={(initialValues && initialValues.configuration) || ""} rows={10} />
           </fieldset>
         </Form>
       </div>

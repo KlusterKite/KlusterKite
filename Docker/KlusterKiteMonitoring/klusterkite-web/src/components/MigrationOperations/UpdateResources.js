@@ -143,7 +143,6 @@ export class UpdateResources extends React.Component {
           return (
             <div key={node.code}>
               <h4 className="migration-title">{node.code}</h4>
-              <p>Is processing: {isProcessing.toString()}</p>
               <table className="table table-hover">
                 <thead>
                 <tr>
@@ -166,7 +165,7 @@ export class UpdateResources extends React.Component {
                       </tr>
                       {resources.map((resourceEdge) => {
                         const resourceNode = resourceEdge.node;
-                        const direction = resourceNode.position === 'Source' ? 'Destination' : 'Source';
+                        const direction = (resourceNode.position === 'Source' || resourceNode.position === 'NotCreated') ? 'Destination' : 'Source';
 
                         return (
                           <tr key={resourceNode.code}>
@@ -175,7 +174,7 @@ export class UpdateResources extends React.Component {
                             <td className="migration-resources">{resourceNode.position}</td>
                             <td className="migration-resources">{resourceNode.currentPoint}</td>
                             <td className="migration-resources migration-upgrade">
-                              {resourceNode.migrationToDestinationExecutor !== null &&
+                              {(resourceNode.migrationToDestinationExecutor !== null || resourceNode.position === 'NotCreated') &&
                                 <input
                                   type="checkbox"
                                   checked={this.state.selectedResources.some(item => item.target === direction && item.resourceCode === resourceNode.code)}

@@ -2,8 +2,8 @@ import React from 'react';
 import { storiesOf, action } from '@kadira/storybook';
 // import StubContainer from 'react-storybooks-relay-container';
 
-import PackagesSelector from './selector';
-import PackagesMultiSelector from './multiselector';
+import PackagesSelector from './PackagesSelector';
+import PackagesMultiSelector from './PackagesMultiSelector';
 
 storiesOf('Packages')
   .add('name and version input, empty', () => {

@@ -1,14 +1,13 @@
 import React from 'react'
 import Relay from 'react-relay'
-// import { browserHistory } from 'react-router'
 
 import delay from 'lodash/delay'
-// import isEqual from 'lodash/isEqual'
 
 import NodesList from '../../components/NodesList/NodesList'
 import MigrationLogs from '../../components/MigrationOperations/MigrationLogs'
 import MigrationSteps from '../../components/MigrationOperations/MigrationSteps'
 import NodesWithTemplates from '../../components/NodesWithTemplates/index'
+import UpdateResources from '../../components/MigrationOperations/UpdateResources'
 
 import { hasPrivilege } from '../../utils/privileges'
 import DateFormat from '../../utils/date'
@@ -162,15 +161,25 @@ class MigrationPage extends React.Component {
           />
         }
 
-        {currentMigration &&
-          <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
+        {currentMigration && resourceState.currentMigrationStep === 'NodesUpdating' &&
+        <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
         }
 
         {resourceState.currentMigrationStep === 'NodesUpdating' &&
-          <NodesList hasError={false}
-                     upgradeNodePrivilege={hasPrivilege('KlusterKite.NodeManager.UpgradeNode')}
-                     nodeDescriptions={this.props.api.klusterKiteNodesApi}
-                     hideDetails={true}
+        <NodesList hasError={false}
+                   upgradeNodePrivilege={hasPrivilege('KlusterKite.NodeManager.UpgradeNode')}
+                   nodeDescriptions={this.props.api.klusterKiteNodesApi}
+                   hideDetails={true}
+        />
+        }
+
+        {currentMigration &&
+          <UpdateResources
+            onStateChange={this.onStateChange}
+            onError={this.onError}
+            migrationState={resourceState.migrationState}
+            canMigrateResources={resourceState.canMigrateResources}
+            operationIsInProgress={this.state.operationIsInProgress}
           />
         }
 
@@ -211,6 +220,9 @@ export default Relay.createContainer(
                 canMigrateResources
                 currentMigrationStep
                 ${MigrationSteps.getFragment('resourceState')},
+                migrationState {
+                  ${UpdateResources.getFragment('migrationState')},
+                }
               }
             }
             ${NodesWithTemplates.getFragment('data')},

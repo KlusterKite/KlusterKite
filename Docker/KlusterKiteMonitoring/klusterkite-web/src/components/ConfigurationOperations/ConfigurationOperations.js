@@ -8,6 +8,7 @@ import { Link } from 'react-router';
 import DraftOperations from './DraftOperations';
 import ReadyOperations from './ReadyOperations';
 import ActiveOperations from './ActiveOperations';
+import ArchivedOperations from './ArchivedOperations';
 import ObsoleteOperations from './ObsoleteOperations';
 
 import './styles.css';
@@ -75,7 +76,7 @@ export class ConfigurationOperations extends React.Component {
             isStable={this.props.isStable}
           />
 
-          <ObsoleteOperations
+          <ArchivedOperations
             configurationId={this.props.configurationId}
             configurationInnerId={this.props.configurationInnerId}
             currentState={this.props.currentState}
@@ -83,6 +84,10 @@ export class ConfigurationOperations extends React.Component {
             canCreateMigration={this.props.nodeManagement.resourceState.canCreateMigration}
             currentMigration={this.props.nodeManagement.currentMigration}
             onStartMigration={this.props.onStartMigration}
+          />
+
+          <ObsoleteOperations
+            currentState={this.props.currentState}
           />
         </div>
         <h2 className="margined-header">Settings</h2>
