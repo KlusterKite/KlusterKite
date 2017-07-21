@@ -9,6 +9,8 @@
 
 namespace KlusterKite.NodeManager.Client.MigrationStates
 {
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.Migrator;
@@ -20,6 +22,13 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     public class ResourceConfigurationState
     {
         /// <summary>
+        /// The resource unique key
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("the resource unique key", IsKey = true)]
+        public string Key => $"{this.TemplateCode}:{this.MigratorTypeName}:{this.Code}";
+
+        /// <summary>
         /// Gets or sets the human readable resource name
         /// </summary>
         [DeclareField("the human readable resource name")]
@@ -28,7 +37,7 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// <summary>
         /// Gets or sets the resource identification
         /// </summary>
-        [DeclareField("the resource identification", IsKey = true)]
+        [DeclareField("the resource identification")]
         public string Code { get; set; }
 
         /// <summary>
