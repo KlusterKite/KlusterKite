@@ -43,6 +43,7 @@ namespace KlusterKite.NodeManager.Tests
     using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.Messages;
+    using KlusterKite.NodeManager.Migrator;
     using KlusterKite.NodeManager.Tests.Mock;
 
     using Xunit;
@@ -246,6 +247,221 @@ namespace KlusterKite.NodeManager.Tests
         }
 
         /// <summary>
+        /// The migration state test.
+        /// </summary>
+        /// <param name="resources">
+        /// The array of string representing resources.
+        /// Each string contains 3 chars.
+        /// 1. Dependency type: B for CodeDependsOnResource, A for ResourceDependsOnCode 
+        /// 2. The migration direction: U for upgrade, D for downgrade and S for stay
+        /// 3. The resource position: S - source, D - destination, M - no source nor destination (but can be migrated), B - broken, C - create, O - obsolete
+        /// </param>
+        /// <param name="configurationPosition">The current active configuration (1 or 2)</param>
+        /// <param name="nodesPosition">The nodes current configuration (1 or 2)</param>
+        /// <param name="expectedStartBitState">
+        /// The expected start bit state. The list of bites to check at start
+        /// 1. OperationIsInProgress
+        /// 2. CanCancelMigration
+        /// 3. CanCreateMigration
+        /// 4. CanFinishMigration
+        /// 5. CanMigrateResources
+        /// 6. CanUpdateNodesToDestination
+        /// 7. CanUpdateNodesToSource
+        /// </param>
+        /// <param name="expectedStartStep">
+        /// The expected start step.
+        /// </param>
+        /// <param name="expectedSteps">
+        /// The expected states.
+        /// </param>
+        /// <param name="expectedMigratableResources">
+        /// The list of expected migratable resources (the index numbers of resources in the resources list).
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        [Theory]
+        [InlineData(new[] { "BDS" }, 1, 1, "0100010", EnMigrationSteps.Start, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BDS" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BDS" }, 1, 2, "0000010", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BDS" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BDD" }, 2, 2, "0001100", EnMigrationSteps.Finish, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BDD", "BDS" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 1 })]
+
+        [InlineData(new[] { "ADS" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "ADD" }, 1, 1, "0000110", EnMigrationSteps.PreNodeResourcesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "ADD", "ADS" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0, 1 })]
+        [InlineData(new[] { "ADD" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "ADD" }, 1, 2, "0000010", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "ADD" }, 2, 2, "0001001", EnMigrationSteps.Finish, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+
+        [InlineData(new[] { "AUS" }, 1, 1, "0100010", EnMigrationSteps.Start, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "AUS" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "AUS" }, 1, 2, "0000010", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "AUS" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "AUD" }, 2, 2, "0001100", EnMigrationSteps.Finish, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "AUD", "AUS" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 1 })]
+
+        [InlineData(new[] { "BUS" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BUD" }, 1, 1, "0000110", EnMigrationSteps.PreNodeResourcesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BUD", "BUS" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0, 1 })]
+        [InlineData(new[] { "BUD" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BUD" }, 2, 2, "0001001", EnMigrationSteps.Finish, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+
+        [InlineData(new[] { "BUS", "BDS", "AUS", "ADS" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3 })]
+        [InlineData(new[] { "BUD", "BDS", "AUS", "ADS" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3 })]
+        [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 1, 1, "0000110", EnMigrationSteps.PreNodeResourcesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3 })]
+        [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 1, 2, "0000010", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 1, 2 })]
+        [InlineData(new[] { "BUD", "BDD", "AUS", "ADD" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 1, 2 })]
+        [InlineData(new[] { "BUD", "BDD", "AUD", "ADD" }, 2, 2, "0001100", EnMigrationSteps.Finish, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 1, 2 })]
+
+        [InlineData(new[] { "BDO" }, 1, 1, "0100010", EnMigrationSteps.Start, "Start, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "ADO" }, 1, 1, "0100010", EnMigrationSteps.Start, "Start, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "AUO" }, 1, 1, "0100010", EnMigrationSteps.Start, "Start, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BUO" }, 1, 1, "0100010", EnMigrationSteps.Start, "Start, NodesUpdating, Finish", new int[0])]
+
+        [InlineData(new[] { "BDC" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "ADC" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "AUC" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BUC" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+
+        [InlineData(new[] { "BDM" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "ADM" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "AUM" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BUM" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+
+        [InlineData(new[] { "BDB" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "ADB" }, 2, 2, "0000000", EnMigrationSteps.Broken, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "AUB" }, 2, 2, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BUB" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+
+        [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 2, 2, "0000101", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3, 1, 2 })]
+        [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 1, 1, "0000110", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3, 1, 2 })]
+
+        public async Task MigrationStateTest(
+            string[] resources,
+            int configurationPosition,
+            int nodesPosition,
+            string expectedStartBitState,
+            EnMigrationSteps expectedStartStep,
+            string expectedSteps,
+            int[] expectedMigratableResources)
+        {
+            using (var ds = this.GetContext())
+            {
+                if (configurationPosition == 2)
+                {
+                    var sourceConfiguration = ds.Configurations.First(c => c.Id == 1);
+                    var destinationConfiguration = ds.Configurations.First(c => c.Id == 2);
+
+                    sourceConfiguration.State = EnConfigurationState.Archived;
+                    destinationConfiguration.State = EnConfigurationState.Active;
+                }
+
+                var migration = new Migration
+                                    {
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
+                                        IsActive = true,
+                                        Started = DateTimeOffset.Now,
+                                        State = EnMigrationState.Ready
+                                    };
+                ds.Migrations.Add(migration);
+                ds.SaveChanges();
+            }
+
+            VirtualNode node1;
+            VirtualNode node2;
+            VirtualNode node3;
+            var actor = this.CreateActor(nodesPosition, out node1, out node2, out node3);
+            var migratorStates = resources.Select(
+                r =>
+                    {
+                        var dependency = r[0] == 'B'
+                                             ? EnResourceDependencyType.CodeDependsOnResource
+                                             : EnResourceDependencyType.ResourceDependsOnCode;
+                        string[] sourcePoints;
+                        string[] destinationPoints;
+                        ResourceDescription resourceDescription;
+
+                        switch (r[1])
+                        {
+                            case 'U':
+                                sourcePoints = new[] { "first" };
+                                destinationPoints = new[] { "first", "second", "third" };
+                                break;
+                            case 'D':
+                                sourcePoints = new[] { "first", "second", "third" };
+                                destinationPoints = new[] { "first" };
+                                break;
+                            case 'S':
+                                sourcePoints = new[] { "first", "second", "third" };
+                                destinationPoints = new[] { "first", "second", "third" };
+                                break;
+                            default: throw new ArgumentException(nameof(resources));
+                        }
+
+                        switch (r[2])
+                        {
+                            case 'S':
+                                resourceDescription = new ResourceDescription(sourcePoints.Last());
+                                break;
+                            case 'D':
+                                resourceDescription = new ResourceDescription(destinationPoints.Last());
+                                break;
+                            case 'M':
+                                resourceDescription = new ResourceDescription("second");
+                                break;
+                            case 'B':
+                                resourceDescription = new ResourceDescription("non-existent");
+                                break;
+                            case 'C':
+                                resourceDescription =
+                                    new ResourceDescription(null) { Position = EnResourcePosition.Destination };
+                                break;
+                            case 'O':
+                                resourceDescription =
+                                    new ResourceDescription(destinationPoints.Last())
+                                        {
+                                            Position = EnResourcePosition
+                                                .Source
+                                        };
+                                break;
+                            default: throw new ArgumentException(nameof(resources));
+                        }
+
+                        var resourceDescriptions = new[] { resourceDescription };
+                        return new MigratorDescription(
+                                   sourcePoints,
+                                   destinationPoints,
+                                   resourceDescriptions)
+                                   {
+                                       DependencyType = dependency
+                                   };
+                    }).ToArray();
+
+            var migrationState = this.CreateMigrationActorMigrationState(migratorStates);
+            actor.Tell(migrationState);
+            this.ExpectNoMsg();
+            var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
+            Assert.NotNull(state.MigrationState);
+            Assert.Equal(expectedStartStep, state.CurrentMigrationStep);
+            Assert.Equal(expectedSteps, string.Join(", ", state.MigrationSteps));
+            Assert.Equal(expectedStartBitState, GetCanBitString(state));
+
+            var migratableResources = state.MigrationState.MigratableResources
+                .Select(
+                    mr => migratorStates.FirstOrDefault(
+                        ms => ms.TypeName == mr.MigratorTypeName && ms.Resources[0].Code == mr.Code))
+                .Select(ms => Array.IndexOf(migratorStates, ms)).ToArray();
+            Assert.Equal(
+                string.Join(", ", expectedMigratableResources.Select(i => i.ToString())),
+                string.Join(", ", migratableResources.Select(i => i.ToString())));
+        }
+
+        /// <summary>
         /// The actor is in migration state, updating resources
         /// </summary>
         /// <returns>The async task</returns>
@@ -256,7 +472,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Downgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -269,9 +484,10 @@ namespace KlusterKite.NodeManager.Tests
 
             var actor = this.CreateActor(1);
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -288,7 +504,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationCancel(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -307,7 +525,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Downgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -324,9 +541,10 @@ namespace KlusterKite.NodeManager.Tests
 
             var actor = this.CreateActor(2);
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -343,7 +561,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationFinish(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -362,7 +582,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Downgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -382,9 +601,10 @@ namespace KlusterKite.NodeManager.Tests
             VirtualNode node3;
             var actor = this.CreateActor(2, out node1, out node2, out node3);
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -401,7 +621,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(
                 await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
@@ -418,7 +640,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -442,7 +666,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -456,7 +682,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Downgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -473,9 +698,10 @@ namespace KlusterKite.NodeManager.Tests
             var actor = this.CreateActor(1, out node1, out node2, out node3);
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -492,7 +718,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(
                 await actor.Ask<bool>(
@@ -511,13 +739,15 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
                 var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
                 var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
-                Assert.Equal(EnConfigurationState.Faulted, sourceConfiguration.State);
+                Assert.Equal(EnConfigurationState.Archived, sourceConfiguration.State);
                 Assert.Equal(EnConfigurationState.Active, destinationConfiguration.State);
             }
 
@@ -535,7 +765,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -549,7 +781,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Downgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -565,10 +796,12 @@ namespace KlusterKite.NodeManager.Tests
             }
 
             var actor = this.CreateActor(2);
-            var migrationState = this.CreateMigrationActorMigrationState(
+            var migratorDescriptions = new MigratorDescription(
+                new[] { "first", "second" },
                 new[] { "first" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new[] { new ResourceDescription("first") });
+            var migrationState = this.CreateMigrationActorMigrationState(
+                migratorDescriptions);
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -585,14 +818,16 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
                                      {
-                                         MigratorTypeName = "TestMigrator",
-                                         ResourceCode = "0",
+                                         MigratorTypeName = migratorDescriptions.TypeName,
+                                         ResourceCode = migratorDescriptions.Resources[0].Code,
                                          Target = EnMigrationSide.Source,
                                          TemplateCode = "test"
                                      }
@@ -610,13 +845,16 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(EnMigrationSteps.PreNodesResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -633,7 +871,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -647,7 +887,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Downgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -663,10 +902,12 @@ namespace KlusterKite.NodeManager.Tests
             }
 
             var actor = this.CreateActor(2);
+            var migratorDescriptions = new MigratorDescription(
+                new[] { "first", "second" },
+                new[] { "first" },
+                new[] { new ResourceDescription("second") });
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                migratorDescriptions);
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -683,14 +924,16 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
                                      {
-                                         MigratorTypeName = "TestMigrator",
-                                         ResourceCode = "0",
+                                         MigratorTypeName = migratorDescriptions.TypeName,
+                                         ResourceCode = migratorDescriptions.Resources[0].Code,
                                          Target = EnMigrationSide.Destination,
                                          TemplateCode = "test"
                                      }
@@ -708,13 +951,16 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
-            
+            Assert.Equal(EnMigrationSteps.PreNodesResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
+
             migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -731,7 +977,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
-            Assert.Equal("Start, NodesUpdating, NodesUpdated, ResourcesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -745,7 +993,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Stay,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -758,9 +1005,10 @@ namespace KlusterKite.NodeManager.Tests
 
             var actor = this.CreateActor(1);
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -796,7 +1044,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Stay,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -813,9 +1060,10 @@ namespace KlusterKite.NodeManager.Tests
 
             var actor = this.CreateActor(2);
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -851,7 +1099,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Stay,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -872,9 +1119,10 @@ namespace KlusterKite.NodeManager.Tests
             var actor = this.CreateActor(2, out node1, out node2, out node3);
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -946,7 +1194,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Stay,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -963,9 +1210,10 @@ namespace KlusterKite.NodeManager.Tests
             var actor = this.CreateActor(1, out node1, out node2, out node3);
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1039,7 +1287,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Upgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -1052,9 +1299,10 @@ namespace KlusterKite.NodeManager.Tests
 
             var actor = this.CreateActor(1);
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1071,7 +1319,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationCancel(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -1090,7 +1340,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Upgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -1107,9 +1356,10 @@ namespace KlusterKite.NodeManager.Tests
 
             var actor = this.CreateActor(2);
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1126,7 +1376,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(await actor.Ask<bool>(new MigrationFinish(), TimeSpan.FromSeconds(1)));
             this.ExpectMsg<RecheckState>("/user/migrationActor");
@@ -1145,13 +1397,12 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Upgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
                                         Started = DateTimeOffset.Now,
                                         State = EnMigrationState.Ready
-                };
+                                    };
                 ds.Migrations.Add(migration);
                 var sourceConfiguration = ds.Configurations.First(r => r.Id == 1);
                 var destinationConfiguration = ds.Configurations.First(r => r.Id == 2);
@@ -1166,9 +1417,10 @@ namespace KlusterKite.NodeManager.Tests
             var actor = this.CreateActor(2, out node1, out node2, out node3);
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1185,7 +1437,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(
                 await actor.Ask<bool>(new NodesUpgrade { Target = EnMigrationSide.Source }, TimeSpan.FromSeconds(1)));
@@ -1202,7 +1456,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -1224,9 +1480,11 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanMigrateResources);
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
-            
-            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+
+            Assert.Equal(EnMigrationSteps.PreNodeResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1240,7 +1498,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Upgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -1257,9 +1514,10 @@ namespace KlusterKite.NodeManager.Tests
             var actor = this.CreateActor(1, out node1, out node2, out node3);
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1275,8 +1533,10 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(EnMigrationSteps.PreNodeResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             Assert.True(
                 await actor.Ask<bool>(
@@ -1295,7 +1555,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.NodesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             using (var ds = this.GetContext())
             {
@@ -1319,7 +1581,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Finish, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1333,7 +1597,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Upgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -1345,10 +1608,12 @@ namespace KlusterKite.NodeManager.Tests
             }
 
             var actor = this.CreateActor(1);
+            var migratorDescriptions = new MigratorDescription(
+                new[] { "first" },
+                new[] { "first", "second" },
+                new[] { new ResourceDescription("second") });
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                migratorDescriptions);
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1364,15 +1629,17 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(EnMigrationSteps.PreNodeResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
                                      {
-                                         MigratorTypeName = "TestMigrator",
-                                         ResourceCode = "0",
+                                         MigratorTypeName = migratorDescriptions.TypeName,
+                                         ResourceCode = migratorDescriptions.Resources[0].Code,
                                          Target = EnMigrationSide.Source,
                                          TemplateCode = "test"
                                      }
@@ -1390,13 +1657,16 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(EnMigrationSteps.PreNodesResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1413,7 +1683,9 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1427,7 +1699,6 @@ namespace KlusterKite.NodeManager.Tests
             {
                 var migration = new Migration
                                     {
-                                        Direction = EnMigrationDirection.Upgrade,
                                         FromConfigurationId = 1,
                                         ToConfigurationId = 2,
                                         IsActive = true,
@@ -1439,10 +1710,12 @@ namespace KlusterKite.NodeManager.Tests
             }
 
             var actor = this.CreateActor(1);
-            var migrationState = this.CreateMigrationActorMigrationState(
+            var migratorDescriptions = new MigratorDescription(
                 new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new[] { "first", "second" },
+                new[] { new ResourceDescription("first") });
+            var migrationState = this.CreateMigrationActorMigrationState(
+                migratorDescriptions);
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1459,14 +1732,16 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToSource);
 
             Assert.Equal(EnMigrationSteps.Start, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             var update = new List<ResourceUpgrade>
                              {
                                  new ResourceUpgrade
                                      {
-                                         MigratorTypeName = "TestMigrator",
-                                         ResourceCode = "0",
+                                         MigratorTypeName = migratorDescriptions.TypeName,
+                                         ResourceCode = migratorDescriptions.Resources[0].Code,
                                          Target = EnMigrationSide.Destination,
                                          TemplateCode = "test"
                                      }
@@ -1484,13 +1759,16 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.Equal(EnMigrationSteps.ResourcesUpdating, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(EnMigrationSteps.PreNodesResourcesUpdating, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
 
             migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1506,8 +1784,10 @@ namespace KlusterKite.NodeManager.Tests
             Assert.True(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
 
-            Assert.Equal(EnMigrationSteps.ResourcesUpdated, state.CurrentMigrationStep);
-            Assert.Equal("Start, ResourcesUpdating, ResourcesUpdated, NodesUpdating, Finish", string.Join(", ", state.MigrationSteps));
+            Assert.Equal(EnMigrationSteps.PreNodeResourcesUpdated, state.CurrentMigrationStep);
+            Assert.Equal(
+                "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish",
+                string.Join(", ", state.MigrationSteps));
         }
 
         /// <summary>
@@ -1533,6 +1813,205 @@ namespace KlusterKite.NodeManager.Tests
             Assert.False(state.CanMigrateResources);
             Assert.False(state.CanUpdateNodesToDestination);
             Assert.False(state.CanUpdateNodesToSource);
+        }
+
+        /// <summary>
+        /// Checking the resource states, resource is broken and should be updated manually
+        /// </summary>
+        /// <returns>The resource states</returns>
+        [Fact]
+        public async Task ResourceConfigurationStateRecheckTest()
+        {
+            var actor = this.CreateActor(1);
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("third", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
+            this.ExpectNoMsg();
+
+            var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.False(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.True(await actor.Ask<bool>(new RecheckState(), TimeSpan.FromMilliseconds(500)));
+            this.ExpectMsg<RecheckState>("/user/migrationActor");
+
+            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.True(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("second", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
+            this.ExpectNoMsg();
+
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.False(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.True(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.NotNull(state.ConfigurationState.MigratableResources);
+            Assert.Equal(0, state.ConfigurationState.MigratableResources.Count);
+        }
+
+        /// <summary>
+        /// Checking the resource states, resource is not in last migration point and should be updated manually
+        /// </summary>
+        /// <returns>The resource states</returns>
+        [Fact]
+        public async Task ResourceConfigurationStateResourceUpgradeTest()
+        {
+            var actor = this.CreateActor(1);
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("first", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
+            this.ExpectNoMsg();
+
+            var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.False(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.True(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.NotNull(state.ConfigurationState.MigratableResources);
+            Assert.Equal(1, state.ConfigurationState.MigratableResources.Count);
+            var resource = state.ConfigurationState.MigratableResources[0];
+
+            var update = new List<ResourceUpgrade>
+                             {
+                                 new ResourceUpgrade
+                                     {
+                                         MigratorTypeName = resource.MigratorTypeName,
+                                         ResourceCode = resource.Code,
+                                         TemplateCode = resource.TemplateCode
+                                     }
+                             };
+
+            Assert.True(await actor.Ask<bool>(update, TimeSpan.FromSeconds(1)));
+            this.ExpectMsg<List<ResourceUpgrade>>("/user/migrationActor");
+            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.True(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("second", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
+            this.ExpectNoMsg();
+
+            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.False(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.True(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.NotNull(state.ConfigurationState.MigratableResources);
+            Assert.Equal(0, state.ConfigurationState.MigratableResources.Count);
+        }
+
+        /// <summary>
+        /// Checking the resource states, resource is not in last migration point and should be updated manually
+        /// </summary>
+        /// <returns>The resource states</returns>
+        [Fact]
+        public async Task ResourceConfigurationStateResourceCreateTest()
+        {
+            var actor = this.CreateActor(1);
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState(null, new[] { "first" });
+            actor.Tell(migrationActorConfigurationState);
+            this.ExpectNoMsg();
+
+            var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.False(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.True(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.NotNull(state.ConfigurationState.MigratableResources);
+            Assert.Equal(1, state.ConfigurationState.MigratableResources.Count);
+            var resource = state.ConfigurationState.MigratableResources[0];
+
+            var update = new List<ResourceUpgrade>
+                             {
+                                 new ResourceUpgrade
+                                     {
+                                         MigratorTypeName = resource.MigratorTypeName,
+                                         ResourceCode = resource.Code,
+                                         TemplateCode = resource.TemplateCode
+                                     }
+                             };
+
+            Assert.True(await actor.Ask<bool>(update, TimeSpan.FromSeconds(1)));
+            this.ExpectMsg<List<ResourceUpgrade>>("/user/migrationActor");
+            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromSeconds(10));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.True(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.False(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("second", new[] { "first", "second" });
+            actor.Tell(migrationActorConfigurationState);
+            this.ExpectNoMsg();
+
+            state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
+            Assert.Null(state.MigrationState);
+            Assert.NotNull(state.ConfigurationState);
+            Assert.False(state.OperationIsInProgress);
+            Assert.False(state.CanCancelMigration);
+            Assert.True(state.CanCreateMigration);
+            Assert.False(state.CanFinishMigration);
+            Assert.False(state.CanMigrateResources);
+            Assert.False(state.CanUpdateNodesToDestination);
+            Assert.False(state.CanUpdateNodesToSource);
+
+            Assert.NotNull(state.ConfigurationState.MigratableResources);
+            Assert.Equal(0, state.ConfigurationState.MigratableResources.Count);
         }
 
         /// <summary>
@@ -1567,7 +2046,8 @@ namespace KlusterKite.NodeManager.Tests
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("first", new[] { "first" });
             actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
@@ -1602,9 +2082,14 @@ namespace KlusterKite.NodeManager.Tests
             Assert.Equal(EnMigrationState.Preparing, migration.State);
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first", "second" },
-                new[] { new[] { "first" }, new[] { "first", "second" } },
-                new[] { new[] { "first", "second" }, new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("first") }),
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1625,7 +2110,6 @@ namespace KlusterKite.NodeManager.Tests
             Assert.Equal(1, migration.FromConfigurationId);
             Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
-            Assert.Null(migration.Direction);
         }
 
         /// <summary>
@@ -1673,9 +2157,10 @@ namespace KlusterKite.NodeManager.Tests
             var migrationId = migration.Id;
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "second" },
-                new[] { new[] { "first", "second" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first", "second" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("second") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1696,7 +2181,6 @@ namespace KlusterKite.NodeManager.Tests
             Assert.Equal(1, migration.FromConfigurationId);
             Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Ready, migration.State);
-            Assert.Equal(EnMigrationDirection.Downgrade, migration.Direction);
         }
 
         /// <summary>
@@ -1711,7 +2195,8 @@ namespace KlusterKite.NodeManager.Tests
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("first", new[] { "first" });
             actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
@@ -1764,7 +2249,6 @@ namespace KlusterKite.NodeManager.Tests
             Assert.Equal(1, migration.FromConfigurationId);
             Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Preparing, migration.State);
-            Assert.Null(migration.Direction);
         }
 
         /// <summary>
@@ -1776,7 +2260,8 @@ namespace KlusterKite.NodeManager.Tests
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("first", new[] { "first" });
             actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
@@ -1811,9 +2296,10 @@ namespace KlusterKite.NodeManager.Tests
             var migrationId = migration.Id;
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1845,7 +2331,8 @@ namespace KlusterKite.NodeManager.Tests
         {
             var actor = this.CreateActor(1);
 
-            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("first", new[] { "first" });
             actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
 
@@ -1880,9 +2367,10 @@ namespace KlusterKite.NodeManager.Tests
             var migrationId = migration.Id;
 
             var migrationState = this.CreateMigrationActorMigrationState(
-                new[] { "first" },
-                new[] { new[] { "first" } },
-                new[] { new[] { "first", "second" } });
+                new MigratorDescription(
+                    new[] { "first" },
+                    new[] { "first", "second" },
+                    new[] { new ResourceDescription("first") }));
 
             actor.Tell(migrationState);
             this.ExpectNoMsg();
@@ -1903,7 +2391,6 @@ namespace KlusterKite.NodeManager.Tests
             Assert.Equal(1, migration.FromConfigurationId);
             Assert.Equal(2, migration.ToConfigurationId);
             Assert.Equal(EnMigrationState.Ready, migration.State);
-            Assert.Equal(EnMigrationDirection.Upgrade, migration.Direction);
         }
 
         /// <summary>
@@ -1914,7 +2401,8 @@ namespace KlusterKite.NodeManager.Tests
         public async Task ResourceConfigurationStateOkTest()
         {
             var actor = this.CreateActor(1);
-            var migrationActorConfigurationState = this.CreateMigrationActorConfigurationState("first", new[] { "first" });
+            var migrationActorConfigurationState =
+                this.CreateMigrationActorConfigurationState("first", new[] { "first" });
             actor.Tell(migrationActorConfigurationState);
             this.ExpectNoMsg();
             var state = await actor.Ask<ResourceState>(new ResourceStateRequest(), TimeSpan.FromMilliseconds(500));
@@ -2038,7 +2526,8 @@ namespace KlusterKite.NodeManager.Tests
                                 new AvailableTemplatesRequest
                                     {
                                         ContainerType = "test",
-                                        FrameworkRuntimeType = ConfigurationCheckTestsBase.Net46
+                                        FrameworkRuntimeType = ConfigurationCheckTestsBase
+                                            .Net46
                                     },
                                 TimeSpan.FromSeconds(1));
             Assert.NotNull(templates);
@@ -2048,7 +2537,8 @@ namespace KlusterKite.NodeManager.Tests
                                   new NewNodeTemplateRequest
                                       {
                                           ContainerType = "test",
-                                          FrameworkRuntimeType = ConfigurationCheckTestsBase.Net46,
+                                          FrameworkRuntimeType =
+                                              ConfigurationCheckTestsBase.Net46,
                                           NodeUid = Guid.NewGuid()
                                       },
                                   TimeSpan.FromSeconds(1));
@@ -2061,6 +2551,22 @@ namespace KlusterKite.NodeManager.Tests
         {
             this.GetContext().Database.EnsureDeleted();
             base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Creates a bit string from state "Can" properties
+        /// </summary>
+        /// <param name="state">The migrator state</param>
+        /// <returns>The bit string</returns>
+        private static string GetCanBitString(ResourceState state)
+        {
+            return (state.OperationIsInProgress ? "1" : "0")
+                   + (state.CanCancelMigration ? "1" : "0")
+                   + (state.CanCreateMigration ? "1" : "0")
+                   + (state.CanFinishMigration ? "1" : "0")
+                   + (state.CanMigrateResources ? "1" : "0")
+                   + (state.CanUpdateNodesToDestination ? "1" : "0")
+                   + (state.CanUpdateNodesToSource ? "1" : "0");
         }
 
         /// <summary>
@@ -2157,142 +2663,83 @@ namespace KlusterKite.NodeManager.Tests
         /// <summary>
         /// Creates the migration actor state with active migration
         /// </summary>
-        /// <param name="resourcePoints">
-        /// The list of migration point for resources
-        /// </param>
-        /// <param name="sourcePoints">
-        /// The list of defined migration points for resources in source configuration
-        /// </param>
-        /// <param name="destinationPoints">
-        /// The list of defined migration points for resources in destination configuration
-        /// </param>
+        /// <param name="migratorDescriptions">The test migrators description</param>
         /// <returns>
         /// the migration actor state
         /// </returns>
         private MigrationActorMigrationState CreateMigrationActorMigrationState(
-            string[] resourcePoints,
-            string[][] sourcePoints,
-            string[][] destinationPoints)
+            params MigratorDescription[] migratorDescriptions)
         {
-            Assert.Equal(resourcePoints.Length, sourcePoints.Length);
-            Assert.Equal(resourcePoints.Length, destinationPoints.Length);
-
             var migratorTemplate = new MigratorTemplate { Code = "test" };
-            var resourceMigrationStates = new List<ResourceMigrationState>();
-
-            var direction = EnMigrationDirection.Stay;
-
-            for (var i = 0; i < resourcePoints.Length; i++)
-            {
-                var migrationToSourceExecutor =
-                    destinationPoints[i].Contains(resourcePoints[i])
-                    && destinationPoints[i].Contains(sourcePoints[i].Last())
-                        ? EnMigrationSide.Destination
-                        : sourcePoints[i].Contains(resourcePoints[i])
-                            ? EnMigrationSide.Source
-                            : (EnMigrationSide?)null;
-
-                var migrationToDestinationExecutor =
-                    sourcePoints[i].Contains(resourcePoints[i]) && sourcePoints[i].Contains(destinationPoints[i].Last())
-                        ? EnMigrationSide.Source
-                        : destinationPoints[i].Contains(resourcePoints[i])
-                            ? EnMigrationSide.Destination
-                            : (EnMigrationSide?)null;
-
-                var resourceMigrationState =
-                    new ResourceMigrationState
-                        {
-                            Code = i.ToString(),
-                            CurrentPoint = resourcePoints[i],
-                            SourcePoint = sourcePoints[i].Last(),
-                            DestinationPoint = destinationPoints[i].Last(),
-                            Name = i.ToString(),
-                            MigrationToSourceExecutor = migrationToSourceExecutor,
-                            MigrationToDestinationExecutor = migrationToDestinationExecutor,
-                        };
-                resourceMigrationStates.Add(resourceMigrationState);
-
-                if (sourcePoints[i].Contains(resourcePoints[i]) && destinationPoints[i].Contains(resourcePoints[i])
-                    && sourcePoints[i].Last() == destinationPoints[i].Last())
-                {
-                }
-                else if (sourcePoints[i].Contains(resourcePoints[i])
-                         && sourcePoints[i].Contains(destinationPoints[i].Last()))
-                {
-                    switch (direction)
+            var sourceMigratorStates = migratorDescriptions.Where(d => d.SourcePoints != null).Select(
+                d =>
                     {
-                        case EnMigrationDirection.Stay:
-                            direction = EnMigrationDirection.Downgrade;
-                            break;
-                        case EnMigrationDirection.Upgrade:
-                            direction = EnMigrationDirection.Undefined;
-                            break;
-                    }
-                }
-                else if (destinationPoints[i].Contains(resourcePoints[i])
-                         && destinationPoints[i].Contains(sourcePoints[i].Last()))
-                {
-                    switch (direction)
+                        var resources = d.Resources.Where(r => r.Position != EnResourcePosition.Destination)
+                            .Select(
+                                r => new ResourceConfigurationState
+                                         {
+                                             Code = r.Code,
+                                             CurrentPoint = r.CurrentPoint,
+                                             Name = r.Code,
+                                             MigratorTypeName = d.TypeName,
+                                             TemplateCode = migratorTemplate.Code
+                                         }).ToList();
+                        return new MigratorConfigurationState
+                                   {
+                                       DependencyType = d.DependencyType,
+                                       LastDefinedPoint = d.SourcePoints.Last(),
+                                       MigrationPoints = d.SourcePoints.ToList(),
+                                       Priority = d.Priority,
+                                       TypeName = d.TypeName,
+                                       Name = d.TypeName,
+                                       Resources = resources
+                                   };
+                    }).ToList();
+            var destinationMigratorStates = migratorDescriptions.Where(d => d.DestinationPoints != null).Select(
+                d =>
                     {
-                        case EnMigrationDirection.Stay:
-                            direction = EnMigrationDirection.Upgrade;
-                            break;
-                        case EnMigrationDirection.Downgrade:
-                            direction = EnMigrationDirection.Undefined;
-                            break;
-                    }
-                }
-                else
-                {
-                    direction = EnMigrationDirection.Undefined;
-                }
-            }
-
-            var migratorMigrationState =
-                new MigratorMigrationState
+                        var resources = d.Resources.Where(r => r.Position != EnResourcePosition.Source)
+                            .Select(
+                                r => new ResourceConfigurationState
+                                         {
+                                             Code = r.Code,
+                                             CurrentPoint = r.CurrentPoint,
+                                             Name = r.Code,
+                                             MigratorTypeName = d.TypeName,
+                                             TemplateCode = migratorTemplate.Code
+                                }).ToList();
+                        return new MigratorConfigurationState
+                                   {
+                                       DependencyType = d.DependencyType,
+                                       LastDefinedPoint = d.DestinationPoints.Last(),
+                                       MigrationPoints = d.DestinationPoints.ToList(),
+                                       Priority = d.Priority,
+                                       TypeName = d.TypeName,
+                                       Name = d.TypeName,
+                                       Resources = resources
+                                   };
+                    }).ToList();
+            var sourceState =
+                new MigratorTemplateConfigurationState
                     {
-                        Direction = direction,
-                        Name = "test migrator",
-                        TypeName = "TestMigrator",
-                        Position = EnMigratorPosition.Merged,
-                        Resources = resourceMigrationStates
+                        Code = migratorTemplate.Code,
+                        Template = migratorTemplate,
+                        MigratorsStates = sourceMigratorStates
+                    };
+            var destinationState =
+                new MigratorTemplateConfigurationState
+                    {
+                        Code = migratorTemplate.Code,
+                        Template = migratorTemplate,
+                        MigratorsStates = destinationMigratorStates
                     };
 
-            var migratorMigrationStates = new[] { migratorMigrationState }.ToList();
-            var migratorTemplateMigrationState =
-                new MigratorTemplateMigrationState
-                    {
-                        Code = "test",
-                        DestinationTemplate = migratorTemplate,
-                        SourceTemplate = migratorTemplate,
-                        Position = EnMigratorPosition.Merged,
-                        Migrators = migratorMigrationStates
-                    };
-
-            var migratorTemplateMigrationStates = new[] { migratorTemplateMigrationState }.ToList();
-
-            var hasDestinationResources = migratorTemplateMigrationStates.Any(
-                t => t.Migrators.Any(m => m.Resources.Any(r => r.Position == EnResourcePosition.Destination)));
-            var hasSourceResources = migratorTemplateMigrationStates.Any(
-                t => t.Migrators.Any(m => m.Resources.Any(r => r.Position == EnResourcePosition.Source)));
-            var hasBrokenResources = migratorTemplateMigrationStates.Any(
-                t => t.Migrators.Any(m => m.Resources.Any(r => r.Position == EnResourcePosition.Undefined)));
-
-            var position = hasBrokenResources || (hasDestinationResources && hasSourceResources)
-                               ? EnMigrationActorMigrationPosition.Broken
-                               : hasSourceResources
-                                   ? EnMigrationActorMigrationPosition.Source
-                                   : hasDestinationResources
-                                       ? EnMigrationActorMigrationPosition.Destination
-                                       : EnMigrationActorMigrationPosition.NoMigrationNeeded;
-
-            var migrationState =
-                new MigrationActorMigrationState
-                    {
-                        Position = position,
-                        TemplateStates = migratorTemplateMigrationStates
-                    };
-            return migrationState;
+            return new MigrationActorMigrationState
+                       {
+                           TemplateStates = MigrationActor.CreateMigrationState(
+                               new[] { sourceState },
+                               new[] { destinationState }).ToList()
+                       };
         }
 
         /// <summary>
@@ -2318,9 +2765,11 @@ namespace KlusterKite.NodeManager.Tests
                                       {
                                           new MigratorConfigurationState
                                               {
-                                                  LastDefinedPoint = configurationPoints.Last(),
+                                                  LastDefinedPoint =
+                                                      configurationPoints.Last(),
                                                   Name = "test migrator",
-                                                  MigrationPoints = configurationPoints.ToList(),
+                                                  MigrationPoints =
+                                                      configurationPoints.ToList(),
                                                   TypeName = "TestMigrator",
                                                   Resources = resources
                                               }
@@ -2408,6 +2857,97 @@ namespace KlusterKite.NodeManager.Tests
                         };
                 return pluginInstallers;
             }
+        }
+
+        /// <summary>
+        /// The migrator description
+        /// </summary>
+        private class MigratorDescription
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MigratorDescription"/> class.
+            /// </summary>
+            /// <param name="sourcePoints">
+            /// The source points.
+            /// </param>
+            /// <param name="destinationPoints">
+            /// The destination points.
+            /// </param>
+            /// <param name="resources">
+            /// The resources.
+            /// </param>
+            public MigratorDescription(
+                string[] sourcePoints,
+                string[] destinationPoints,
+                ResourceDescription[] resources)
+            {
+                this.SourcePoints = sourcePoints;
+                this.DestinationPoints = destinationPoints;
+                this.Resources = resources;
+            }
+
+            /// <summary>
+            /// Gets the resources
+            /// </summary>
+            public ResourceDescription[] Resources { get; }
+
+            /// <summary>
+            /// Gets the list of source points
+            /// </summary>
+            public string[] SourcePoints { get; }
+
+            /// <summary>
+            /// Gets the list of destination points
+            /// </summary>
+            public string[] DestinationPoints { get; }
+
+            /// <summary>
+            /// Gets or sets the migrator priority
+            /// </summary>
+            public decimal Priority { get; set; } = 1M;
+
+            /// <summary>
+            /// Gets or sets the type of resource dependency
+            /// </summary>
+            public EnResourceDependencyType DependencyType { get; set; } =
+                EnResourceDependencyType.CodeDependsOnResource;
+
+            /// <summary>
+            /// Gets the migrator type name
+            /// </summary>
+            public string TypeName { get; } = Guid.NewGuid().ToString();
+        }
+
+        /// <summary>
+        /// The test resource description
+        /// </summary>
+        private class ResourceDescription
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ResourceDescription"/> class.
+            /// </summary>
+            /// <param name="currentPoint">
+            /// The current point.
+            /// </param>
+            public ResourceDescription(string currentPoint)
+            {
+                this.CurrentPoint = currentPoint;
+            }
+
+            /// <summary>
+            /// Gets the resource current state
+            /// </summary>
+            public string CurrentPoint { get; }
+
+            /// <summary>
+            /// Gets or sets the resource id
+            /// </summary>
+            public string Code { get; set; } = Guid.NewGuid().ToString();
+
+            /// <summary>
+            /// Gets or sets the test resource position
+            /// </summary>
+            public EnResourcePosition Position { get; set; } = EnResourcePosition.SourceAndDestination;
         }
 
         /// <summary>
@@ -2507,7 +3047,8 @@ namespace KlusterKite.NodeManager.Tests
                 container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
                     .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
 
-                container.RegisterType<ConfigurationDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
+                container.RegisterType<ConfigurationDataFactory>()
+                    .As<DataFactory<ConfigurationContext, Configuration, int>>();
                 var packageRepository = this.CreateTestRepository();
                 container.RegisterInstance(packageRepository).As<IPackageRepository>();
                 container.RegisterType<TestMessageRouter>().As<IMessageRouter>().SingleInstance();
@@ -2547,8 +3088,7 @@ namespace KlusterKite.NodeManager.Tests
                                          {
                                              ConfigurationCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ConfigurationCheckTestsBase
-                                                         .Net46,
+                                                     ConfigurationCheckTestsBase.Net46,
                                                      "dp1 1.0.0")
                                          }
                              };
@@ -2560,8 +3100,7 @@ namespace KlusterKite.NodeManager.Tests
                                          {
                                              ConfigurationCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ConfigurationCheckTestsBase
-                                                         .Net46,
+                                                     ConfigurationCheckTestsBase.Net46,
                                                      "dp2 1.0.0")
                                          }
                              };
@@ -2573,8 +3112,7 @@ namespace KlusterKite.NodeManager.Tests
                                          {
                                              ConfigurationCheckTestsBase
                                                  .CreatePackageDependencySet(
-                                                     ConfigurationCheckTestsBase
-                                                         .Net46,
+                                                     ConfigurationCheckTestsBase.Net46,
                                                      "dp3 2.0.0")
                                          }
                              };
@@ -2591,8 +3129,7 @@ namespace KlusterKite.NodeManager.Tests
                                           {
                                               ConfigurationCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ConfigurationCheckTestsBase
-                                                          .Net46,
+                                                      ConfigurationCheckTestsBase.Net46,
                                                       "dp1 2.0.0")
                                           }
                               };
@@ -2604,8 +3141,7 @@ namespace KlusterKite.NodeManager.Tests
                                           {
                                               ConfigurationCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ConfigurationCheckTestsBase
-                                                          .Net46,
+                                                      ConfigurationCheckTestsBase.Net46,
                                                       "dp2 2.0.0")
                                           }
                               };
@@ -2617,8 +3153,7 @@ namespace KlusterKite.NodeManager.Tests
                                           {
                                               ConfigurationCheckTestsBase
                                                   .CreatePackageDependencySet(
-                                                      ConfigurationCheckTestsBase
-                                                          .Net46,
+                                                      ConfigurationCheckTestsBase.Net46,
                                                       "dp3 2.0.0")
                                           }
                               };
@@ -2628,19 +3163,7 @@ namespace KlusterKite.NodeManager.Tests
 
                 var dp32 = new TestPackage("dp3", "2.0.0");
 
-                return new TestRepository(
-                    p1,
-                    p2,
-                    p3,
-                    dp1,
-                    dp2,
-                    dp3,
-                    p12,
-                    p22,
-                    p32,
-                    dp12,
-                    dp22,
-                    dp32);
+                return new TestRepository(p1, p2, p3, dp1, dp2, dp3, p12, p22, p32, dp12, dp22, dp32);
             }
         }
 
@@ -2662,7 +3185,7 @@ namespace KlusterKite.NodeManager.Tests
             /// <summary>
             /// The actor system
             /// </summary>
-            private ActorSystem system;
+            private readonly ActorSystem system;
 
             /// <summary>
             ///     Initializes a new instance of the <see cref="VirtualNode" /> class.

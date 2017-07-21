@@ -107,7 +107,9 @@ namespace KlusterKite.NodeManager.RemoteDomain
                             Name = migrator.Name,
                             MigrationPoints = migrationPoints,
                             LastDefinedPoint = migrator.LatestPoint,
-                            Resources = states
+                            Resources = states,
+                            Priority = migrator.Priority,
+                            DependencyType = migrator.DependencyType
                         });
             }
 

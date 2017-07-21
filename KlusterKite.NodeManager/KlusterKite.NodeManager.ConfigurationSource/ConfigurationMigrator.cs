@@ -58,6 +58,9 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         public override string Name => "KlusterKite configuration database";
 
         /// <inheritdoc />
+        public override decimal Priority => 1M;
+
+        /// <inheritdoc />
         public override IEnumerable<ResourceId> GetMigratableResources()
         {
             yield return this.GetDefaultResourceId();

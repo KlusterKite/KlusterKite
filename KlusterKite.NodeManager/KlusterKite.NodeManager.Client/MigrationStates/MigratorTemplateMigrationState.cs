@@ -67,25 +67,18 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
                 throw new ArgumentException(@"Can be called only for new or obsolete templates", nameof(position));
             }
 
+            var sourceTemplate = position == EnMigratorPosition.Obsolete ? state.Template : null;
+            var destinationTemplate = position == EnMigratorPosition.New ? state.Template : null;
+            var migrators = state.MigratorsStates
+                .Select(m => MigratorMigrationState.CreateFrom(state.Code, m, position)).ToList();
+
             return new MigratorTemplateMigrationState
                        {
                            Code = state.Template.Code,
-                           SourceTemplate =
-                               position == EnMigratorPosition.Obsolete
-                                   ? state.Template
-                                   : null,
-                           DestinationTemplate =
-                               position == EnMigratorPosition.New
-                                   ? state.Template
-                                   : null,
+                           SourceTemplate = sourceTemplate,
+                           DestinationTemplate = destinationTemplate,
                            Position = position,
-                           Migrators =
-                               state.MigratorsStates
-                                   .Select(
-                                       m => MigratorMigrationState.CreateFrom(
-                                           m,
-                                           position))
-                                   .ToList()
+                           Migrators = migrators
                        };
         }
     }

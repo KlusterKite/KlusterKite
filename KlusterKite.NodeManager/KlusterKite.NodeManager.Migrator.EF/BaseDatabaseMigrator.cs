@@ -60,6 +60,12 @@ namespace KlusterKite.NodeManager.Migrator.EF
         public abstract string Name { get; }
 
         /// <inheritdoc />
+        public EnResourceDependencyType DependencyType => EnResourceDependencyType.CodeDependsOnResource;
+
+        /// <inheritdoc />
+        public abstract decimal Priority { get; }
+
+        /// <inheritdoc />
         public abstract IEnumerable<ResourceId> GetMigratableResources();
 
         /// <summary>

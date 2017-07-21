@@ -50,13 +50,6 @@ namespace KlusterKite.NodeManager.Client.ORM
         public EnMigrationState State { get; set; }
 
         /// <summary>
-        /// Gets or sets the migration direction
-        /// </summary>
-        [UsedImplicitly]
-        [DeclareField("the migration direction")]
-        public EnMigrationDirection? Direction { get; set; }
-
-        /// <summary>
         /// Gets or sets the migration start time
         /// </summary>
         [UsedImplicitly]

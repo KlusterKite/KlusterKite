@@ -12,6 +12,7 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     using System.Collections.Generic;
 
     using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Migrator;
 
     /// <summary>
     /// The state of migrators resources
@@ -48,5 +49,17 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// </summary>
         [DeclareField("the state of defined resources")]
         public List<ResourceConfigurationState> Resources { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of resource dependency
+        /// </summary>
+        [DeclareField("the type of resource dependency")]
+        public EnResourceDependencyType DependencyType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the priority of execution. In case of migration, the migrators will be run in order of priority from largest to lowest
+        /// </summary>
+        [DeclareField("the priority of execution. In case of migration, the migrators will be run in order of priority from largest to lowest")]
+        public decimal Priority { get; set; }
     }
 }

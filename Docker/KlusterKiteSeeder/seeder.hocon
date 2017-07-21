@@ -49,10 +49,20 @@
 
 	KlusterKite.NodeManager.Mock {
 		RedisConnection = "172.18.0.4:6379"
-		ResourcePoints = [
+		
+		Dependent.ResourcePoints = [
 			"first"
 		]
-		Resources = [
+		Dependent.Resources = [
+			"resource-1",
+			"resource-2",
+			"resource-3"
+		]
+
+		Dependence.ResourcePoints = [
+			"first"
+		]
+		Dependence.Resources = [
 			"resource-1",
 			"resource-2",
 			"resource-3"

@@ -153,6 +153,12 @@ mutation {
   }
 }
 
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "KlusterKite", migratorTypeName: "KlusterKite.NodeManager.Mock.MockResourceMigrator", resourceCode: "resource-4", target: Destination}]}}) {
+    result 
+  }
+}
+
 -- finish migration
 mutation {
   klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationFinish {

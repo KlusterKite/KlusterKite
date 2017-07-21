@@ -17,7 +17,7 @@ namespace KlusterKite.NodeManager.Tests
 
     using Akka.Actor;
     using Akka.Configuration;
-
+    
     using Autofac;
 
     using KlusterKite.Core;
@@ -66,6 +66,137 @@ namespace KlusterKite.NodeManager.Tests
         {
             this.connectionString = this.Sys.Settings.Config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             this.databaseName = this.Sys.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
+        }
+
+        /// <summary>
+        /// <see cref="MigrationActor"/> checks the upgrade migration
+        /// </summary>
+        [Fact]
+        public void ConfigurationCheckFailedTest()
+        {
+            this.CreateConfiguration();
+            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
+            using (var context = this.GetContext())
+            {
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
+                {{
+                    TestMigrator.DefinedMigrationPoints = [
+                        ""first"",
+                        ""second"",
+                    ]
+                    TestMigrator.Resources = [
+                        ""{resourceName.Replace("\\", "\\\\")}""
+                    ]
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                    ]
+
+                    TestMigrator.ThrowOnGetMigratableResources = true
+                }}
+                ";
+                context.SaveChanges();
+            }
+
+            try
+            {
+                TestMigrator.SetMigrationPoint(resourceName, "first");
+
+                this.ActorOf(
+                    () => new MigratorForwarder(
+                        this.TestActor,
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
+                    "migrationActor");
+                this.ExpectMsg<ProcessingTheRequest>();
+                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(30));
+                this.ExpectNoMsg();
+            }
+            finally
+            {
+                File.Delete(resourceName);
+            }
+        }
+
+        /// <summary>
+        /// <see cref="MigrationActor"/> checks the upgrade migration
+        /// </summary>
+        [Fact]
+        public void ConfigurationUpgradeCheckTest()
+        {
+            this.CreateConfiguration();
+            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
+            using (var context = this.GetContext())
+            {
+                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
+                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
+                {{
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
+                        ""first"",
+                        ""second"",
+                    ]
+                    TestMigrator.Dependence.Resources = [
+                        ""{resourceName.Replace("\\", "\\\\")}""
+                    ]
+                    KlusterKite.NodeManager.Migrators = [
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
+                    ]
+                }}
+                ";
+                context.SaveChanges();
+            }
+
+            try
+            {
+                TestMigrator.SetMigrationPoint(resourceName, "first");
+
+                var actor = this.ActorOf(
+                    () => new MigratorForwarder(
+                        this.TestActor,
+                        this.Container.Resolve<UniversalContextFactory>(),
+                        this.Container.Resolve<IPackageRepository>()),
+                    "migrationActor");
+                this.ExpectMsg<ProcessingTheRequest>();
+                var state = this.ExpectMsg<MigrationActorConfigurationState>(TimeSpan.FromSeconds(45));
+                this.ExpectNoMsg();
+                Assert.Equal(1, state.States.Count);
+                Assert.Equal(1, state.States[0].MigratorsStates.Count);
+                Assert.Equal(1, state.States[0].MigratorsStates[0].Resources.Count);
+                Assert.Equal("first", state.States[0].MigratorsStates[0].Resources[0].CurrentPoint);
+
+                var resourceUpgrade = new ResourceUpgrade
+                                          {
+                                              TemplateCode = "migrator",
+                                              MigratorTypeName =
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
+                                              ResourceCode = Path.GetFileName(resourceName),
+                                              Target = EnMigrationSide.Destination
+                                          };
+
+                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
+                this.ExpectMsg<ProcessingTheRequest>();
+                var log = this.ExpectMsg<List<MigrationLogRecord>>();
+                Assert.Equal(1, log.Count);
+                var record = log.First();
+                Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
+                Assert.Null(record.MigrationId);
+                Assert.Equal(1, record.ConfigurationId);
+                Assert.Equal("migrator", record.MigratorTemplateCode);
+                Assert.Equal("first", record.SourcePoint);
+                Assert.Equal("second", record.DestinationPoint);
+
+                state = this.ExpectMsg<MigrationActorConfigurationState>(TimeSpan.FromSeconds(10));
+                this.ExpectNoMsg();
+                Assert.Equal(1, state.States.Count);
+                Assert.Equal(1, state.States[0].MigratorsStates.Count);
+                Assert.Equal(1, state.States[0].MigratorsStates[0].Resources.Count);
+                Assert.Equal("second", state.States[0].MigratorsStates[0].Resources[0].CurrentPoint);
+            }
+            finally
+            {
+                File.Delete(resourceName);
+            }
         }
 
         /// <summary>
@@ -150,29 +281,31 @@ namespace KlusterKite.NodeManager.Tests
 
                 nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first""
                     ]
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
 
                 activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first"",
                         ""second"",
                     ]
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -193,11 +326,10 @@ namespace KlusterKite.NodeManager.Tests
                 this.ExpectMsg<ProcessingTheRequest>();
                 var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
                 Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Downgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
@@ -206,7 +338,7 @@ namespace KlusterKite.NodeManager.Tests
                                           {
                                               TemplateCode = "migrator",
                                               MigratorTypeName =
-                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
                                               ResourceCode = Path.GetFileName(resourceName),
                                               Target = EnMigrationSide.Destination
                                           };
@@ -224,11 +356,10 @@ namespace KlusterKite.NodeManager.Tests
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Destination, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
                 Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Downgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
                 Assert.Equal(
@@ -256,28 +387,30 @@ namespace KlusterKite.NodeManager.Tests
 
                 nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first""
                     ]
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
 
                 activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first"",
                     ]
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -299,11 +432,10 @@ namespace KlusterKite.NodeManager.Tests
 
                 var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.NoMigrationNeeded, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
                 Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Stay, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
                 Assert.Equal(
@@ -331,29 +463,31 @@ namespace KlusterKite.NodeManager.Tests
 
                 activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first""
                     ]
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
 
                 nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first"",
                         ""second"",
                     ]
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -375,11 +509,10 @@ namespace KlusterKite.NodeManager.Tests
 
                 var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
                 Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
@@ -388,7 +521,7 @@ namespace KlusterKite.NodeManager.Tests
                                           {
                                               TemplateCode = "migrator",
                                               MigratorTypeName =
-                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
                                               ResourceCode = Path.GetFileName(resourceName),
                                               Target = EnMigrationSide.Destination
                                           };
@@ -406,11 +539,10 @@ namespace KlusterKite.NodeManager.Tests
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Destination, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
                 Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
                 Assert.Equal(
@@ -438,30 +570,32 @@ namespace KlusterKite.NodeManager.Tests
 
                 activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first""
                     ]
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
 
                 nextConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
                 {{
-                    TestMigrator.DefinedMigrationPoints = [
+                    TestMigrator.Dir = ""{Path.GetFullPath(".").Replace("\\", "\\\\")}""
+                    TestMigrator.Dependence.DefinedMigrationPoints = [
                         ""first"",
                         ""second"",
                     ]
 
-                    TestMigrator.Resources = [
+                    TestMigrator.Dependence.Resources = [
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
 
                     TestMigrator.ThrowOnMigrate = true
@@ -485,11 +619,10 @@ namespace KlusterKite.NodeManager.Tests
 
                 var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
                 this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
                 Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
@@ -498,7 +631,7 @@ namespace KlusterKite.NodeManager.Tests
                                           {
                                               TemplateCode = "migrator",
                                               MigratorTypeName =
-                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
+                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
                                               ResourceCode = Path.GetFileName(resourceName),
                                               Target = EnMigrationSide.Destination
                                           };
@@ -517,11 +650,10 @@ namespace KlusterKite.NodeManager.Tests
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
-                Assert.Equal(EnMigrationActorMigrationPosition.Source, state.Position);
                 Assert.Equal(1, state.TemplateStates.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
                 Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
-                Assert.Equal(EnMigratorPosition.Merged, state.TemplateStates[0].Migrators[0].Position);
+                Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
                 Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
@@ -529,155 +661,6 @@ namespace KlusterKite.NodeManager.Tests
             finally
             {
                 File.Delete(resourceName);
-            }
-        }
-
-        /// <summary>
-        /// <see cref="MigrationActor"/> checks the upgrade migration
-        /// </summary>
-        [Fact]
-        public void ConfigurationCheckFailedTest()
-        {
-            this.CreateConfiguration();
-            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = this.GetContext())
-            {
-                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
-                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
-                {{
-                    TestMigrator.DefinedMigrationPoints = [
-                        ""first"",
-                        ""second"",
-                    ]
-                    TestMigrator.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
-                    ]
-                    KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
-                    ]
-
-                    TestMigrator.ThrowOnGetMigratableResources = true
-                }}
-                ";
-                context.SaveChanges();
-            }
-
-            try
-            {
-                TestMigrator.SetMigrationPoint(resourceName, "first");
-
-                this.ActorOf(
-                    () => new MigratorForwarder(
-                        this.TestActor,
-                        this.Container.Resolve<UniversalContextFactory>(),
-                        this.Container.Resolve<IPackageRepository>()),
-                    "migrationActor");
-                this.ExpectMsg<ProcessingTheRequest>();
-                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(30));
-                this.ExpectNoMsg();
-            }
-            finally
-            {
-                File.Delete(resourceName);
-            }
-        }
-
-        /// <summary>
-        /// <see cref="MigrationActor"/> checks the upgrade migration
-        /// </summary>
-        [Fact]
-        public void ConfigurationUpgradeCheckTest()
-        {
-            this.CreateConfiguration();
-            var resourceName = Path.Combine(Path.GetFullPath("."), Guid.NewGuid().ToString("N"));
-            using (var context = this.GetContext())
-            {
-                var activeConfiguration = context.Configurations.First(r => r.Id == 1);
-                activeConfiguration.Settings.MigratorTemplates.First().Configuration = $@"
-                {{
-                    TestMigrator.DefinedMigrationPoints = [
-                        ""first"",
-                        ""second"",
-                    ]
-                    TestMigrator.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
-                    ]
-                    KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
-                    ]
-                }}
-                ";
-                context.SaveChanges();
-            }
-
-            try
-            {
-                TestMigrator.SetMigrationPoint(resourceName, "first");
-
-                var actor = this.ActorOf(
-                    () => new MigratorForwarder(
-                        this.TestActor,
-                        this.Container.Resolve<UniversalContextFactory>(),
-                        this.Container.Resolve<IPackageRepository>()),
-                    "migrationActor");
-                this.ExpectMsg<ProcessingTheRequest>();
-                var state = this.ExpectMsg<MigrationActorConfigurationState>(TimeSpan.FromSeconds(45));
-                this.ExpectNoMsg();
-                Assert.Equal(1, state.States.Count);
-                Assert.Equal(1, state.States[0].MigratorsStates.Count);
-                Assert.Equal(1, state.States[0].MigratorsStates[0].Resources.Count);
-                Assert.Equal("first", state.States[0].MigratorsStates[0].Resources[0].CurrentPoint);
-
-                var resourceUpgrade = new ResourceUpgrade
-                                          {
-                                              TemplateCode = "migrator",
-                                              MigratorTypeName =
-                                                  "KlusterKite.NodeManager.Tests.Migrations.TestMigrator",
-                                              ResourceCode = Path.GetFileName(resourceName),
-                                              Target = EnMigrationSide.Destination
-                                          };
-
-                actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
-                this.ExpectMsg<ProcessingTheRequest>();
-                var log = this.ExpectMsg<List<MigrationLogRecord>>();
-                Assert.Equal(1, log.Count);
-                var record = log.First();
-                Assert.Equal(EnMigrationLogRecordType.Operation, record.Type);
-                Assert.Null(record.MigrationId);
-                Assert.Equal(1, record.ConfigurationId);
-                Assert.Equal("migrator", record.MigratorTemplateCode);
-                Assert.Equal("first", record.SourcePoint);
-                Assert.Equal("second", record.DestinationPoint);
-
-                state = this.ExpectMsg<MigrationActorConfigurationState>(TimeSpan.FromSeconds(10));
-                this.ExpectNoMsg();
-                Assert.Equal(1, state.States.Count);
-                Assert.Equal(1, state.States[0].MigratorsStates.Count);
-                Assert.Equal(1, state.States[0].MigratorsStates[0].Resources.Count);
-                Assert.Equal("second", state.States[0].MigratorsStates[0].Resources[0].CurrentPoint);
-            }
-            finally
-            {
-                File.Delete(resourceName);
-            }
-        }
-
-        /// <summary>
-        /// Creates the new migration in database
-        /// </summary>
-        private void CreateMigration()
-        {
-            using (var context = this.GetContext())
-            {
-                var migration = new Migration
-                                    {
-                                        FromConfigurationId = 1,
-                                        ToConfigurationId = 2,
-                                        IsActive = true,
-                                        State = EnMigrationState.Preparing
-                                    };
-                context.Migrations.Add(migration);
-                context.SaveChanges();
             }
         }
 
@@ -724,14 +707,15 @@ namespace KlusterKite.NodeManager.Tests
                 .Select(p => p.Identity).Select(
                     p => new PackageDescription { Id = p.Id, Version = p.Version.ToString() }).ToList();
 
-            var configurationSettings = new ConfigurationSettings
-                                    {
-                                        NodeTemplates = new[] { template }.ToList(),
-                                        MigratorTemplates = new[] { migrator }.ToList(),
-                                        Packages = packageDescriptions,
-                                        NugetFeed = "http://nuget/",
-                                        SeedAddresses = new[] { "http://seed" }.ToList()
-                                    };
+            var configurationSettings =
+                new ConfigurationSettings
+                    {
+                        NodeTemplates = new[] { template }.ToList(),
+                        MigratorTemplates = new[] { migrator }.ToList(),
+                        Packages = packageDescriptions,
+                        NugetFeed = "http://nuget/",
+                        SeedAddresses = new[] { "http://seed" }.ToList()
+                    };
 
             var configuration = new Configuration { Settings = configurationSettings };
             return configuration;
@@ -749,7 +733,10 @@ namespace KlusterKite.NodeManager.Tests
                 var activeConfiguration = this.CreateConfiguration(repo);
                 context.Configurations.Add(activeConfiguration);
                 context.SaveChanges();
-                var errors = activeConfiguration.CheckAll(context, repo, new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
+                var errors = activeConfiguration.CheckAll(
+                        context,
+                        repo,
+                        new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
@@ -763,7 +750,10 @@ namespace KlusterKite.NodeManager.Tests
                 var nextConfiguration = this.CreateConfiguration(repo);
                 context.Configurations.Add(nextConfiguration);
                 context.SaveChanges();
-                errors = nextConfiguration.CheckAll(context, repo, new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
+                errors = nextConfiguration.CheckAll(
+                        context,
+                        repo,
+                        new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
@@ -772,6 +762,25 @@ namespace KlusterKite.NodeManager.Tests
 
                 Assert.Equal(0, errors.Count);
                 nextConfiguration.State = EnConfigurationState.Ready;
+                context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Creates the new migration in database
+        /// </summary>
+        private void CreateMigration()
+        {
+            using (var context = this.GetContext())
+            {
+                var migration = new Migration
+                                    {
+                                        FromConfigurationId = 1,
+                                        ToConfigurationId = 2,
+                                        IsActive = true,
+                                        State = EnMigrationState.Preparing
+                                    };
+                context.Migrations.Add(migration);
                 context.SaveChanges();
             }
         }
@@ -920,9 +929,11 @@ namespace KlusterKite.NodeManager.Tests
                 container.RegisterAssemblyTypes(typeof(Core.Installer).GetTypeInfo().Assembly)
                     .Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
 
-                container.RegisterType<ConfigurationDataFactory>().As<DataFactory<ConfigurationContext, Configuration, int>>();
+                container.RegisterType<ConfigurationDataFactory>()
+                    .As<DataFactory<ConfigurationContext, Configuration, int>>();
 
-                container.RegisterInstance(TestRepository.CreateRepositoryFromLoadedAssemblies()).As<IPackageRepository>();
+                container.RegisterInstance(TestRepository.CreateRepositoryFromLoadedAssemblies())
+                    .As<IPackageRepository>();
                 container.RegisterType<TestMessageRouter>().As<IMessageRouter>();
             }
         }

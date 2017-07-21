@@ -81,11 +81,13 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// <summary>
         /// Creates <see cref="ResourceMigrationState"/>
         /// </summary>
+        /// <param name="templateCode">The migrator template code</param>
         /// <param name="state">The migrator state</param>
         /// <param name="resource">The resource state</param>
         /// <param name="position">The migrator position</param>
         /// <returns>The <see cref="ResourceMigrationState"/></returns>
         public static ResourceMigrationState CreateFrom(
+            string templateCode,
             MigratorConfigurationState state,
             ResourceConfigurationState resource,
             EnMigratorPosition position)
@@ -97,13 +99,13 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
                                                 ? null
                                                 : position == EnMigratorPosition.Obsolete
                                                   && state.MigrationPoints.Contains(resource.CurrentPoint)
+                                                  && state.LastDefinedPoint != resource.CurrentPoint
                                                     ? EnMigrationSide.Source
                                                     : (EnMigrationSide?)null;
 
             var migrationToDestinationExecutor = resource.CurrentPoint == state.LastDefinedPoint
                                                      ? null
                                                      : position == EnMigratorPosition.New
-                                                       && state.MigrationPoints.Contains(resource.CurrentPoint)
                                                          ? EnMigrationSide.Destination
                                                          : (EnMigrationSide?)null;
             return new ResourceMigrationState
@@ -114,13 +116,16 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
                            SourcePoint = sourcePoint,
                            DestinationPoint = destinationPoint,
                            MigrationToSourceExecutor = migrationToSourceExecutor,
-                           MigrationToDestinationExecutor = migrationToDestinationExecutor
+                           MigrationToDestinationExecutor = migrationToDestinationExecutor,
+                           MigratorTypeName = state.TypeName,
+                           TemplateCode = templateCode
                        };
         }
 
         /// <summary>
         /// Creates <see cref="ResourceMigrationState"/>
         /// </summary>
+        /// <param name="templateCode">The migrator template code</param>
         /// <param name="sourceMigratorState">
         /// The migrator state in source configuration
         /// </param>
@@ -137,6 +142,7 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// The <see cref="ResourceMigrationState"/>
         /// </returns>
         public static ResourceMigrationState CreateFrom(
+            string templateCode,
             MigratorConfigurationState sourceMigratorState,
             ResourceConfigurationState sourceState,
             MigratorConfigurationState destinationMigratorState,
@@ -164,6 +170,8 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
                        {
                            Code = destinationState.Code,
                            Name = destinationState.Name,
+                           MigratorTypeName = destinationMigratorState.TypeName,
+                           TemplateCode = templateCode,
                            SourcePoint = sourceMigratorState.LastDefinedPoint,
                            DestinationPoint = destinationMigratorState.LastDefinedPoint,
                            CurrentPoint = currentPoint,

@@ -28,7 +28,7 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// This entity is located in both source and destination configuration
         /// </summary>
         [ApiDescription("This entity is located in both source and destination configuration")]
-        Merged,
+        Present,
 
         /// <summary>
         /// This entity is not present in the destination configuration

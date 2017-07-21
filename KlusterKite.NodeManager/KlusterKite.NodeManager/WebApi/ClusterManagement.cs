@@ -87,6 +87,22 @@ namespace KlusterKite.NodeManager.WebApi
         private TimeSpan AkkaTimeout { get; }
 
         /// <summary>
+        /// Reloads current cluster configuration/migration state
+        /// </summary>
+        /// <returns>
+        /// The result of operation
+        /// </returns>
+        [UsedImplicitly]
+        [RequireSession]
+        [RequireUser]
+        [RequirePrivilege(Privileges.MigrateCluster)]
+        [DeclareMutation("Reloads current cluster configuration/migration state")]
+        public Task<bool> RecheckState()
+        {
+            return this.Actor.Ask<bool>(new RecheckState(), this.AkkaTimeout);
+        }
+
+        /// <summary>
         /// Gets the current cluster migration
         /// </summary>
         /// <returns>

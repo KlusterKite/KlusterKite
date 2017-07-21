@@ -25,5 +25,11 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
         /// </summary>
         [DeclareField("the list of template states")]
         public List<MigratorTemplateConfigurationState> States { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of resources that can be recovered
+        /// </summary>
+        [DeclareField("the list of resources that can be recovered")]
+        public List<ResourceConfigurationState> MigratableResources { get; set; }
     }
 }

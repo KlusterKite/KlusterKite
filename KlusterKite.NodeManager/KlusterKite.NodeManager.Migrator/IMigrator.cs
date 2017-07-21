@@ -27,6 +27,16 @@ namespace KlusterKite.NodeManager.Migrator
         string Name { get; }
 
         /// <summary>
+        /// Gets the type of resource dependency
+        /// </summary>
+        EnResourceDependencyType DependencyType { get; }
+
+        /// <summary>
+        /// Gets the priority of execution. In case of migration, the migrators will be run in order of priority from largest to lowest
+        /// </summary>
+        decimal Priority { get; }
+
+        /// <summary>
         /// Gets the list of cluster resources that this migrator can migrate
         /// </summary>
         /// <returns>The list of migratable resources</returns>

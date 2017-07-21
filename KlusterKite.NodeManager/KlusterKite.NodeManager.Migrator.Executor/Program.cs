@@ -65,7 +65,7 @@ namespace KlusterKite.NodeManager.Migrator.Executor
             BaseInstaller.RunComponentRegistration(builder, config);
 
             var migratorTypeNames = config.GetStringList("KlusterKite.NodeManager.Migrators");
-            foreach (var typeName in migratorTypeNames)
+            foreach (var typeName in migratorTypeNames.Where(t => !string.IsNullOrWhiteSpace(t)))
             {
                 var type = Type.GetType(typeName, false);
                 if (type == null)
