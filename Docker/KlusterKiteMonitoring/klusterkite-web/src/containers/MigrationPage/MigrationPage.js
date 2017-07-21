@@ -7,6 +7,7 @@ import NodesList from '../../components/NodesList/NodesList'
 import MigrationLogs from '../../components/MigrationOperations/MigrationLogs'
 import MigrationSteps from '../../components/MigrationOperations/MigrationSteps'
 import NodesWithTemplates from '../../components/NodesWithTemplates/index'
+import RecheckState from '../../components/RecheckState/RecheckState';
 import UpdateResources from '../../components/MigrationOperations/UpdateResources'
 
 import { hasPrivilege } from '../../utils/privileges'
@@ -104,7 +105,7 @@ class MigrationPage extends React.Component {
 
         {currentMigration &&
           <div>
-            <h2>Migration {currentMigration.fromConfiguration && currentMigration.fromConfiguration.name} → {currentMigration.toConfiguration && currentMigration.toConfiguration.name}</h2>
+            <h2>Migration {currentMigration.fromConfiguration && currentMigration.fromConfiguration.name} → {currentMigration.toConfiguration && currentMigration.toConfiguration.name} <RecheckState /></h2>
             <p>Created: {currentMigration.started && DateFormat.formatDateTime(new Date(currentMigration.started))}</p>
 
             {(nodesUpdating || this.state.operationIsInProgress) && !this.state.migrationHasFinished &&

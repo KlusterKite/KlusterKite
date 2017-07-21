@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, Textarea } from 'formsy-react-components';
 
 import Form from '../Form/Form';
+import RecheckState from '../../components/RecheckState/RecheckState';
 import RowText from '../Form/RowText';
 
 export default class ConfigurationForm extends React.Component {
@@ -36,10 +37,10 @@ export default class ConfigurationForm extends React.Component {
     return (
       <div>
         {initialValues && canEdit &&
-          <h2>Edit Configuration</h2>
+          <h2>Edit Configuration <RecheckState /></h2>
         }
         {initialValues && !canEdit &&
-          <h2>View Configuration</h2>
+          <h2>View Configuration <RecheckState /></h2>
         }
         {!initialValues &&
           <h2>Create a new Configuration</h2>

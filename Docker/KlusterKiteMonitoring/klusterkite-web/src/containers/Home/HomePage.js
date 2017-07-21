@@ -5,6 +5,7 @@ import delay from 'lodash/delay'
 
 import NodesList from '../../components/NodesList/NodesList';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
+import RecheckState from '../../components/RecheckState/RecheckState';
 
 import { hasPrivilege } from '../../utils/privileges';
 
@@ -29,7 +30,8 @@ class HomePage extends React.Component {
   render () {
     return (
       <div>
-        <h1>Monitoring</h1>
+        <h1>Monitoring <RecheckState /></h1>
+
         {hasPrivilege('KlusterKite.NodeManager.GetTemplateStatistics') && this.props.api.klusterKiteNodesApi &&
           <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
         }

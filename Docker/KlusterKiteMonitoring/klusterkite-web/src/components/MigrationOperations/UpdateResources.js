@@ -195,7 +195,7 @@ export class UpdateResources extends React.Component {
                             <td className="migration-resources">{resourceNode.position}</td>
                             <td className="migration-resources">{resourceNode.currentPoint}</td>
                             <td className="migration-resources migration-upgrade">
-                              {isMigratable && (resourceNode.migrationToDestinationExecutor !== null || resourceNode.position === 'NotCreated') &&
+                              {isMigratable && resourceNode.migrationToDestinationExecutor !== null &&
                                 <input
                                   type="checkbox"
                                   checked={this.state.selectedResources.some(item => item.target === direction && item.key === resourceNode.key)}
