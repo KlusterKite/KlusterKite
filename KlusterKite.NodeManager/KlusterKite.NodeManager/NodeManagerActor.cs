@@ -380,9 +380,13 @@ namespace KlusterKite.NodeManager
             var allResources = this.resourceState.MigrationState.TemplateStates.SelectMany(t => t.Migrators)
                 .SelectMany(m => m.Resources);
 
-            if (allResources.Any(
-                r => r.Position == EnResourcePosition.Undefined && r.MigrationToDestinationExecutor == null
-                     && r.MigrationToDestinationExecutor == null))
+            if (allResources.Any(r => r.Position == EnResourcePosition.OutOfScope))
+            {
+                return EnMigrationSteps.Broken;
+            }
+
+            if (this.resourceState.MigrationState.TemplateStates.SelectMany(t => t.Migrators)
+                .Any(m => m.Direction == EnMigrationDirection.Undefined))
             {
                 return EnMigrationSteps.Broken;
             }
@@ -758,6 +762,19 @@ namespace KlusterKite.NodeManager
                     this.resourceState.MigrationState.MigratableResources = preNodesMigratableResources
                         .Union(postNodesMigratableResources).ToList();
                     break;
+                case EnMigrationSteps.Broken:
+                    if (this.currentConfiguration.Id == this.currentMigration.FromConfigurationId && this.resourceState
+                            .MigrationState.TemplateStates.SelectMany(t => t.Migrators).SelectMany(m => m.Resources)
+                            .All(
+                                r => r.Position == EnResourcePosition.Source
+                                     || r.Position == EnResourcePosition.SourceAndDestination
+                                     || r.Position == EnResourcePosition.NotCreated
+                                     || r.Position == EnResourcePosition.Obsolete))
+                    {
+                        this.resourceState.CanCancelMigration = true;
+                    }
+
+                    break;
             }
         }
 
@@ -830,6 +847,15 @@ namespace KlusterKite.NodeManager
             }
 
             this.resourceState.ConfigurationState = state;
+
+            var resources = state.States.SelectMany(t => t.MigratorsStates)
+                .SelectMany(m => m.Resources.Select(r => new { m, r }));
+
+            foreach (var res in resources)
+            {
+                res.r.SetPosition(res.m);
+            }
+
             this.resourceState.MigrationState = null;
             Context.GetLogger().Info("{Type}: received a MigrationActorConfigurationState", this.GetType().Name);
             this.InitDatabase();

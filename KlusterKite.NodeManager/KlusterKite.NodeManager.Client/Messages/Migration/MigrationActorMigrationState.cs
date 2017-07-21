@@ -51,8 +51,7 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
                                   || (p.m.Direction == EnMigrationDirection.Downgrade && p.m.DependencyType
                                       == EnResourceDependencyType.ResourceDependsOnCode))))
                          && p.r.Position != EnResourcePosition.SourceAndDestination
-                         && (p.r.MigrationToDestinationExecutor != null || p.r.MigrationToSourceExecutor != null
-                             || p.r.Position == EnResourcePosition.Undefined)).Select(p => p.r);
+                         && p.r.Position != EnResourcePosition.OutOfScope).Select(p => p.r);
         }
 
         /// <summary>
@@ -71,8 +70,7 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
                                   || (p.m.Direction == EnMigrationDirection.Downgrade && p.m.DependencyType
                                       == EnResourceDependencyType.CodeDependsOnResource))))
                          && p.r.Position != EnResourcePosition.SourceAndDestination
-                         && (p.r.MigrationToDestinationExecutor != null || p.r.MigrationToSourceExecutor != null
-                             || p.r.Position == EnResourcePosition.Undefined)).Select(p => p.r);
+                         && p.r.Position != EnResourcePosition.OutOfScope).Select(p => p.r);
         }
 
         /// <summary>

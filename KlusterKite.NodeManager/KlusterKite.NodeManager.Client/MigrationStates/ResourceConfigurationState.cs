@@ -47,6 +47,12 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         public string CurrentPoint { get; set; }
 
         /// <summary>
+        /// Gets or sets the resource current position
+        /// </summary>
+        [DeclareField("the resource current position")]
+        public EnResourcePosition Position { get; set; }
+
+        /// <summary>
         /// Gets or sets the code of <see cref="MigratorTemplate.Code"/>
         /// </summary>
         [DeclareField("The code of migrator template")]
@@ -57,5 +63,29 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// </summary>
         [DeclareField("The type name of the migrator")]
         public string MigratorTypeName { get; set; }
+
+        /// <summary>
+        /// Calculates the resource position according to configuration
+        /// </summary>
+        /// <param name="sourceConfiguration">The configuration</param>
+        public void SetPosition(MigratorConfigurationState sourceConfiguration)
+        {
+            if (this.CurrentPoint == sourceConfiguration.LastDefinedPoint)
+            {
+                this.Position = EnResourcePosition.Source;
+            }
+            else if (string.IsNullOrWhiteSpace(this.CurrentPoint))
+            {
+                this.Position = EnResourcePosition.NotCreated;
+            }
+            else if (sourceConfiguration.MigrationPoints.Contains(this.CurrentPoint))
+            {
+                this.Position = EnResourcePosition.InScope;
+            }
+            else
+            {
+                this.Position = EnResourcePosition.OutOfScope;
+            }
+        }
     }
 }

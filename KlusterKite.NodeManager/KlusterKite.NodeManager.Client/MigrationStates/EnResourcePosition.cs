@@ -30,10 +30,16 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         Source,
 
         /// <summary>
-        /// The migration position of the resource is neither source nor destination
+        /// The migration position of the resource is neither source nor destination, but can be updated to source or destination
         /// </summary>
         [ApiDescription("The migration position of the resource is neither source nor destination")]
-        Undefined,
+        InScope,
+
+        /// <summary>
+        /// The migration position of the resource is neither source nor destination and cannot be updated to source or destination
+        /// </summary>
+        [ApiDescription("The migration position of the resource is neither source nor destination")]
+        OutOfScope,
 
         /// <summary>
         /// The resource is in the destination point migration

@@ -253,7 +253,7 @@ namespace KlusterKite.NodeManager.Tests
         /// The array of string representing resources.
         /// Each string contains 3 chars.
         /// 1. Dependency type: B for CodeDependsOnResource, A for ResourceDependsOnCode 
-        /// 2. The migration direction: U for upgrade, D for downgrade and S for stay
+        /// 2. The migration direction: U for upgrade, D for downgrade, S for stay and B from Broken (when source and destination migration does not contain one another)
         /// 3. The resource position: S - source, D - destination, M - no source nor destination (but can be migrated), B - broken, C - create, O - obsolete
         /// </param>
         /// <param name="configurationPosition">The current active configuration (1 or 2)</param>
@@ -332,13 +332,16 @@ namespace KlusterKite.NodeManager.Tests
         [InlineData(new[] { "AUM" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
         [InlineData(new[] { "BUM" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
 
-        [InlineData(new[] { "BDB" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
-        [InlineData(new[] { "ADB" }, 2, 2, "0000000", EnMigrationSteps.Broken, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
-        [InlineData(new[] { "AUB" }, 2, 2, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
-        [InlineData(new[] { "BUB" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BDB" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "ADB" }, 2, 2, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "AUB" }, 2, 2, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BUB" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
 
         [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 2, 2, "0000101", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3, 1, 2 })]
         [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 1, 1, "0000110", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3, 1, 2 })]
+
+        [InlineData(new[] { "BBS" }, 1, 1, "0100000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
+        [InlineData(new[] { "BBM" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
 
         public async Task MigrationStateTest(
             string[] resources,
@@ -399,6 +402,10 @@ namespace KlusterKite.NodeManager.Tests
                             case 'S':
                                 sourcePoints = new[] { "first", "second", "third" };
                                 destinationPoints = new[] { "first", "second", "third" };
+                                break;
+                            case 'B':
+                                sourcePoints = new[] { "first", "second", "third" };
+                                destinationPoints = new[] { "first", "second", "forth" };
                                 break;
                             default: throw new ArgumentException(nameof(resources));
                         }
