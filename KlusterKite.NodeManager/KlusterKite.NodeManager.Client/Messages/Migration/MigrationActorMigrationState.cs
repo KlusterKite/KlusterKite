@@ -41,8 +41,9 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
         /// <returns>The list of resources</returns>
         public IEnumerable<ResourceMigrationState> GetPreNodesMigratableResources()
         {
-            return this.TemplateStates.SelectMany(t => t.Migrators)
-                .SelectMany(m => m.Resources.Select(r => new { m, r })).Where(
+            var enumerable = this.TemplateStates.SelectMany(t => t.Migrators)
+                .SelectMany(m => m.Resources.Select(r => new { m, r }))
+                .Where(
                     p => ((p.r.Position == EnResourcePosition.NotCreated
                            && p.m.DependencyType == EnResourceDependencyType.CodeDependsOnResource)
                           || (p.r.Position != EnResourcePosition.NotCreated
@@ -51,7 +52,12 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
                                   || (p.m.Direction == EnMigrationDirection.Downgrade && p.m.DependencyType
                                       == EnResourceDependencyType.ResourceDependsOnCode))))
                          && p.r.Position != EnResourcePosition.SourceAndDestination
-                         && p.r.Position != EnResourcePosition.OutOfScope).Select(p => p.r);
+                         && p.r.Position != EnResourcePosition.OutOfScope
+                         && p.r.Position != EnResourcePosition.Obsolete).ToList();
+
+            return enumerable.Where(r => r.m.Direction == EnMigrationDirection.Downgrade).OrderBy(r => r.m.Priority)
+                .Union(enumerable.Where(r => r.m.Direction != EnMigrationDirection.Downgrade).OrderByDescending(r => r.m.Priority))
+                .Select(p => p.r);
         }
 
         /// <summary>
@@ -60,8 +66,9 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
         /// <returns>The list of resources</returns>
         public IEnumerable<ResourceMigrationState> GetPostNodesMigratableResources()
         {
-            return this.TemplateStates.SelectMany(t => t.Migrators)
-                .SelectMany(m => m.Resources.Select(r => new { m, r })).Where(
+            var enumerable = this.TemplateStates.SelectMany(t => t.Migrators)
+                .SelectMany(m => m.Resources.Select(r => new { m, r }))
+                .Where(
                     p => ((p.r.Position == EnResourcePosition.NotCreated
                            && p.m.DependencyType == EnResourceDependencyType.ResourceDependsOnCode)
                           || (p.r.Position != EnResourcePosition.NotCreated
@@ -70,7 +77,12 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
                                   || (p.m.Direction == EnMigrationDirection.Downgrade && p.m.DependencyType
                                       == EnResourceDependencyType.CodeDependsOnResource))))
                          && p.r.Position != EnResourcePosition.SourceAndDestination
-                         && p.r.Position != EnResourcePosition.OutOfScope).Select(p => p.r);
+                         && p.r.Position != EnResourcePosition.OutOfScope
+                         && p.r.Position != EnResourcePosition.Obsolete).ToList();
+
+            return enumerable.Where(r => r.m.Direction == EnMigrationDirection.Downgrade).OrderBy(r => r.m.Priority)
+                .Union(enumerable.Where(r => r.m.Direction != EnMigrationDirection.Downgrade).OrderByDescending(r => r.m.Priority))
+                .Select(p => p.r);
         }
 
         /// <summary>

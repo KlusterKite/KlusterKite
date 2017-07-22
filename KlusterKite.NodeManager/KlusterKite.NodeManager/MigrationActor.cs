@@ -355,6 +355,10 @@ namespace KlusterKite.NodeManager
         {
             var plan = new MigrationPlan();
             errors = new List<MigrationLogRecord>();
+
+            MigratorTemplatePlan currentTemplatePlan = null;
+            MigratorMigrationsCommand currentCommand = null;
+
             foreach (var resourceUpgrade in request)
             {
                 var error = new MigrationLogRecord
@@ -400,27 +404,28 @@ namespace KlusterKite.NodeManager
 
                 error.ResourceName = resource.Name;
 
-                var sideExecutionPlans = plan.SourceExecution;
-
-                MigratorTemplatePlan templatePlan;
-                if (!sideExecutionPlans.TryGetValue(resourceUpgrade.TemplateCode, out templatePlan))
+                if (template.Code != currentTemplatePlan?.Template.Code || currentTemplatePlan == null)
                 {
-                    templatePlan = new MigratorTemplatePlan { Template = template.Template };
-                    sideExecutionPlans[resourceUpgrade.TemplateCode] = templatePlan;
+                    currentTemplatePlan =
+                        new MigratorTemplatePlan
+                            {
+                                Template = template.Template
+                            };
+                    currentCommand = null;
+                    plan.Executions.Add(currentTemplatePlan);
                 }
 
-                MigratorMigrationsCommand migratorMigrationsCommand;
-                if (!templatePlan.MigratorPlans.TryGetValue(
-                        resourceUpgrade.MigratorTypeName,
-                        out migratorMigrationsCommand))
+                if (migrator.TypeName != currentCommand?.TypeName || currentCommand == null)
                 {
-                    migratorMigrationsCommand =
-                        new MigratorMigrationsCommand { TypeName = resourceUpgrade.MigratorTypeName };
-                    templatePlan.MigratorPlans[resourceUpgrade.MigratorTypeName] = migratorMigrationsCommand;
+                    currentCommand = new MigratorMigrationsCommand { TypeName = migrator.TypeName };
+                    currentTemplatePlan.Commands.Add(currentCommand);
                 }
 
                 var migrationPoint = migrator.LastDefinedPoint;
-                migratorMigrationsCommand.Resources.Add(resource.Code, migrationPoint);
+
+                var resourceMigrationCommand =
+                    new ResourceMigrationCommand { ResourceCode = resource.Code, MigrationPoint = migrationPoint };
+                currentCommand.Resources.Add(resourceMigrationCommand);
             }
 
             return plan;
@@ -437,6 +442,10 @@ namespace KlusterKite.NodeManager
             var plan = new MigrationPlan();
             errors = new List<MigrationLogRecord>();
             var errorId = -1;
+
+            MigratorTemplatePlan currentTemplatePlan = null;
+            MigratorMigrationsCommand currentCommand = null;
+
             foreach (var resourceUpgrade in request)
             {
                 var error = new MigrationLogRecord
@@ -493,35 +502,33 @@ namespace KlusterKite.NodeManager
                     continue;
                 }
 
-                var sideExecutionPlans = executionSide.Value == EnMigrationSide.Source
-                                             ? plan.SourceExecution
-                                             : plan.DestinationExecution;
-
-                MigratorTemplatePlan templatePlan;
-                if (!sideExecutionPlans.TryGetValue(resourceUpgrade.TemplateCode, out templatePlan))
+                if (template.Code != currentTemplatePlan?.Template.Code || executionSide != currentTemplatePlan?.Side)
                 {
-                    templatePlan = new MigratorTemplatePlan();
-                    templatePlan.Template = executionSide.Value == EnMigrationSide.Source
-                                                ? template.SourceTemplate
-                                                : template.DestinationTemplate;
-                    sideExecutionPlans[resourceUpgrade.TemplateCode] = templatePlan;
+                    currentTemplatePlan =
+                        new MigratorTemplatePlan
+                            {
+                                Side = executionSide.Value,
+                                Template = executionSide == EnMigrationSide.Destination
+                                               ? template.DestinationTemplate
+                                               : template.SourceTemplate
+                            };
+                    currentCommand = null;
+                    plan.Executions.Add(currentTemplatePlan);
                 }
 
-                MigratorMigrationsCommand migratorMigrationsCommand;
-                if (!templatePlan.MigratorPlans.TryGetValue(
-                        resourceUpgrade.MigratorTypeName,
-                        out migratorMigrationsCommand))
+                if (migrator.TypeName != currentCommand?.TypeName || currentCommand == null)
                 {
-                    migratorMigrationsCommand =
-                        new MigratorMigrationsCommand { TypeName = resourceUpgrade.MigratorTypeName };
-                    templatePlan.MigratorPlans[resourceUpgrade.MigratorTypeName] = migratorMigrationsCommand;
+                    currentCommand = new MigratorMigrationsCommand { TypeName = migrator.TypeName };
+                    currentTemplatePlan.Commands.Add(currentCommand);
                 }
 
                 var migrationPoint = resourceUpgrade.Target == EnMigrationSide.Source
                                          ? resource.SourcePoint
                                          : resource.DestinationPoint;
 
-                migratorMigrationsCommand.Resources.Add(resource.Code, migrationPoint);
+                var resourceMigrationCommand =
+                    new ResourceMigrationCommand { ResourceCode = resource.Code, MigrationPoint = migrationPoint };
+                currentCommand.Resources.Add(resourceMigrationCommand);
             }
 
             return plan;
@@ -555,11 +562,11 @@ namespace KlusterKite.NodeManager
                 this.GetType().Name,
                 plan.Template.Code,
                 configurationId,
-                plan.MigratorPlans.Values.SelectMany(m => m.Resources.Values).Count());
+                plan.Commands.SelectMany(m => m.Resources).Count());
 
             try
             {
-                var collector = new MigrationExecutor { Commands = plan.MigratorPlans.Values.ToList() };
+                var collector = new MigrationExecutor { Commands = plan.Commands };
 
                 Context.GetLogger().Info(
                     "{Type}: {MigratorTemplateCode} of configuration {ConfigurationId} migration executor was created",
@@ -673,8 +680,7 @@ namespace KlusterKite.NodeManager
 
             try
             {
-                var collector = new MigrationExecutor();
-                collector.Commands = plan.MigratorPlans.Values.ToList();
+                var collector = new MigrationExecutor { Commands = plan.Commands };
                 collector = this.ExecuteMigrator(configurationDir, collector);
 
                 var operations = collector.Result;
@@ -1295,10 +1301,10 @@ isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.
             this.Sender.Tell(new RequestAcknowledged());
             this.Parent.Tell(new ProcessingTheRequest());
 
-            var migrationLog = plan.SourceExecution.Values.Aggregate(
+            var log = plan.Executions.Aggregate(
                 (IEnumerable<MigrationLogRecord>)new List<MigrationLogRecord>(),
-                (list, templatePlan) => list.Union(this.ExecuteMigration(templatePlan))).ToList();
-            this.Parent.Tell(migrationLog);
+                (list, templatePlan) => list.Union(this.ExecuteMigration(templatePlan)));
+            this.Parent.Tell(log.ToList());
             return this.LoadState();
         }
 
@@ -1320,15 +1326,11 @@ isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.
                 return this.Stay();
             }
 
-            var sourceLog = plan.SourceExecution.Values.Aggregate(
+            var log = plan.Executions.Aggregate(
                 (IEnumerable<MigrationLogRecord>)new List<MigrationLogRecord>(),
-                (list, templatePlan) => list.Union(this.ExecuteMigration(EnMigrationSide.Source, templatePlan)));
+                (list, templatePlan) => list.Union(this.ExecuteMigration(templatePlan.Side, templatePlan)));
 
-            var destinationLog = plan.DestinationExecution.Values.Aggregate(
-                (IEnumerable<MigrationLogRecord>)new List<MigrationLogRecord>(),
-                (list, templatePlan) => list.Union(this.ExecuteMigration(EnMigrationSide.Destination, templatePlan)));
-
-            this.Parent.Tell(sourceLog.Union(destinationLog).ToList());
+            this.Parent.Tell(log.ToList());
             return this.LoadState();
         }
 
@@ -1379,16 +1381,9 @@ isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.
         private class MigrationPlan
         {
             /// <summary>
-            /// Gets the list of migrations that should be performed with the destination configuration code
+            /// Gets the list of migrator executions
             /// </summary>
-            public Dictionary<string, MigratorTemplatePlan> DestinationExecution { get; } =
-                new Dictionary<string, MigratorTemplatePlan>();
-
-            /// <summary>
-            /// Gets the list of migrations that should be performed with the source configuration code
-            /// </summary>
-            public Dictionary<string, MigratorTemplatePlan> SourceExecution { get; } =
-                new Dictionary<string, MigratorTemplatePlan>();
+            public List<MigratorTemplatePlan> Executions { get; } = new List<MigratorTemplatePlan>();
         }
 
         /// <summary>
@@ -1397,15 +1392,20 @@ isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.
         private class MigratorTemplatePlan
         {
             /// <summary>
-            /// Gets the list of command to execute with migrators
+            /// Gets the list of commands to execute with migrators
             /// </summary>
-            public Dictionary<string, MigratorMigrationsCommand> MigratorPlans { get; } =
-                new Dictionary<string, MigratorMigrationsCommand>();
+            public List<MigratorMigrationsCommand> Commands { get; } =
+                new List<MigratorMigrationsCommand>();
 
             /// <summary>
             /// Gets or sets the migrator template
             /// </summary>
             public MigratorTemplate Template { get; set; }
+
+            /// <summary>
+            /// Gets or sets the execution side
+            /// </summary>
+            public EnMigrationSide Side { get; set; }
         }
     }
 }

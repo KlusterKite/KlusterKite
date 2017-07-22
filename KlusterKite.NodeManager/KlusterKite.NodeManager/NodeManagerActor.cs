@@ -647,7 +647,7 @@ namespace KlusterKite.NodeManager
 
             this.resourceState.CanCreateMigration = true;
             this.resourceState.CanMigrateResources = false;
-            
+
             if (this.nodeDescriptions.Values.Any(n => n.IsObsolete))
             {
                 this.resourceState.CanCreateMigration = false;
@@ -675,9 +675,14 @@ namespace KlusterKite.NodeManager
             this.resourceState.ConfigurationState.MigratableResources = this.resourceState.ConfigurationState.States
                 .SelectMany(t => t.MigratorsStates)
                 .SelectMany(
-                    m => m.Resources.Where(
-                        r => r.CurrentPoint != m.LastDefinedPoint
-                             && (m.MigrationPoints.Contains(r.CurrentPoint) || r.CurrentPoint == null))).ToList();
+                    m => m.Resources
+                        .Where(
+                            r => r.CurrentPoint != m.LastDefinedPoint
+                                 && (m.MigrationPoints.Contains(r.CurrentPoint) || r.CurrentPoint == null))
+                        .Select(r => new
+                                         {
+                                             m, r
+                                         })).OrderByDescending(r => r.m.Priority).Select(r => r.r).ToList();
 
             this.resourceState.CanMigrateResources = this.resourceState.ConfigurationState.MigratableResources.Any();
         }
@@ -1112,7 +1117,7 @@ namespace KlusterKite.NodeManager
         /// Processes the request to upgrade resources during migration
         /// </summary>
         /// <param name="request">The request</param>
-        private void OnMigrationResourceUpgrade(List<ResourceUpgrade> request)
+        private void OnResourceUpgradeRequest(List<ResourceUpgrade> request)
         {
             if (!this.resourceState.CanMigrateResources)
             {
@@ -1135,22 +1140,30 @@ namespace KlusterKite.NodeManager
                 return;
             }
 
-            foreach (var upgrade in request)
+            var resourcesToUpgrade = request.Select(
+                u =>
+                    {
+                        var resource = migratableResources.FirstOrDefault(
+                            r => r.TemplateCode == u.TemplateCode && r.MigratorTypeName == u.MigratorTypeName
+                                 && r.Code == u.ResourceCode);
+                        if (resource == null)
+                        {
+                            Context.GetLogger().Warning(
+                                "{Type}: received ResourceUpgrade request with unknown resource {TemplateCode} {MigratorTypeName} {ResourceCode}",
+                                this.GetType().Name,
+                                u.TemplateCode,
+                                u.MigratorTypeName,
+                                u.ResourceCode);
+                            return null;
+                        }
+
+                        return new { R = u, Position = migratableResources.IndexOf(resource) };
+                    }).Where(r => r != null).OrderBy(r => r.Position).Select(r => r.R).ToList();
+
+            if (resourcesToUpgrade.Count != request.Count)
             {
-                var resource = migratableResources.FirstOrDefault(
-                    r => r.TemplateCode == upgrade.TemplateCode && r.MigratorTypeName == upgrade.MigratorTypeName
-                                          && r.Code == upgrade.ResourceCode);
-                if (resource == null)
-                {
-                    Context.GetLogger().Warning(
-                        "{Type}: received ResourceUpgrade request with unknown resource {TemplateCode} {MigratorTypeName} {ResourceCode}",
-                        this.GetType().Name,
-                        upgrade.TemplateCode,
-                        upgrade.MigratorTypeName,
-                        upgrade.ResourceCode);
-                    this.Sender.Tell(false);
-                    return;
-                }
+                this.Sender.Tell(false);
+                return;
             }
 
             this.Sender.Tell(true);
@@ -1780,7 +1793,7 @@ namespace KlusterKite.NodeManager
             this.Receive<List<MigrationLogRecord>>(r => this.OnMigrationLogRecords(r));
             this.Receive<MigrationCancel>(r => this.OnMigrationCancel());
             this.Receive<MigrationFinish>(r => this.OnMigrationFinish());
-            this.Receive<List<ResourceUpgrade>>(r => this.OnMigrationResourceUpgrade(r));
+            this.Receive<List<ResourceUpgrade>>(r => this.OnResourceUpgradeRequest(r));
             this.Receive<NodesUpgrade>(r => this.OnMigrationNodesUpgrade(r));
 
             this.Receive<ResourceStateRequest>(r => this.Sender.Tell(this.resourceState));

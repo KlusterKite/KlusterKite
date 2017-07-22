@@ -285,7 +285,9 @@ namespace KlusterKite.NodeManager.Tests
         [InlineData(new[] { "BDS" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
         [InlineData(new[] { "BDS" }, 1, 2, "0000010", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
         [InlineData(new[] { "BDS" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BDS", "BDO" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
         [InlineData(new[] { "BDD" }, 2, 2, "0001100", EnMigrationSteps.Finish, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BDD", "BDO" }, 2, 2, "0001100", EnMigrationSteps.Finish, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
         [InlineData(new[] { "BDD", "BDS" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 1 })]
 
         [InlineData(new[] { "ADS" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
@@ -299,18 +301,22 @@ namespace KlusterKite.NodeManager.Tests
         [InlineData(new[] { "AUS" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
         [InlineData(new[] { "AUS" }, 1, 2, "0000010", EnMigrationSteps.NodesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
         [InlineData(new[] { "AUS" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "AUS", "AUO" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
         [InlineData(new[] { "AUD" }, 2, 2, "0001100", EnMigrationSteps.Finish, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "AUD", "AUO" }, 2, 2, "0001100", EnMigrationSteps.Finish, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0 })]
         [InlineData(new[] { "AUD", "AUS" }, 2, 2, "0000100", EnMigrationSteps.PostNodesResourcesUpdating, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 1 })]
 
         [InlineData(new[] { "BUS" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BUS", "BUO" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
         [InlineData(new[] { "BUD" }, 1, 1, "0000110", EnMigrationSteps.PreNodeResourcesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
+        [InlineData(new[] { "BUD", "BUO" }, 1, 1, "0000110", EnMigrationSteps.PreNodeResourcesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0 })]
         [InlineData(new[] { "BUD", "BUS" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0, 1 })]
         [InlineData(new[] { "BUD" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
         [InlineData(new[] { "BUD" }, 2, 2, "0001001", EnMigrationSteps.Finish, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new int[0])]
 
-        [InlineData(new[] { "BUS", "BDS", "AUS", "ADS" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3 })]
-        [InlineData(new[] { "BUD", "BDS", "AUS", "ADS" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3 })]
-        [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 1, 1, "0000110", EnMigrationSteps.PreNodeResourcesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3 })]
+        [InlineData(new[] { "BUS", "BDS", "AUS", "ADS" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 3, 0 })]
+        [InlineData(new[] { "BUD", "BDS", "AUS", "ADS" }, 1, 1, "0000100", EnMigrationSteps.PreNodesResourcesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 3, 0 })]
+        [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 1, 1, "0000110", EnMigrationSteps.PreNodeResourcesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 3, 0 })]
         [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 2, 1, "0000001", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
         [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 1, 2, "0000010", EnMigrationSteps.NodesUpdating, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new int[0])]
         [InlineData(new[] { "BUD", "BDS", "AUS", "ADD" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 1, 2 })]
@@ -337,12 +343,14 @@ namespace KlusterKite.NodeManager.Tests
         [InlineData(new[] { "AUB" }, 2, 2, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
         [InlineData(new[] { "BUB" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
 
-        [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 2, 2, "0000101", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3, 1, 2 })]
-        [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 1, 1, "0000110", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 3, 1, 2 })]
+        [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 2, 2, "0000101", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 3, 0, 1, 2 })]
+        [InlineData(new[] { "BUS", "BDD", "AUD", "ADS" }, 1, 1, "0000110", EnMigrationSteps.Recovery, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 3, 0, 1, 2 })]
 
         [InlineData(new[] { "BBS" }, 1, 1, "0100000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
         [InlineData(new[] { "BBM" }, 1, 1, "0000000", EnMigrationSteps.Broken, "Start, NodesUpdating, Finish", new int[0])]
 
+        [InlineData(new[] { "ADS1", "ADS3", "ADS2", "BUS5", "BUS7", "BUS6" }, 1, 1, "0100100", EnMigrationSteps.Start, "Start, PreNodesResourcesUpdating, PreNodeResourcesUpdated, NodesUpdating, Finish", new[] { 0, 2, 1, 4, 5, 3 })]
+        [InlineData(new[] { "BDS1", "BDS3", "BDS2", "AUS5", "AUS7", "AUS6" }, 2, 2, "0000101", EnMigrationSteps.NodesUpdated, "Start, NodesUpdating, NodesUpdated, PostNodesResourcesUpdating, Finish", new[] { 0, 2, 1, 4, 5, 3 })]
         public async Task MigrationStateTest(
             string[] resources,
             int configurationPosition,
@@ -430,7 +438,7 @@ namespace KlusterKite.NodeManager.Tests
                                 break;
                             case 'O':
                                 resourceDescription =
-                                    new ResourceDescription(destinationPoints.Last())
+                                    new ResourceDescription(sourcePoints.Last())
                                         {
                                             Position = EnResourcePosition
                                                 .Source
@@ -439,13 +447,20 @@ namespace KlusterKite.NodeManager.Tests
                             default: throw new ArgumentException(nameof(resources));
                         }
 
+                        var priority = 1M;
+                        if (r.Length >= 4)
+                        {
+                            priority = decimal.Parse(r[3].ToString());
+                        }
+
                         var resourceDescriptions = new[] { resourceDescription };
                         return new MigratorDescription(
                                    sourcePoints,
                                    destinationPoints,
                                    resourceDescriptions)
                                    {
-                                       DependencyType = dependency
+                                       DependencyType = dependency,
+                                       Priority = priority
                                    };
                     }).ToArray();
 

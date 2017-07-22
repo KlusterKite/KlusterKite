@@ -137,7 +137,7 @@ namespace KlusterKite.NodeManager.Tests
                         ""second"",
                     ]
                     TestMigrator.Dependence.Resources = [
-                        ""{resourceName.Replace("\\", "\\\\")}""
+                        ""{Path.GetFileName(resourceName)}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
                         ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""

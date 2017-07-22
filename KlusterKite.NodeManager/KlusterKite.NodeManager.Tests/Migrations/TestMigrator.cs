@@ -135,7 +135,7 @@ namespace KlusterKite.NodeManager.Tests.Migrations
 
             if (!this.DefinedMigrationPoints.Contains(pointToMigrate))
             {
-                throw new InvalidOperationException($"Unknown migration point {pointToMigrate}");
+                throw new InvalidOperationException($"Unknown migration point {pointToMigrate} among {string.Join(", ", this.DefinedMigrationPoints)}");
             }
 
             var path = Path.Combine(this.Config.GetString("TestMigrator.Dir"), resourceId.ConnectionString);
