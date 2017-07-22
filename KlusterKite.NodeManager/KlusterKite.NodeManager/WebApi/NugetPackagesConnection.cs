@@ -52,17 +52,18 @@ namespace KlusterKite.NodeManager.WebApi
             if (apiRequest.Fields.Where(f => f.FieldName == "items").SelectMany(f => f.Fields)
                 .Any(f => f.FieldName == "availableVersions"))
             {
-                query = (await this.packageRepository.SearchAsync(string.Empty, true)).Select(p => p.Identity)
-                    .GroupBy(p => p.Id).Select(
+                query = (await this.packageRepository.SearchAsync(string.Empty, true)).GroupBy(p => p.Identity.Id)
+                    .Select(
                         g =>
                             {
-                                var package = g.OrderByDescending(p => p.Version).First();
+                                var package = g.OrderByDescending(p => p.Identity.Version).First();
                                 return new PackageFamily
                                            {
-                                               Name = package.Id,
-                                               Version = package.Version.ToString(),
-                                               AvailableVersions = g.OrderByDescending(p => p.Version)
-                                                   .Select(p => p.Version.ToString()).ToList()
+                                               Name = package.Identity.Id,
+                                               Version = package.Identity.Version.ToString(),
+                                               AvailableVersions = package.GetVersionsAsync()
+                                                   .ConfigureAwait(false).GetAwaiter().GetResult()
+                                                   .Select(v => v.Version.ToString()).ToList()
                                            };
                             }).AsQueryable();
             }
