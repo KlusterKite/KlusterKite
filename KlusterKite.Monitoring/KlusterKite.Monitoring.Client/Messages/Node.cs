@@ -57,7 +57,7 @@ namespace KlusterKite.Monitoring.Client.Messages
         /// Gets or sets the actor's name
         /// </summary>
         [UsedImplicitly]
-        [DeclareField("the actor's name", IsKey = true)]
+        [DeclareField("the actor's name")]
         public string Name { get; set; }
 
         /// <summary>
@@ -77,5 +77,19 @@ namespace KlusterKite.Monitoring.Client.Messages
         /// </summary>
         [DeclareField("the actor's children")]
         public Node[] Children { get; set; }
+
+        /// <summary>
+        /// Gets or sets the actor's address
+        /// </summary>
+        [DeclareField("the actor's address", IsKey = true)]
+        [UsedImplicitly]
+        public string Address { get; set; }
+
+        /// <summary>
+        /// Gets or sets the actor's parent's address
+        /// </summary>
+        [DeclareField("the actor's parent's address")]
+        [UsedImplicitly]
+        public string ParentAddress { get; set; }
     }
 }
