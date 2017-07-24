@@ -2,8 +2,6 @@ import React from 'react'
 import Relay from 'react-relay'
 import { browserHistory } from 'react-router'
 
-import { Link } from 'react-router';
-
 import ConfigurationOperations from '../../components/ConfigurationOperations/ConfigurationOperations';
 import ConfigurationForm from '../../components/ConfigurationForm/ConfigurationForm'
 import FeedsList from '../../components/FeedsList/FeedList'
@@ -11,6 +9,7 @@ import MigratorTemplatesList from '../../components/MigratorTemplatesList/Migrat
 import NodeTemplatesList from '../../components/NodeTemplatesList/NodeTemplatesList'
 import PackagesList from '../../components/PackagesList/PackagesList'
 import SeedsList from '../../components/SeedsList/SeedsList'
+import Warnings from '../../components/Warnings/Warnings';
 
 import CreateConfigurationMutation from './mutations/CreateConfigurationMutation'
 import UpdateConfigurationMutation from './mutations/UpdateConfigurationMutation'
@@ -154,13 +153,12 @@ class ConfigurationPage extends React.Component {
     const canEdit = !model || model.state === 'Draft';
     return (
       <div>
-        {nodeManagement.currentMigration &&
-          <div className="alert alert-warning" role="alert">
-            <span className="glyphicon glyphicon-alert" aria-hidden="true"></span>
-            {' '}
-            Migration is in progress! Please <Link to={'/klusterkite/Migration/'}>finish it</Link>.
-          </div>
-        }
+        <Warnings
+          klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
+          migrationWarning={true}
+          migrationBrokenWarning={true}
+          notInSourcePositionWarning={true}
+        />
         <ConfigurationForm
           onSubmit={this.onSubmit}
 //          onDelete={this.onDelete}
@@ -275,11 +273,9 @@ export default Relay.createContainer(
           },
           klusterKiteNodesApi {
             clusterManagement {
-              currentMigration {
-                state
-              }
               ${ConfigurationOperations.getFragment('nodeManagement')}
             }
+            ${Warnings.getFragment('klusterKiteNodesApi')}
           }
         }
       `,

@@ -5,6 +5,8 @@ import { browserHistory } from 'react-router'
 import { Link } from 'react-router';
 
 import Paginator from '../Paginator/Paginator';
+import Warnings from '../../components/Warnings/Warnings';
+
 import DateFormat from '../../utils/date';
 
 export class ConfigurationsList extends React.Component {
@@ -31,13 +33,11 @@ export class ConfigurationsList extends React.Component {
 
     return (
       <div>
-        {this.props.klusterKiteNodesApi.clusterManagement.currentMigration &&
-          <div className="alert alert-warning" role="alert">
-            <span className="glyphicon glyphicon-alert" aria-hidden="true"></span>
-            {' '}
-            Migration is in progress! Please <Link to={'/klusterkite/Migration/'}>finish it</Link>.
-          </div>
-        }
+        <Warnings
+          klusterKiteNodesApi={this.props.klusterKiteNodesApi}
+          migrationWarning={true}
+          migrationBrokenWarning={true}
+        />
         <h3>Configurations list</h3>
         <Link to={`/klusterkite/Configuration/create/exact`} className="btn btn-primary" role="button">Add a new configuration</Link>
         <Link to={`/klusterkite/Configuration/create/update`} className="btn btn-primary btn-margined" role="button">Add a new configuration (update)</Link>
@@ -112,11 +112,7 @@ export default Relay.createContainer(
           }
           count
         }
-        clusterManagement {
-          currentMigration {
-            state
-          }
-        }
+        ${Warnings.getFragment('klusterKiteNodesApi')}
       }
       `,
     },

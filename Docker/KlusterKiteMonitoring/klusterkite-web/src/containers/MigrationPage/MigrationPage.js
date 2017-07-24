@@ -9,6 +9,7 @@ import MigrationSteps from '../../components/MigrationOperations/MigrationSteps'
 import NodesWithTemplates from '../../components/NodesWithTemplates/index'
 import RecheckState from '../../components/RecheckState/RecheckState';
 import UpdateResources from '../../components/MigrationOperations/UpdateResources'
+import Warnings from '../../components/Warnings/Warnings';
 
 import { hasPrivilege } from '../../utils/privileges'
 import DateFormat from '../../utils/date'
@@ -95,6 +96,11 @@ class MigrationPage extends React.Component {
 
     return (
       <div>
+        <Warnings
+          klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
+          migrationBrokenWarning={true}
+        />
+
         {this.state.migrationHasFinished &&
           <div className="alert alert-success" role="alert">
             <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -224,6 +230,7 @@ export default Relay.createContainer(
             }
             ${NodesWithTemplates.getFragment('data')},
             ${NodesList.getFragment('nodeDescriptions')},
+            ${Warnings.getFragment('klusterKiteNodesApi')},
           }
         }
       `,
