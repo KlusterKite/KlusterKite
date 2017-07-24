@@ -22,7 +22,6 @@ export class Warnings extends React.Component {
         {this.props.migrationWarning &&
           <MigrationInProgressWarning clusterManagement={klusterKiteNodesApi.clusterManagement} />
         }
-        }
       </div>
     );
   }
@@ -37,7 +36,7 @@ export class Warnings extends React.Component {
         }
         {this.props.migrationBrokenWarning &&
           <OutOfScopeWarning resourceState={klusterKiteNodesApi.clusterManagement.resourceState}/>
-
+        }
  */
 
 export default Relay.createContainer(
@@ -47,7 +46,6 @@ export default Relay.createContainer(
       klusterKiteNodesApi: () => Relay.QL`fragment on IKlusterKiteNodeApi_Root {
         clusterManagement {
           ${MigrationInProgressWarning.getFragment('clusterManagement')}
-          }
         }
       }
       `,
