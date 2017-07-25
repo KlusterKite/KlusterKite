@@ -5,7 +5,7 @@ export class OutOfScopeWarning extends React.Component {
   render() {
     const resourceState = this.props.resourceState;
     let error = false;
-    if (resourceState && resourceState.configurationState.states.edges) {
+    if (resourceState && resourceState.configurationState && resourceState.configurationState.states.edges) {
       const configurationStateNodes = resourceState.configurationState.states.edges.map(x => x.node);
       configurationStateNodes.forEach(configurationStateNode => {
         if (configurationStateNode.migratorsStates.edges.length > 0) {

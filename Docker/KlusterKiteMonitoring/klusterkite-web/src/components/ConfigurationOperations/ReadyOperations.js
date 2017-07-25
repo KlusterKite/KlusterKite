@@ -34,6 +34,9 @@ export class ReadyOperations extends React.Component {
     canCreateMigration: React.PropTypes.bool.isRequired,
     onStartMigration: React.PropTypes.func.isRequired,
     currentMigration: React.PropTypes.object,
+    operationIsInProgress: React.PropTypes.bool,
+    resourceInNonSourcePosition: React.PropTypes.bool,
+    resourceIsObsolete: React.PropTypes.bool,
   };
 
   onStartMigrationConfirmRequest = () => {
@@ -192,6 +195,21 @@ export class ReadyOperations extends React.Component {
       setObsoleteClassName += ' fa-spin';
     }
 
+    const shouldBeAbleToCreateMigration = this.props.currentState && this.props.currentState === 'Ready' && this.props.canCreateMigration && !this.state.isChangingState;
+    let cantCreateMigrationReason = null;
+    if (shouldBeAbleToCreateMigration && !this.props.canCreateMigration)
+    {
+      if (this.props.operationIsInProgress) {
+        cantCreateMigrationReason = 'Operation is in progress';
+      }
+      if (this.props.resourceInNonSourcePosition) {
+        cantCreateMigrationReason = 'At least one resource is not in Source position';
+      }
+      if (this.props.resourceIsObsolete) {
+        cantCreateMigrationReason = 'At least one node is obsolete';
+      }
+    }
+
     return (
     <div>
       {this.state.setStableErrors && this.state.setStableErrors.map((error, index) => {
@@ -236,10 +254,20 @@ export class ReadyOperations extends React.Component {
       </div>
       }
 
-      {this.props.currentState && this.props.currentState === 'Ready' && this.props.canCreateMigration && !this.state.isChangingState &&
-      <button className="btn btn-primary" type="button" onClick={this.onStartMigrationConfirmRequest}>
-        <Icon name="wrench" className={startMigrationClassName}/>{' '}Start migration
-      </button>
+      {shouldBeAbleToCreateMigration && !this.props.canCreateMigration &&
+        <div>
+          <div className="alert alert-warning" role="alert">
+            <span className="glyphicon glyphicon-alert" aria-hidden="true"></span>
+            {' '}
+            Can't create migration: {cantCreateMigrationReason || 'Reason unknown'}
+          </div>
+        </div>
+      }
+
+      {shouldBeAbleToCreateMigration && this.props.canCreateMigration &&
+        <button className="btn btn-primary" type="button" onClick={this.onStartMigrationConfirmRequest}>
+          <Icon name="wrench" className={startMigrationClassName}/>{' '}Start migration
+        </button>
       }
 
       {this.props.currentState && this.props.currentState === 'Ready' && this.props.currentMigration &&

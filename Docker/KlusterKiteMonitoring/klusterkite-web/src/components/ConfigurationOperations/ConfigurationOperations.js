@@ -43,6 +43,38 @@ export class ConfigurationOperations extends React.Component {
     return edges.map(x => x.node).map(x => x.message);
   };
 
+  /**
+   * Checks if there is any resource in non Source position
+   * @return {boolean} Resource in non Source position found
+   */
+  hasNonSourceResource() {
+    const resourceState = this.props.nodeManagement.resourceState;
+    let error = false;
+    if (resourceState && resourceState.configurationState.states && resourceState.configurationState.states.edges) {
+      const configurationStateNodes = resourceState.configurationState.states.edges.map(x => x.node);
+      configurationStateNodes.forEach(configurationStateNode => {
+        if (configurationStateNode.migratorsStates.edges.length > 0) {
+          const migratorsStatesNodes = configurationStateNode.migratorsStates.edges.map(x => x.node);
+          migratorsStatesNodes.forEach(migratorsStatesNode => {
+            if (migratorsStatesNode.resources.edges.length > 0){
+              error = true;
+            }
+          });
+        }
+      });
+    }
+
+    return error;
+  }
+
+  /**
+   * Checks if there is any resource in obsolete position
+   * @return {boolean} Resource in obsolete position
+   */
+  isResourseObsolete() {
+    return this.props.klusterKiteNodesApi.getActiveNodeDescriptions.edges.length > 0;
+  }
+
   render() {
     const nodeTemplates = this.props.configuration && this.props.configuration.nodeTemplates && this.props.configuration.nodeTemplates.edges;
 
@@ -66,6 +98,9 @@ export class ConfigurationOperations extends React.Component {
             canCreateMigration={this.props.nodeManagement.resourceState.canCreateMigration}
             currentMigration={this.props.nodeManagement.currentMigration}
             onStartMigration={this.props.onStartMigration}
+            operationIsInProgress={this.props.nodeManagement.resourceState.operationIsInProgress}
+            resourceInNonSourcePosition={this.hasNonSourceResource()}
+            resourceIsObsolete={this.isResourseObsolete()}
           />
 
           <ActiveOperations
@@ -132,9 +167,40 @@ export default Relay.createContainer(
       nodeManagement: () => Relay.QL`fragment on IKlusterKiteNodeApi_ClusterManagement {
         resourceState {
           canCreateMigration
+          operationIsInProgress
+          configurationState {
+            states {
+              edges {
+                node {
+                  migratorsStates {
+                    edges {
+                      node {
+                        resources(filter: { position_not: Source }) {
+                          edges {
+                            node {
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
         currentMigration {
           state
+        }
+      }`,
+      klusterKiteNodesApi: () => Relay.QL`fragment on KlusterKiteNodeApi_Root {
+        getActiveNodeDescriptions(filter: { isObsolete: true }) {
+          edges {
+            node {
+              id
+            }
+          }
         }
       }`,
     },

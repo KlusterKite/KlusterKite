@@ -7,7 +7,7 @@ export class MigratableResourcesWarning extends React.Component {
 
     return (
       <div>
-        {resourceState && resourceState.configurationState.migratableResources.edges.length > 0 &&
+        {resourceState && resourceState.configurationState && resourceState.configurationState.migratableResources.edges.length > 0 &&
           <div className="alert alert-warning" role="alert">
             <span className="glyphicon glyphicon-alert" aria-hidden="true"></span>
             {' '}
