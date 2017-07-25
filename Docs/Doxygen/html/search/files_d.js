@@ -1,30 +1,4 @@
 var searchData=
 [
-  ['namespaceactor_2ecs',['NameSpaceActor.cs',['../_name_space_actor_8cs.html',1,'']]],
-  ['namespaceforwarder_2ecs',['NameSpaceForwarder.cs',['../_name_space_forwarder_8cs.html',1,'']]],
-  ['namingutilities_2ecs',['NamingUtilities.cs',['../_naming_utilities_8cs.html',1,'']]],
-  ['navigation_2ecs',['Navigation.cs',['../_navigation_8cs.html',1,'']]],
-  ['nestedprovider_2ecs',['NestedProvider.cs',['../_nested_provider_8cs.html',1,'']]],
-  ['newnodetemplaterequest_2ecs',['NewNodeTemplateRequest.cs',['../_new_node_template_request_8cs.html',1,'']]],
-  ['nginxconfiguratoractor_2ecs',['NginxConfiguratorActor.cs',['../_nginx_configurator_actor_8cs.html',1,'']]],
-  ['nginxconfiguratortest_2ecs',['NginxConfiguratorTest.cs',['../_nginx_configurator_test_8cs.html',1,'']]],
-  ['node_2ecs',['Node.cs',['../_node_8cs.html',1,'']]],
-  ['nodedescription_2ecs',['NodeDescription.cs',['../_node_description_8cs.html',1,'']]],
-  ['nodedescriptionrequest_2ecs',['NodeDescriptionRequest.cs',['../_node_description_request_8cs.html',1,'']]],
-  ['nodeinterface_2ecs',['NodeInterface.cs',['../_node_interface_8cs.html',1,'']]],
-  ['nodemanageractor_2ecs',['NodeManagerActor.cs',['../_node_manager_actor_8cs.html',1,'']]],
-  ['nodemanageractortests_2ecs',['NodeManagerActorTests.cs',['../_node_manager_actor_tests_8cs.html',1,'']]],
-  ['nodemanagerapi_2ecs',['NodeManagerApi.cs',['../_node_manager_api_8cs.html',1,'']]],
-  ['nodemanagercontroller_2ecs',['NodeManagerController.cs',['../_node_manager_controller_8cs.html',1,'']]],
-  ['nodemanagerreceiveractor_2ecs',['NodeManagerReceiverActor.cs',['../_node_manager_receiver_actor_8cs.html',1,'']]],
-  ['nodesearcher_2ecs',['NodeSearcher.cs',['../_node_searcher_8cs.html',1,'']]],
-  ['nodeserviceconfiguration_2ecs',['NodeServiceConfiguration.cs',['../_node_service_configuration_8cs.html',1,'']]],
-  ['nodestartupconfiguration_2ecs',['NodeStartUpConfiguration.cs',['../_node_start_up_configuration_8cs.html',1,'']]],
-  ['nodestartupwaitmessage_2ecs',['NodeStartupWaitMessage.cs',['../_node_startup_wait_message_8cs.html',1,'']]],
-  ['nodesupgrade_2ecs',['NodesUpgrade.cs',['../_nodes_upgrade_8cs.html',1,'']]],
-  ['nodetemplate_2ecs',['NodeTemplate.cs',['../_node_template_8cs.html',1,'']]],
-  ['nodeupgraderequest_2ecs',['NodeUpgradeRequest.cs',['../_node_upgrade_request_8cs.html',1,'']]],
-  ['nugetpackagesconnection_2ecs',['NugetPackagesConnection.cs',['../_nuget_packages_connection_8cs.html',1,'']]],
-  ['nugetpackagesfactory_2ecs',['NugetPackagesFactory.cs',['../_nuget_packages_factory_8cs.html',1,'']]],
-  ['nullresolver_2ecs',['NullResolver.cs',['../_null_resolver_8cs.html',1,'']]]
+  ['objectresolver_2ecs',['ObjectResolver.cs',['../_object_resolver_8cs.html',1,'']]]
 ];

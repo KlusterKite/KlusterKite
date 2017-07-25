@@ -14,6 +14,7 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
     using JetBrains.Annotations;
 
     using KlusterKite.API.Attributes;
+    using KlusterKite.NodeManager.Client.MigrationStates;
     using KlusterKite.NodeManager.Client.ORM;
 
     /// <summary>
@@ -98,5 +99,28 @@ namespace KlusterKite.NodeManager.Client.Messages.Migration
         [UsedImplicitly]
         [DeclareField("the current migration step")]
         public EnMigrationSteps? CurrentMigrationStep { get; set; }
+
+        /// <summary>
+        /// Sets all "Can" properties to false
+        /// </summary>
+        public void CleanCanBits()
+        {
+            this.CanUpdateNodesToDestination = false;
+            this.CanCreateMigration = false;
+            this.CanFinishMigration = false;
+            this.CanMigrateResources = false;
+            this.CanUpdateNodesToSource = false;
+            this.CanCancelMigration = false;
+
+            if (this.ConfigurationState != null)
+            {
+                this.ConfigurationState.MigratableResources = new List<ResourceConfigurationState>();
+            }
+
+            if (this.MigrationState != null)
+            {
+                this.MigrationState.MigratableResources = new List<ResourceMigrationState>();
+            }
+        }
     }
 }

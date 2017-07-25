@@ -33,8 +33,7 @@ mutation newMigration {
           __id
         }
         currentMigration {
-          state
-          direction
+          state          
           started
           finished
           logs {
@@ -45,7 +44,7 @@ mutation newMigration {
                 type
                 sourcePoint
                 destinationPoint
-                errorMessage
+                message
                 errorStackTrace
                 migratorTemplateCode
                 migratorTemplateName
@@ -65,26 +64,22 @@ mutation newMigration {
           canUpdateNodesToSource
           canCancelMigration
           canFinishMigration
-          migrationState {
-            position
+          migrationState {            
             templateStates {
               edges {
                 node {
                   code
-                  position
-                  migrators {
+                   migrators {
                     edges {
                       node {
                         typeName
-                        name
-                        position
+                        name                        
                         direction
                         resources {
                           edges {
                             node {
                               sourcePoint
-                              destinationPoint
-                              position
+                              destinationPoint                              
                               migrationToSourceExecutor
                               migrationToDestinationExecutor
                               name
@@ -139,6 +134,7 @@ mutation newMigration {
 
 
 
+
 -- Update nodes
 mutation {
   klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationNodesUpdate(input: {target: Destination}) {
@@ -152,6 +148,19 @@ mutation {
     result 
   }
 }
+
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "KlusterKite", migratorTypeName: "KlusterKite.NodeManager.Mock.MockResourceMigratorDependence", resourceCode: "resource-1", target: Destination}]}}) {
+    result 
+  }
+}
+
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "KlusterKite", migratorTypeName: "KlusterKite.NodeManager.Mock.MockResourceMigratorDependent", resourceCode: "resource-1", target: Destination}]}}) {
+    result 
+  }
+}
+
 
 -- finish migration
 mutation {

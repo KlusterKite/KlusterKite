@@ -1,7 +1,4 @@
 {
-	KlusterKite.Web.Authentication.AuthorizeEndpointPath = "/api/1.x/security/authorization"
-	KlusterKite.Web.AuthenticationTokenEndpointPath = "/api/1.x/security/token"
-
 	KlusterKite.Web {
 		Services {
 			Authentication { // ServiceName is just unique service identification, used in order to handle stacked config properly. It is used just localy on node

@@ -43,7 +43,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                                 Type = EnMigrationLogRecordType.Error,
                                 MigratorTypeName = migrator.GetType().FullName,
                                 MigratorName = migrator.Name,
-                                ErrorMessage =
+                                Message =
                                     $"Error on requesting migratable resources: {exception.Message}",
                                 Exception = exception
                             });
@@ -63,7 +63,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                                 Type = EnMigrationLogRecordType.Error,
                                 MigratorTypeName = migrator.GetType().FullName,
                                 MigratorName = migrator.Name,
-                                ErrorMessage =
+                                Message =
                                     $"Error on requesting available migration points: {exception.Message}",
                                 Exception = exception
                             });
@@ -93,7 +93,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                                     MigratorName = migrator.Name,
                                     ResourceCode = resource.Code,
                                     ResourceName = resource.Name,
-                                    ErrorMessage =
+                                    Message =
                                         $"Error on requesting resource current point: {exception.Message}",
                                     Exception = exception
                                 });
@@ -107,7 +107,9 @@ namespace KlusterKite.NodeManager.RemoteDomain
                             Name = migrator.Name,
                             MigrationPoints = migrationPoints,
                             LastDefinedPoint = migrator.LatestPoint,
-                            Resources = states
+                            Resources = states,
+                            Priority = migrator.Priority,
+                            DependencyType = migrator.DependencyType
                         });
             }
 

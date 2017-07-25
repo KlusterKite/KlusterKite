@@ -2,6 +2,7 @@ var searchData=
 [
   ['baseactortest',['BaseActorTest',['../class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html',1,'KlusterKite::Core::TestKit']]],
   ['baseactortest_3c_20apibrowseractortest_2econfigurator_20_3e',['BaseActorTest&lt; ApiBrowserActorTest.Configurator &gt;',['../class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html',1,'KlusterKite::Core::TestKit']]],
+  ['baseactortest_3c_20apiintegrationtests_2econfiguration_20_3e',['BaseActorTest&lt; ApiIntegrationTests.Configuration &gt;',['../class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html',1,'KlusterKite::Core::TestKit']]],
   ['baseactortest_3c_20apipublisheractortests_2econfigurator_20_3e',['BaseActorTest&lt; ApiPublisherActorTests.Configurator &gt;',['../class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html',1,'KlusterKite::Core::TestKit']]],
   ['baseactortest_3c_20configurationsourcetests_2econfigurator_20_3e',['BaseActorTest&lt; ConfigurationSourceTests.Configurator &gt;',['../class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html',1,'KlusterKite::Core::TestKit']]],
   ['baseactortest_3c_20configurationtest_2econfigurator_20_3e',['BaseActorTest&lt; ConfigurationTest.Configurator &gt;',['../class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html',1,'KlusterKite::Core::TestKit']]],

@@ -27,11 +27,11 @@ A bundle of generic actors and other abstractions to handle basic data work (mai
 ### [KlusterKite.Web](./KlusterKite.Web/Readme.md)
 A bundle of generic actors and other abstractions to publish Web API (both REST and GraphQL). Also provides authentication and authorization for external applications.
 
-### [KlusterKite.Monitoring](./KlusterKite.Monitoring/Readme.md)
-Collecting diagnostics and monitoring information from cluster nodes.
-
 ### [KlusterKite.NodeManager](./KlusterKite.NodeManager/Readme.md)
 Cluster configuration and orchestration, remote node configuration, managing and updating.
+
+### [KlusterKite.Monitoring](./KlusterKite.Monitoring/Readme.md)
+Collecting diagnostics and monitoring information from cluster nodes.
 
 ### [Sources build instructions](./BuildScript.md)
 ### [Sample cluster build with docker-compose](./Docker/Readme.md)

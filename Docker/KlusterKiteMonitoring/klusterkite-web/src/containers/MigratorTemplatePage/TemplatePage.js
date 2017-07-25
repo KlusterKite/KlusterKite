@@ -43,24 +43,24 @@ class TemplatePage extends React.Component {
     Relay.Store.commitUpdate(
       new UpdateFeedMutation(
         {
-          nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.release.__id,
-          configuration: this.props.api.release.configuration,
+          nodeId: this.props.params.configurationId,
+          configurationId: this.props.api.configuration.__id,
+          settings: this.props.api.configuration.settings,
           migratorTemplateId: editId,
           migratorTemplate: model
         }),
       {
         onSuccess: (response) => {
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges);
 
             this.setState({
               saving: false,
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Configuration/${this.props.params.configurationId}`);
           }
         },
         onFailure: (transaction) => {
@@ -84,25 +84,25 @@ class TemplatePage extends React.Component {
     Relay.Store.commitUpdate(
       new UpdateFeedMutation(
         {
-          nodeId: this.props.params.releaseId,
-          releaseId: this.props.api.release.__id,
-          configuration: this.props.api.release.configuration,
-          migratorTemplateId: this.props.api.release.id,
+          nodeId: this.props.params.configurationId,
+          configurationId: this.props.api.configuration.__id,
+          settings: this.props.api.configuration.settings,
+          migratorTemplateId: this.props.api.configuration.id,
           migratorTemplate: {},
           migratorTemplateDeleteId: this.props.params.id,
         }),
       {
         onSuccess: (response) => {
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_update.errors.edges);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_configurations_update.errors.edges);
 
             this.setState({
               deleting: false,
               saveErrors: messages
             });
           } else {
-            browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`);
+            browserHistory.push(`/klusterkite/Configuration/${this.props.params.configurationId}`);
           }
         },
         onFailure: (transaction) => {
@@ -115,7 +115,7 @@ class TemplatePage extends React.Component {
   };
 
   onCancel = () => {
-    browserHistory.push(`/klusterkite/Release/${this.props.params.releaseId}`)
+    browserHistory.push(`/klusterkite/Configuration/${this.props.params.configurationId}`)
   };
 
   render () {
@@ -143,7 +143,7 @@ export default Relay.createContainer(
   {
     initialVariables: {
       id: null,
-      releaseId: null,
+      configurationId: null,
       nodeExists: false,
     },
     prepareVariables: (prevVariables) => Object.assign({}, prevVariables, {
@@ -165,11 +165,11 @@ export default Relay.createContainer(
               }
             }
           }
-          release:__node(id: $releaseId) {
-            ...on IKlusterKiteNodeApi_Release {
+          configuration:__node(id: $configurationId) {
+            ...on IKlusterKiteNodeApi_Configuration {
               __id
-              configuration {
-                ${UpdateFeedMutation.getFragment('configuration')},
+              settings   {
+                ${UpdateFeedMutation.getFragment('settings')},
               }
             }
           }

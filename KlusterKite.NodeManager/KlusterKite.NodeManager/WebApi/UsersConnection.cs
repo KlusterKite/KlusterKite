@@ -123,7 +123,7 @@ namespace KlusterKite.NodeManager.WebApi
             var result =
                 await this.System.ActorSelection(this.DataActorPath)
                     .Ask<CrudActionResponse<User>>(
-                        new UserRoleAddRequest { UserUid = userUid, RoleUid = roleUid, ReturnUser = true },
+                        new UserRoleRemoveRequest { UserUid = userUid, RoleUid = roleUid, ReturnUser = true },
                         this.Timeout);
 
             return CreateResponse(result);

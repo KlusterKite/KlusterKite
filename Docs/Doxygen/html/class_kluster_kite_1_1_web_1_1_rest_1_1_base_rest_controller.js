@@ -10,6 +10,7 @@ var class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller =
     [ "Update", "class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#a61dd76c8d07b4c95ca338940f6d36b9e", null ],
     [ "DataListIsLarge", "class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#a981d65b912eaa1686d84bc2341c5675f", null ],
     [ "AkkaTimeout", "class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#ae2a3d20478aaf99bc31bc83559970862", null ],
+    [ "DataIsLarge", "class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#a0d3137abacbe7e5bcf0673189cafbd44", null ],
     [ "DefaultFilter", "class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#a5aaccfaac38ec99fac86eca8add8bb2e", null ],
     [ "DefaultSort", "class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#a0af0402397d8a329ed99b195ed56706a", null ],
     [ "System", "class_kluster_kite_1_1_web_1_1_rest_1_1_base_rest_controller.html#ad56a48656949f0a59ae41c92bc7627d4", null ]

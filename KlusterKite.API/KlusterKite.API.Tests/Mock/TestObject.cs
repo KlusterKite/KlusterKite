@@ -31,11 +31,13 @@ namespace KlusterKite.API.Tests.Mock
             /// <summary>
             /// This is good object
             /// </summary>
+            [ApiDescription(Description = "This is good object")]
             Good = 1,
 
             /// <summary>
             /// This is bad object
             /// </summary>
+            [ApiDescription(Description = "This is bad object")]
             Bad = 2
         }
 

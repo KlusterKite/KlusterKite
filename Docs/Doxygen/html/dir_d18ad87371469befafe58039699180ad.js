@@ -1,6 +1,5 @@
 var dir_d18ad87371469befafe58039699180ad =
 [
-    [ "obj", "dir_f06cf6532bb1eedb886b98e061055867.html", "dir_f06cf6532bb1eedb886b98e061055867" ],
     [ "Installer.cs", "_kluster_kite_8_data_2_kluster_kite_8_data_8_e_f_8_npgsql_2_installer_8cs.html", [
       [ "Installer", "class_kluster_kite_1_1_data_1_1_e_f_1_1_npgsql_1_1_installer.html", "class_kluster_kite_1_1_data_1_1_e_f_1_1_npgsql_1_1_installer" ]
     ] ],

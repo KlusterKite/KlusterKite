@@ -1,8 +1,0 @@
-digraph "KlusterKite.Data.CRUD.ActionMessages.CrudActionResponse&lt; TData &gt;"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  Node2 [label="KlusterKite.Data.CRUD.Action\lMessages.CrudActionResponse\l\< TData \>",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node3 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node3 [label="IMessageWithExtraData",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$interface_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_i_message_with_extra_data.html",tooltip="Message contains additional data, that should be returned with response (a was provided in request) ..."];
-}

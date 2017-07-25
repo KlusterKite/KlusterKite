@@ -1,7 +1,8 @@
 var dir_6f138a28d96222556fa2052183c44586 =
 [
-    [ "obj", "dir_94393db142f717f5b273286b7cb896bf.html", "dir_94393db142f717f5b273286b7cb896bf" ],
-    [ "Extensions.cs", "_kluster_kite_8_large_objects_2_kluster_kite_8_large_objects_2_extensions_8cs.html", null ],
+    [ "Extensions.cs", "_kluster_kite_8_large_objects_2_kluster_kite_8_large_objects_2_extensions_8cs.html", [
+      [ "Extensions", "class_kluster_kite_1_1_large_objects_1_1_extensions.html", "class_kluster_kite_1_1_large_objects_1_1_extensions" ]
+    ] ],
     [ "INotificationEnveloper.cs", "_i_notification_enveloper_8cs.html", [
       [ "INotificationEnveloper", "interface_kluster_kite_1_1_large_objects_1_1_i_notification_enveloper.html", "interface_kluster_kite_1_1_large_objects_1_1_i_notification_enveloper" ]
     ] ],

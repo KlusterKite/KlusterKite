@@ -30,43 +30,6 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         public string DestinationPoint { get; set; }
 
         /// <summary>
-        /// Gets the resource current position
-        /// </summary>
-        [DeclareField("the resource current position")]
-        public EnResourcePosition Position
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(this.CurrentPoint))
-                {
-                    return EnResourcePosition.NotCreated;
-                }
-
-                if (string.IsNullOrWhiteSpace(this.DestinationPoint))
-                {
-                    return EnResourcePosition.Obsolete;
-                }
-
-                if (this.SourcePoint == this.CurrentPoint && this.DestinationPoint == this.CurrentPoint)
-                {
-                    return EnResourcePosition.SourceAndDestination;
-                }
-
-                if (this.SourcePoint == this.CurrentPoint)
-                {
-                    return EnResourcePosition.Source;
-                }
-
-                if (this.DestinationPoint == this.CurrentPoint)
-                {
-                    return EnResourcePosition.Destination;
-                }
-
-                return EnResourcePosition.Undefined;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating what configuration can execute migration to source configuration point
         /// </summary>
         [DeclareField("a value indicating what configuration can execute migration to source configuration point")]
@@ -81,11 +44,13 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// <summary>
         /// Creates <see cref="ResourceMigrationState"/>
         /// </summary>
+        /// <param name="templateCode">The migrator template code</param>
         /// <param name="state">The migrator state</param>
         /// <param name="resource">The resource state</param>
         /// <param name="position">The migrator position</param>
         /// <returns>The <see cref="ResourceMigrationState"/></returns>
         public static ResourceMigrationState CreateFrom(
+            string templateCode,
             MigratorConfigurationState state,
             ResourceConfigurationState resource,
             EnMigratorPosition position)
@@ -97,30 +62,36 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
                                                 ? null
                                                 : position == EnMigratorPosition.Obsolete
                                                   && state.MigrationPoints.Contains(resource.CurrentPoint)
+                                                  && state.LastDefinedPoint != resource.CurrentPoint
                                                     ? EnMigrationSide.Source
                                                     : (EnMigrationSide?)null;
 
             var migrationToDestinationExecutor = resource.CurrentPoint == state.LastDefinedPoint
                                                      ? null
                                                      : position == EnMigratorPosition.New
-                                                       && state.MigrationPoints.Contains(resource.CurrentPoint)
                                                          ? EnMigrationSide.Destination
                                                          : (EnMigrationSide?)null;
-            return new ResourceMigrationState
-                       {
-                           Name = resource.Name,
-                           Code = resource.Code,
-                           CurrentPoint = resource.CurrentPoint,
-                           SourcePoint = sourcePoint,
-                           DestinationPoint = destinationPoint,
-                           MigrationToSourceExecutor = migrationToSourceExecutor,
-                           MigrationToDestinationExecutor = migrationToDestinationExecutor
-                       };
+
+            var resourceMigrationState = new ResourceMigrationState
+                                             {
+                                                 Name = resource.Name,
+                                                 Code = resource.Code,
+                                                 CurrentPoint = resource.CurrentPoint,
+                                                 SourcePoint = sourcePoint,
+                                                 DestinationPoint = destinationPoint,
+                                                 MigrationToSourceExecutor = migrationToSourceExecutor,
+                                                 MigrationToDestinationExecutor = migrationToDestinationExecutor,
+                                                 MigratorTypeName = state.TypeName,
+                                                 TemplateCode = templateCode
+                                             };
+            resourceMigrationState.SetPosition();
+            return resourceMigrationState;
         }
 
         /// <summary>
         /// Creates <see cref="ResourceMigrationState"/>
         /// </summary>
+        /// <param name="templateCode">The migrator template code</param>
         /// <param name="sourceMigratorState">
         /// The migrator state in source configuration
         /// </param>
@@ -137,6 +108,7 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         /// The <see cref="ResourceMigrationState"/>
         /// </returns>
         public static ResourceMigrationState CreateFrom(
+            string templateCode,
             MigratorConfigurationState sourceMigratorState,
             ResourceConfigurationState sourceState,
             MigratorConfigurationState destinationMigratorState,
@@ -160,22 +132,62 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
                                                          ? EnMigrationSide.Source
                                                          : (EnMigrationSide?)null;
 
-            return new ResourceMigrationState
-                       {
-                           Code = destinationState.Code,
-                           Name = destinationState.Name,
-                           SourcePoint = sourceMigratorState.LastDefinedPoint,
-                           DestinationPoint = destinationMigratorState.LastDefinedPoint,
-                           CurrentPoint = currentPoint,
-                           MigrationToSourceExecutor =
-                               currentPoint != sourceMigratorState.LastDefinedPoint
-                                   ? migrationToSourceExecutor
-                                   : null,
-                           MigrationToDestinationExecutor =
-                               currentPoint != destinationMigratorState.LastDefinedPoint
-                                   ? migrationToDestinationExecutor
-                                   : null
-                       };
+            var resourceMigrationState =
+                new ResourceMigrationState
+                    {
+                        Code = destinationState.Code,
+                        Name = destinationState.Name,
+                        MigratorTypeName = destinationMigratorState.TypeName,
+                        TemplateCode = templateCode,
+                        SourcePoint = sourceMigratorState.LastDefinedPoint,
+                        DestinationPoint = destinationMigratorState.LastDefinedPoint,
+                        CurrentPoint = currentPoint,
+                        MigrationToSourceExecutor =
+                            currentPoint != sourceMigratorState.LastDefinedPoint
+                                ? migrationToSourceExecutor
+                                : null,
+                        MigrationToDestinationExecutor =
+                            currentPoint != destinationMigratorState.LastDefinedPoint
+                                ? migrationToDestinationExecutor
+                                : null
+                    };
+            resourceMigrationState.SetPosition();
+            return resourceMigrationState;
+        }
+
+        /// <summary>
+        /// Sets the resource current position
+        /// </summary>
+        private void SetPosition()
+        {
+            if (string.IsNullOrWhiteSpace(this.CurrentPoint))
+            {
+                this.Position = EnResourcePosition.NotCreated;
+            }
+            else if (string.IsNullOrWhiteSpace(this.DestinationPoint))
+            {
+                this.Position = EnResourcePosition.Obsolete;
+            }
+            else if (this.SourcePoint == this.CurrentPoint && this.DestinationPoint == this.CurrentPoint)
+            {
+                this.Position = EnResourcePosition.SourceAndDestination;
+            }
+            else if (this.SourcePoint == this.CurrentPoint)
+            {
+                this.Position = EnResourcePosition.Source;
+            }
+            else if (this.DestinationPoint == this.CurrentPoint)
+            {
+                this.Position = EnResourcePosition.Destination;
+            }
+            else if (this.MigrationToDestinationExecutor != null || this.MigrationToSourceExecutor != null)
+            {
+                this.Position = EnResourcePosition.InScope;
+            }
+            else
+            {
+                this.Position = EnResourcePosition.OutOfScope;
+            }
         }
     }
 }

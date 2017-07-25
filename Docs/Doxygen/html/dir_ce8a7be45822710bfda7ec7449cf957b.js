@@ -1,6 +1,5 @@
 var dir_ce8a7be45822710bfda7ec7449cf957b =
 [
-    [ "obj", "dir_06efdf0a79994c6e8e68fd3f04f02da4.html", "dir_06efdf0a79994c6e8e68fd3f04f02da4" ],
     [ "NewNodeTemplateRequest.cs", "_new_node_template_request_8cs.html", [
       [ "NewNodeTemplateRequest", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_new_node_template_request.html", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_messages_1_1_new_node_template_request" ]
     ] ],

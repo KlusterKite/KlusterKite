@@ -38,7 +38,7 @@ namespace KlusterKite.Monitoring.Client
         private readonly string nodeTemplateName;
 
         /// <summary>
-        /// The minimum timespan between subsequent scans
+        /// The minimum time-span between subsequent scans
         /// </summary>
         private readonly TimeSpan scanMemoize;
 
@@ -51,7 +51,12 @@ namespace KlusterKite.Monitoring.Client
         /// The previous scan time
         /// </summary>
         private DateTimeOffset lastScanTime;
-        
+
+        /// <summary>
+        /// this cluster node address
+        /// </summary>
+        private Address clusterNodeAddress;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScanActor"/> class.
         /// </summary>
@@ -60,6 +65,8 @@ namespace KlusterKite.Monitoring.Client
             // KlusterKite.NodeManager writes some properties to config... but this is not necessary
             var configurationId = Context.System.Settings.Config.GetInt("KlusterKite.NodeManager.ConfigurationId");
             var templateName = Context.System.Settings.Config.GetString("KlusterKite.NodeManager.NodeTemplate");
+
+            this.clusterNodeAddress = Cluster.Get(Context.System).SelfAddress;
 
             this.nodeTemplateName = string.IsNullOrWhiteSpace(templateName)
                                         ? null
@@ -80,7 +87,8 @@ namespace KlusterKite.Monitoring.Client
             var network = new Node
             {
                 Name = string.Empty,
-                Children = this.GetChildren(Context.System.ActorSelection("/").Anchor as ActorRefWithCell)
+                Children = this.GetChildren(Context.System.ActorSelection("/").Anchor as ActorRefWithCell),
+                Address = $"{this.clusterNodeAddress}/"
             };
 
             this.SetNodeStats(network);
@@ -99,21 +107,25 @@ namespace KlusterKite.Monitoring.Client
                 return Enumerable.Empty<Node>().ToArray();
             }
 
-            var nodes = actorRef.Children.Cast<ActorRefWithCell>()
-                .Select(
-                    child =>
+            var nodes = actorRef.Children.OfType<ActorRefWithCell>().Select(
+                child =>
                     {
                         var node = new Node
-                        {
-                            Name = child.Path.Name,
-                            ActorType = child.Underlying.Props.TypeName,
-                            Children = this.GetChildren(child),
-                            QueueSize = child.Underlying.NumberOfMessages,
-                            CurrentMessage = (child.Underlying as ActorCell)?.CurrentMessage?.GetType()
-                                               .FullName,
-                            DispatcherId = (child.Underlying as ActorCell)?.Dispatcher.Id,
-                            DispatcherType = (child.Underlying as ActorCell)?.Dispatcher.GetType().Name,
-                        };
+                                       {
+                                           Name = child.Path.Name,
+                                           Address =
+                                               $"{this.clusterNodeAddress.ToString()}{child.Path.ToStringWithoutAddress()}",
+                                           ParentAddress =
+                                               $"{this.clusterNodeAddress.ToString()}{child.Parent?.Path.ToStringWithoutAddress()}",
+                                           ActorType = child.Underlying.Props.TypeName,
+                                           Children = this.GetChildren(child),
+                                           QueueSize = child.Underlying.NumberOfMessages,
+                                           CurrentMessage =
+                                               (child.Underlying as ActorCell)?.CurrentMessage?.GetType().FullName,
+                                           DispatcherId = (child.Underlying as ActorCell)?.Dispatcher.Id,
+                                           DispatcherType =
+                                               (child.Underlying as ActorCell)?.Dispatcher.GetType().Name,
+                                       };
                         var cell = child.Underlying as ActorCell;
                         if (cell != null)
                         {
@@ -121,9 +133,7 @@ namespace KlusterKite.Monitoring.Client
                         }
 
                         return node;
-                    })
-                .OrderBy(n => n.Name)
-                .ToArray();
+                    }).OrderBy(n => n.Name).ToArray();
 
             return nodes;
         }

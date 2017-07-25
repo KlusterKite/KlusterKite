@@ -1,6 +1,7 @@
 var namespace_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers =
 [
     [ "EnumResolver", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_enum_resolver.html", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_enum_resolver" ],
+    [ "Extensions", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_extensions.html", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_extensions" ],
     [ "ForwarderResolver", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_forwarder_resolver.html", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_forwarder_resolver" ],
     [ "IConnectionResolver", "interface_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_i_connection_resolver.html", "interface_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_i_connection_resolver" ],
     [ "IResolver", "interface_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_i_resolver.html", "interface_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_i_resolver" ],

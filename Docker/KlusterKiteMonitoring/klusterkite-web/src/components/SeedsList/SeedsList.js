@@ -11,7 +11,7 @@ class SeedsList extends React.Component {
   }
 
   static propTypes = {
-    releaseId: React.PropTypes.string,
+    configurationId: React.PropTypes.string,
     configuration: React.PropTypes.object,
     canEdit: React.PropTypes.bool
   };
@@ -24,7 +24,7 @@ class SeedsList extends React.Component {
         <div>
           <h3>Seed list</h3>
           {this.props.canEdit &&
-            <Link to={`/klusterkite/Seeds/${this.props.releaseId}`} className="btn btn-primary" role="button">Add a new
+            <Link to={`/klusterkite/Seeds/${this.props.configurationId}`} className="btn btn-primary" role="button">Add a new
               seed</Link>
           }
           {seeds && seeds.length > 0 &&
@@ -39,7 +39,7 @@ class SeedsList extends React.Component {
               <tr key={index}>
                 <td>
                   {this.props.canEdit &&
-                    <Link to={`/klusterkite/Seeds/${this.props.releaseId}`}>
+                    <Link to={`/klusterkite/Seeds/${this.props.configurationId}`}>
                       {item}
                     </Link>
                   }
@@ -63,7 +63,7 @@ export default Relay.createContainer(
   SeedsList,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ConfigurationSettings {
         seedAddresses
       }
       `,

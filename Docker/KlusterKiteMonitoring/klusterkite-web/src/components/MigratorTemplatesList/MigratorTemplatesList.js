@@ -11,7 +11,7 @@ class NodeTemplatesList extends React.Component {
   }
 
   static propTypes = {
-    releaseId: React.PropTypes.string,
+    configurationId: React.PropTypes.string,
     configuration: React.PropTypes.object,
     canEdit: React.PropTypes.bool
   };
@@ -23,7 +23,7 @@ class NodeTemplatesList extends React.Component {
       <div>
         <h3>Migrator templates list</h3>
         {this.props.canEdit &&
-          <Link to={`/klusterkite/MigratorTemplates/${this.props.releaseId}/create`} className="btn btn-primary" role="button">Add a new template</Link>
+          <Link to={`/klusterkite/MigratorTemplates/${this.props.configurationId}/create`} className="btn btn-primary" role="button">Add a new template</Link>
         }
         {templates && templates.length > 0 &&
         <table className="table table-hover">
@@ -40,7 +40,7 @@ class NodeTemplatesList extends React.Component {
             <tr key={item.node.id}>
               <td>
                 {this.props.canEdit &&
-                <Link to={`/klusterkite/MigratorTemplates/${this.props.releaseId}/${encodeURIComponent(item.node.id)}`}>
+                <Link to={`/klusterkite/MigratorTemplates/${this.props.configurationId}/${encodeURIComponent(item.node.id)}`}>
                   {item.node.code}
                 </Link>
                 }
@@ -73,7 +73,7 @@ export default Relay.createContainer(
   NodeTemplatesList,
   {
     fragments: {
-      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
+      configuration: () => Relay.QL`fragment on IKlusterKiteNodeApi_ConfigurationSettings {
         migratorTemplates {
           edges {
             node {

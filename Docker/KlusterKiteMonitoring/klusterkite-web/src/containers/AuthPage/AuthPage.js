@@ -53,10 +53,8 @@ export default class AuthPage extends React.Component {
 
     if (response.status === 200) {
       response.json().then(function(data) {
-        console.log('got data', data);
         that.authenticate(data, username);
-        // that.getPrivileges(data.access_token);
-        that.savePrivilegesAndRedirect([]);
+        that.redirectToGetPrivilegies();
       });
     } else {
       this.setState({
@@ -88,61 +86,13 @@ export default class AuthPage extends React.Component {
   }
 
   /**
-   * Request privileges list for a given token
-   * @param accessToken {string} - Access token
+   * Redirects user to temporary page to fetch privilegies list
    */
-  getPrivileges(accessToken) {
-    this.setState({
-      requestingPrivileges: true
-    });
-
-    // const host = 'http://192.168.99.100/';
-    const host = 'http://entry/';
-    const url = `${host}api/1.x/klusterkite/nodemanager/authentication/userScope`;
-
-    fetch(url, {
-      method: 'get',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
-      mode: 'cors'
-    }).then(response => this.processPrivilegesResponse(response));
-  }
-
-  /**
-   * Process server response for privileges list request
-   * @param response {Object} - Server HTTP response
-   * @param response.json {Function} - Function to get JSON response asynchronously
-   */
-  processPrivilegesResponse(response) {
-    const that = this;
-
-    console.log('Privileges response', response);
-    if (response.status === 200) {
-      response.json().then(function(data) {
-        that.savePrivilegesAndRedirect(data);
-      });
-    } else {
-      this.setState({
-        authorizing: false,
-        authorized: false
-      });
-    }
-  }
-
-  /**
-   * Saves privileges list to the local storage; redirect user to the page he came from
-   * @param data {string[]} - Privileges list
-   */
-  savePrivilegesAndRedirect(data) {
-    Storage.set('privileges', JSON.stringify(data));
-
-    this.setState({
-      privilegesReceived: true
-    });
-
+  redirectToGetPrivilegies() {
     if (this.props.location && this.props.location.query && this.props.location.query.from) {
-      browserHistory.push(decodeURIComponent(this.props.location.query.from));
+      browserHistory.push(`/klusterkite/GetPrivileges/?from=${this.props.location.query.from}`);
     } else {
-      browserHistory.push('/klusterkite/');
+      browserHistory.push('/klusterkite/GetPrivileges/');
     }
   }
 

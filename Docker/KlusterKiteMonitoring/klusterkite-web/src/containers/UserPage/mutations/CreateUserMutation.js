@@ -10,7 +10,6 @@ export default class CreateUserMutation extends Relay.Mutation {
     return Relay.QL`
       fragment on KlusterKiteNodeApi_User_NodeMutationPayload {
         node
-        edge
         errors
       }
     `
@@ -37,38 +36,22 @@ export default class CreateUserMutation extends Relay.Mutation {
     }];
   }
 
-  // getConfigs () {
-  //   return [{
-  //     type: 'FIELDS_CHANGE',
-  //     fieldIDs: {
-  //       node: this.props.nodeId,
-  //     },
-  //   }]
-  // }
-
   getVariables () {
     return {
-      id: this.props.__id,
       newNode: {
-        id: this.props.__id,
-        majorVersion: this.props.majorVersion,
-        minorVersion: this.props.minorVersion,
-        name: this.props.name,
-        notes: this.props.notes
+        login: this.props.login,
+        isBlocked: this.props.isBlocked,
+        isDeleted: this.props.isDeleted,
       }
     }
   }
 
   getOptimisticResponse () {
     return {
-      edge: {
-        node: {
-          id: this.props.nodeId,
-          majorVersion: this.props.majorVersion,
-          minorVersion: this.props.minorVersion,
-          name: this.props.name,
-          notes: this.props.notes
-        },
+      model: {
+        login: this.props.login,
+        isBlocked: this.props.isBlocked,
+        isDeleted: this.props.isDeleted,
       },
     }
   }

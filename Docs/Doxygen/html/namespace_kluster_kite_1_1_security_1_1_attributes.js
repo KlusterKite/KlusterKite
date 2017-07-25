@@ -13,5 +13,6 @@ var namespace_kluster_kite_1_1_security_1_1_attributes =
     [ "PrivilegesContainerAttribute", "class_kluster_kite_1_1_security_1_1_attributes_1_1_privileges_container_attribute.html", null ],
     [ "RefreshTicket", "class_kluster_kite_1_1_security_1_1_attributes_1_1_refresh_ticket.html", "class_kluster_kite_1_1_security_1_1_attributes_1_1_refresh_ticket" ],
     [ "RequestContext", "class_kluster_kite_1_1_security_1_1_attributes_1_1_request_context.html", "class_kluster_kite_1_1_security_1_1_attributes_1_1_request_context" ],
-    [ "TokenResponse", "class_kluster_kite_1_1_security_1_1_attributes_1_1_token_response.html", "class_kluster_kite_1_1_security_1_1_attributes_1_1_token_response" ]
+    [ "TokenResponse", "class_kluster_kite_1_1_security_1_1_attributes_1_1_token_response.html", "class_kluster_kite_1_1_security_1_1_attributes_1_1_token_response" ],
+    [ "Utils", "class_kluster_kite_1_1_security_1_1_attributes_1_1_utils.html", "class_kluster_kite_1_1_security_1_1_attributes_1_1_utils" ]
 ];

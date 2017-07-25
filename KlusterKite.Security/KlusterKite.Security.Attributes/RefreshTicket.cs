@@ -36,7 +36,12 @@ namespace KlusterKite.Security.Attributes
         /// <param name="expiring">
         /// The expiring time.
         /// </param>
-        public RefreshTicket(string userId, [NotNull] string clientId, [NotNull] string clientType, DateTimeOffset created, DateTimeOffset? expiring)
+        public RefreshTicket(
+            string userId,
+            [NotNull] string clientId,
+            [NotNull] string clientType,
+            DateTimeOffset created,
+            DateTimeOffset? expiring)
         {
             this.UserId = userId;
             this.ClientId = clientId;
@@ -67,6 +72,7 @@ namespace KlusterKite.Security.Attributes
         /// <summary>
         /// Gets the session created time
         /// </summary>
+        [UsedImplicitly]
         public DateTimeOffset Created { get; }
 
         /// <summary>

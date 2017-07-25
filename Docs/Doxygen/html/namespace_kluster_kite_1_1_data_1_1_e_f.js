@@ -7,5 +7,6 @@ var namespace_kluster_kite_1_1_data_1_1_e_f =
     [ "EntityDataFactorySync", "class_kluster_kite_1_1_data_1_1_e_f_1_1_entity_data_factory_sync.html", "class_kluster_kite_1_1_data_1_1_e_f_1_1_entity_data_factory_sync" ],
     [ "IContextFactory", "interface_kluster_kite_1_1_data_1_1_e_f_1_1_i_context_factory.html", "interface_kluster_kite_1_1_data_1_1_e_f_1_1_i_context_factory" ],
     [ "Installer", "class_kluster_kite_1_1_data_1_1_e_f_1_1_installer.html", "class_kluster_kite_1_1_data_1_1_e_f_1_1_installer" ],
+    [ "SelectBuilder", "class_kluster_kite_1_1_data_1_1_e_f_1_1_select_builder.html", "class_kluster_kite_1_1_data_1_1_e_f_1_1_select_builder" ],
     [ "UniversalContextFactory", "class_kluster_kite_1_1_data_1_1_e_f_1_1_universal_context_factory.html", "class_kluster_kite_1_1_data_1_1_e_f_1_1_universal_context_factory" ]
 ];

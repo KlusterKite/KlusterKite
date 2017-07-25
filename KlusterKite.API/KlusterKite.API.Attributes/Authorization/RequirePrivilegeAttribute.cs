@@ -36,7 +36,7 @@ namespace KlusterKite.API.Attributes.Authorization
         /// <summary>
         /// Gets or sets the scope to look for privilege
         /// </summary>
-        public EnPrivilegeScope Scope { get; set; } = EnPrivilegeScope.Any;
+        public EnPrivilegeScope Scope { get; set; } = EnPrivilegeScope.User;
 
         /// <summary>
         /// Gets or sets the list of connection actions to apply attribute to

@@ -27,6 +27,7 @@ namespace KlusterKite.NodeManager
     using KlusterKite.NodeManager.Client.MigrationStates;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.ConfigurationSource;
+    using KlusterKite.NodeManager.Launcher.Messages;
     using KlusterKite.NodeManager.Launcher.Utils;
     using KlusterKite.NodeManager.RemoteDomain;
 
@@ -61,14 +62,14 @@ namespace KlusterKite.NodeManager
         private readonly string databaseProviderName;
 
         /// <summary>
-        /// The current environment runtime name
-        /// </summary>
-        private readonly string runtime;
-
-        /// <summary>
         /// The nuget repository
         /// </summary>
         private readonly IPackageRepository nugetRepository;
+
+        /// <summary>
+        /// The current environment runtime name
+        /// </summary>
+        private readonly string runtime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationActor"/> class.
@@ -88,7 +89,8 @@ namespace KlusterKite.NodeManager
             this.connectionString =
                 Context.System.Settings.Config.GetString(NodeManagerActor.ConfigConnectionStringPath);
             this.databaseName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseNamePath);
-            this.databaseProviderName = Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
+            this.databaseProviderName =
+                Context.System.Settings.Config.GetString(NodeManagerActor.ConfigDatabaseProviderNamePath);
             this.runtime = Context.System.Settings.Config.GetString("KlusterKite.NodeManager.Runtime");
         }
 
@@ -118,31 +120,78 @@ namespace KlusterKite.NodeManager
         /// </summary>
         protected virtual IActorRef Parent { get; }
 
+        /// <summary>
+        /// Creates migration state from configuration states
+        /// </summary>
+        /// <param name="sourceMigratorTemplateStates">The resource state according to source configuration</param>
+        /// <param name="destinationMigratorTemplateStates">The resource state according to destination configuration</param>
+        /// <returns>The overall resource migration state</returns>
+        public static IEnumerable<MigratorTemplateMigrationState> CreateMigrationState(
+            IReadOnlyCollection<MigratorTemplateConfigurationState> sourceMigratorTemplateStates,
+            IReadOnlyCollection<MigratorTemplateConfigurationState> destinationMigratorTemplateStates)
+        {
+            foreach (var destinationMigratorTemplateState in destinationMigratorTemplateStates)
+            {
+                var sourceMigratorTemplateState =
+                    sourceMigratorTemplateStates.FirstOrDefault(
+                        t => t.Template.Code == destinationMigratorTemplateState.Template.Code);
+
+                if (sourceMigratorTemplateState == null)
+                {
+                    yield return MigratorTemplateMigrationState.CreateFrom(
+                        destinationMigratorTemplateState,
+                        EnMigratorPosition.New);
+                    continue;
+                }
+
+                var migratorStates = CreateMigrationState(
+                    destinationMigratorTemplateState.Code,
+                    sourceMigratorTemplateState.MigratorsStates,
+                    destinationMigratorTemplateState.MigratorsStates);
+
+                yield return new MigratorTemplateMigrationState
+                                 {
+                                     Code = destinationMigratorTemplateState.Template
+                                         .Code,
+                                     DestinationTemplate =
+                                         destinationMigratorTemplateState.Template,
+                                     SourceTemplate =
+                                         sourceMigratorTemplateState.Template,
+                                     Position = EnMigratorPosition.Present,
+                                     Migrators = migratorStates.ToList()
+                                 };
+            }
+
+            foreach (var sourceMigratorTemplateState in sourceMigratorTemplateStates.Where(
+                s => destinationMigratorTemplateStates.All(d => d.Template.Code != s.Template.Code)))
+            {
+                yield return MigratorTemplateMigrationState.CreateFrom(
+                    sourceMigratorTemplateState,
+                    EnMigratorPosition.Obsolete);
+            }
+        }
+
         /// <inheritdoc />
         protected override void PreStart()
         {
             this.When(
                 EnState.Migration,
                 command => command.FsmEvent.Match<State<EnState, Data>>()
-                    .With<List<ResourceUpgrade>>(this.StateMigrationHandleResourceUpgrade)
-                    .ResultOrDefault(o => null));
+                    .With<List<ResourceUpgrade>>(this.StateMigrationHandleResourceUpgrade).ResultOrDefault(o => null));
 
             this.When(
                 EnState.Idle,
                 command => command.FsmEvent.Match<State<EnState, Data>>()
-                    .With<List<ResourceUpgrade>>(this.StateIdleHandleResourceUpgrade)
-                    .ResultOrDefault(o => null));
+                    .With<List<ResourceUpgrade>>(this.StateIdleHandleResourceUpgrade).ResultOrDefault(o => null));
 
             this.When(EnState.InitializationFailed, command => null);
 
             this.WhenUnhandled(
-                command => command.FsmEvent.Match<State<EnState, Data>>()
-                    .With<RecheckState>(m => this.LoadState())
+                command => command.FsmEvent.Match<State<EnState, Data>>().With<RecheckState>(m => this.LoadState())
                     .ResultOrDefault(
                         o =>
                             {
-                                Context.GetLogger()
-                                    .Warning(
+                                Context.GetLogger().Warning(
                                     "{Type}: received unsupported message {MessageType} in state {StateName}",
                                     this.GetType().Name,
                                     o.GetType().Name,
@@ -157,162 +206,14 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Creates the resource migration plan
-        /// </summary>
-        /// <param name="request">The list of migrating resources</param>
-        /// <param name="errors">The list of processing errors</param>
-        /// <returns>The migration plan</returns>
-        private MigrationPlan CreateMigrationPlan(List<ResourceUpgrade> request, out List<MigrationLogRecord> errors)
-        {
-            var plan = new MigrationPlan();
-            errors = new List<MigrationLogRecord>();
-            var errorId = -1;
-            foreach (var resourceUpgrade in request)
-            {
-                var error = new MigrationLogRecord
-                {
-                                    Id = errorId--,
-                                    Type = EnMigrationLogRecordType.Error,
-                                    Started = DateTimeOffset.Now,
-                                    ConfigurationId = this.StateData.Migration.ToConfigurationId,
-                                    MigratorTemplateCode = resourceUpgrade.TemplateCode,
-                                    MigratorTypeName = resourceUpgrade.MigratorTypeName,
-                                    ResourceCode = resourceUpgrade.ResourceCode
-                                };
-
-                var template =
-                    this.StateData.MigrationState?.TemplateStates.FirstOrDefault(
-                        t => t.Code == resourceUpgrade.TemplateCode);
-                if (template == null)
-                {
-                    error.ErrorMessage = "Migrator template was not found";
-                    errors.Add(error);
-                    continue;
-                }
-
-                error.MigratorTemplateName = template.DestinationTemplate?.Name ?? template.SourceTemplate?.Name;
-
-                var migrator = template.Migrators.FirstOrDefault(m => m.TypeName == resourceUpgrade.MigratorTypeName);
-                if (migrator == null)
-                {
-                    error.ErrorMessage = "Migrator was not found";
-                    errors.Add(error);
-                    continue;
-                }
-
-                error.MigratorName = migrator.Name;
-
-                var resource = migrator.Resources.FirstOrDefault(r => r.Code == resourceUpgrade.ResourceCode);
-                if (resource == null)
-                {
-                    error.ErrorMessage = "Resource was not found";
-                    errors.Add(error);
-                    continue;
-                }
-
-                error.ResourceName = resource.Name;
-
-                var executionSide = resourceUpgrade.Target == EnMigrationSide.Destination
-                                        ? resource.MigrationToDestinationExecutor
-                                        : resource.MigrationToSourceExecutor;
-
-                if (!executionSide.HasValue)
-                {
-                    error.ErrorMessage = "Resource can not be migrated";
-                    errors.Add(error);
-                    continue;
-                }
-
-                var sideExecutionPlans = executionSide.Value == EnMigrationSide.Source
-                                             ? plan.SourceExecution
-                                             : plan.DestinationExecution;
-
-                MigratorTemplatePlan templatePlan;
-                if (!sideExecutionPlans.TryGetValue(resourceUpgrade.TemplateCode, out templatePlan))
-                {
-                    templatePlan = new MigratorTemplatePlan();
-                    templatePlan.Template = executionSide.Value == EnMigrationSide.Source
-                                                ? template.SourceTemplate
-                                                : template.DestinationTemplate;
-                    sideExecutionPlans[resourceUpgrade.TemplateCode] = templatePlan;
-                }
-
-                MigratorMigrationsCommand migratorMigrationsCommand;
-                if (!templatePlan.MigratorPlans.TryGetValue(
-                        resourceUpgrade.MigratorTypeName,
-                        out migratorMigrationsCommand))
-                {
-                    migratorMigrationsCommand =
-                        new MigratorMigrationsCommand { TypeName = resourceUpgrade.MigratorTypeName };
-                    templatePlan.MigratorPlans[resourceUpgrade.MigratorTypeName] = migratorMigrationsCommand;
-                }
-
-                var migrationPoint = resourceUpgrade.Target == EnMigrationSide.Source
-                                         ? resource.SourcePoint
-                                         : resource.DestinationPoint;
-
-                migratorMigrationsCommand.Resources.Add(resource.Code, migrationPoint);
-            }
-
-            return plan;
-        }
-
-        /// <summary>
         /// Creates migration state from configuration states
         /// </summary>
-        /// <param name="sourceMigratorTemplateStates">The resource state according to source configuration</param>
-        /// <param name="destinationMigratorTemplateStates">The resource state according to destination configuration</param>
-        /// <returns>The overall resource migration state</returns>
-        private IEnumerable<MigratorTemplateMigrationState> CreateMigrationState(
-            IReadOnlyCollection<MigratorTemplateConfigurationState> sourceMigratorTemplateStates,
-            IReadOnlyCollection<MigratorTemplateConfigurationState> destinationMigratorTemplateStates)
-        {
-            foreach (var destinationMigratorTemplateState in destinationMigratorTemplateStates)
-            {
-                var sourceMigratorTemplateState = sourceMigratorTemplateStates.FirstOrDefault(
-                    t => t.Template.Code == destinationMigratorTemplateState.Template.Code);
-
-                if (sourceMigratorTemplateState == null)
-                {
-                    yield return MigratorTemplateMigrationState.CreateFrom(
-                        destinationMigratorTemplateState,
-                        EnMigratorPosition.New);
-                    continue;
-                }
-
-                var migratorStates = this.CreateMigrationState(
-                    sourceMigratorTemplateState.MigratorsStates,
-                    destinationMigratorTemplateState.MigratorsStates);
-
-                yield return new MigratorTemplateMigrationState
-                                 {
-                                     Code =
-                                         destinationMigratorTemplateState.Template.Code,
-                                     DestinationTemplate =
-                                         destinationMigratorTemplateState.Template,
-                                     SourceTemplate =
-                                         sourceMigratorTemplateState.Template,
-                                     Position = EnMigratorPosition.Merged,
-                                     Migrators = migratorStates.ToList()
-                                 };
-            }
-
-            foreach (var sourceMigratorTemplateState in sourceMigratorTemplateStates.Where(
-                s => destinationMigratorTemplateStates.All(d => d.Template.Code != s.Template.Code)))
-            {
-                yield return MigratorTemplateMigrationState.CreateFrom(
-                    sourceMigratorTemplateState,
-                    EnMigratorPosition.Obsolete);
-            }
-        }
-
-        /// <summary>
-        /// Creates migration state from configuration states
-        /// </summary>
+        /// <param name="templateCode">The migrator template code</param>
         /// <param name="sourceMigratorStates">The resource state according to source configuration</param>
         /// <param name="destinationMigratorStates">The resource state according to destination configuration</param>
         /// <returns>The overall resource migration state</returns>
-        private IEnumerable<MigratorMigrationState> CreateMigrationState(
+        private static IEnumerable<MigratorMigrationState> CreateMigrationState(
+            string templateCode,
             IReadOnlyCollection<MigratorConfigurationState> sourceMigratorStates,
             IReadOnlyCollection<MigratorConfigurationState> destinationMigratorStates)
         {
@@ -323,36 +224,45 @@ namespace KlusterKite.NodeManager
 
                 if (sourceMigratorState == null)
                 {
-                    yield return MigratorMigrationState.CreateFrom(destinationMigratorState, EnMigratorPosition.New);
+                    yield return MigratorMigrationState.CreateFrom(templateCode, destinationMigratorState, EnMigratorPosition.New);
                     continue;
                 }
 
-                var resourceStates = this.CreateMigrationState(sourceMigratorState, destinationMigratorState).ToList();
+                var resourceStates = CreateMigrationState(templateCode, sourceMigratorState, destinationMigratorState).ToList();
 
-                var direction = this.GetDirection(
+                var direction = GetDirection(
                     sourceMigratorState.MigrationPoints,
                     destinationMigratorState.MigrationPoints);
+
+                if (!resourceStates.Any() || resourceStates.All(
+                        r => r.Position == EnResourcePosition.NotCreated || r.Position == EnResourcePosition.Obsolete))
+                {
+                    direction = EnMigrationDirection.Stay;
+                }
 
                 yield return new MigratorMigrationState
                                  {
                                      Name = destinationMigratorState.Name,
                                      TypeName = destinationMigratorState.TypeName,
                                      Direction = direction,
-                                     Position = EnMigratorPosition.Merged,
-                                     Resources = resourceStates
+                                     Position = EnMigratorPosition.Present,
+                                     Resources = resourceStates,
+                                     Priority = destinationMigratorState.Priority,
+                                     DependencyType = destinationMigratorState.DependencyType
                                  };
             }
 
             foreach (var sourceMigratorState in sourceMigratorStates.Where(
                 s => destinationMigratorStates.All(d => d.TypeName != s.TypeName)))
             {
-                yield return MigratorMigrationState.CreateFrom(sourceMigratorState, EnMigratorPosition.Obsolete);
+                yield return MigratorMigrationState.CreateFrom(templateCode, sourceMigratorState, EnMigratorPosition.Obsolete);
             }
         }
 
         /// <summary>
         /// Creates migration state from configuration states
         /// </summary>
+        /// <param name="templateCode">The migrator template code</param>
         /// <param name="sourceMigratorConfigurationState">
         /// The migrator state according to source configuration
         /// </param>
@@ -362,18 +272,21 @@ namespace KlusterKite.NodeManager
         /// <returns>
         /// The overall resource migration state
         /// </returns>
-        private IEnumerable<ResourceMigrationState> CreateMigrationState(
+        private static IEnumerable<ResourceMigrationState> CreateMigrationState(
+            string templateCode,
             MigratorConfigurationState sourceMigratorConfigurationState,
             MigratorConfigurationState destinationMigratorConfigurationState)
         {
             foreach (var destinationResourceState in destinationMigratorConfigurationState.Resources)
             {
                 var sourceResourceState =
-                    sourceMigratorConfigurationState.Resources.FirstOrDefault(s => s.Code == destinationResourceState.Code);
+                    sourceMigratorConfigurationState.Resources.FirstOrDefault(
+                        s => s.Code == destinationResourceState.Code);
 
                 if (sourceResourceState == null)
                 {
                     yield return ResourceMigrationState.CreateFrom(
+                        templateCode,
                         destinationMigratorConfigurationState,
                         destinationResourceState,
                         EnMigratorPosition.New);
@@ -381,6 +294,7 @@ namespace KlusterKite.NodeManager
                 }
 
                 yield return ResourceMigrationState.CreateFrom(
+                    templateCode,
                     sourceMigratorConfigurationState,
                     sourceResourceState,
                     destinationMigratorConfigurationState,
@@ -391,10 +305,42 @@ namespace KlusterKite.NodeManager
                 s => destinationMigratorConfigurationState.Resources.All(d => d.Code != s.Code)))
             {
                 yield return ResourceMigrationState.CreateFrom(
+                    templateCode,
                     sourceMigratorConfigurationState,
                     sourceResourceState,
                     EnMigratorPosition.Obsolete);
             }
+        }
+
+        /// <summary>
+        /// Calculates the migration direction according to the defined migration points
+        /// </summary>
+        /// <param name="sourcePoints">The list of migration points in the source configuration</param>
+        /// <param name="destinationPoints">The list of migration points in the destination configuration</param>
+        /// <returns>The migration direction</returns>
+        private static EnMigrationDirection GetDirection(
+            IEnumerable<string> sourcePoints,
+            IEnumerable<string> destinationPoints)
+        {
+            var source = string.Join(", ", sourcePoints.Select(p => $"\"{p.Replace("\\", "\\\\")}\""));
+            var destination = string.Join(", ", destinationPoints.Select(p => $"\"{p.Replace("\\", "\\\\")}\""));
+
+            if (source == destination)
+            {
+                return EnMigrationDirection.Stay;
+            }
+
+            if (destination.IndexOf(source, StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return EnMigrationDirection.Upgrade;
+            }
+
+            if (source.IndexOf(destination, StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return EnMigrationDirection.Downgrade;
+            }
+
+            return EnMigrationDirection.Undefined;
         }
 
         /// <summary>
@@ -403,10 +349,16 @@ namespace KlusterKite.NodeManager
         /// <param name="request">The list of migrating resources</param>
         /// <param name="errors">The list of processing errors</param>
         /// <returns>The migration plan</returns>
-        private MigrationPlan CreateConfigurationPlan(List<ResourceUpgrade> request, out List<MigrationLogRecord> errors)
+        private MigrationPlan CreateConfigurationPlan(
+            List<ResourceUpgrade> request,
+            out List<MigrationLogRecord> errors)
         {
             var plan = new MigrationPlan();
             errors = new List<MigrationLogRecord>();
+
+            MigratorTemplatePlan currentTemplatePlan = null;
+            MigratorMigrationsCommand currentCommand = null;
+
             foreach (var resourceUpgrade in request)
             {
                 var error = new MigrationLogRecord
@@ -424,7 +376,7 @@ namespace KlusterKite.NodeManager
                         t => t.Template.Code == resourceUpgrade.TemplateCode);
                 if (template == null)
                 {
-                    error.ErrorMessage = "Migrator template was not found";
+                    error.Message = "Migrator template was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -435,7 +387,7 @@ namespace KlusterKite.NodeManager
                     template.MigratorsStates.FirstOrDefault(m => m.TypeName == resourceUpgrade.MigratorTypeName);
                 if (migrator == null)
                 {
-                    error.ErrorMessage = "Migrator was not found";
+                    error.Message = "Migrator was not found";
                     errors.Add(error);
                     continue;
                 }
@@ -445,34 +397,138 @@ namespace KlusterKite.NodeManager
                 var resource = migrator.Resources.FirstOrDefault(r => r.Code == resourceUpgrade.ResourceCode);
                 if (resource == null)
                 {
-                    error.ErrorMessage = "Resource was not found";
+                    error.Message = "Resource was not found";
                     errors.Add(error);
                     continue;
                 }
 
                 error.ResourceName = resource.Name;
 
-                var sideExecutionPlans = plan.SourceExecution;
-
-                MigratorTemplatePlan templatePlan;
-                if (!sideExecutionPlans.TryGetValue(resourceUpgrade.TemplateCode, out templatePlan))
+                if (template.Code != currentTemplatePlan?.Template.Code || currentTemplatePlan == null)
                 {
-                    templatePlan = new MigratorTemplatePlan { Template = template.Template };
-                    sideExecutionPlans[resourceUpgrade.TemplateCode] = templatePlan;
+                    currentTemplatePlan =
+                        new MigratorTemplatePlan
+                            {
+                                Template = template.Template
+                            };
+                    currentCommand = null;
+                    plan.Executions.Add(currentTemplatePlan);
                 }
 
-                MigratorMigrationsCommand migratorMigrationsCommand;
-                if (!templatePlan.MigratorPlans.TryGetValue(
-                        resourceUpgrade.MigratorTypeName,
-                        out migratorMigrationsCommand))
+                if (migrator.TypeName != currentCommand?.TypeName || currentCommand == null)
                 {
-                    migratorMigrationsCommand =
-                        new MigratorMigrationsCommand { TypeName = resourceUpgrade.MigratorTypeName };
-                    templatePlan.MigratorPlans[resourceUpgrade.MigratorTypeName] = migratorMigrationsCommand;
+                    currentCommand = new MigratorMigrationsCommand { TypeName = migrator.TypeName };
+                    currentTemplatePlan.Commands.Add(currentCommand);
                 }
 
                 var migrationPoint = migrator.LastDefinedPoint;
-                migratorMigrationsCommand.Resources.Add(resource.Code, migrationPoint);
+
+                var resourceMigrationCommand =
+                    new ResourceMigrationCommand { ResourceCode = resource.Code, MigrationPoint = migrationPoint };
+                currentCommand.Resources.Add(resourceMigrationCommand);
+            }
+
+            return plan;
+        }
+
+        /// <summary>
+        /// Creates the resource migration plan
+        /// </summary>
+        /// <param name="request">The list of migrating resources</param>
+        /// <param name="errors">The list of processing errors</param>
+        /// <returns>The migration plan</returns>
+        private MigrationPlan CreateMigrationPlan(List<ResourceUpgrade> request, out List<MigrationLogRecord> errors)
+        {
+            var plan = new MigrationPlan();
+            errors = new List<MigrationLogRecord>();
+            var errorId = -1;
+
+            MigratorTemplatePlan currentTemplatePlan = null;
+            MigratorMigrationsCommand currentCommand = null;
+
+            foreach (var resourceUpgrade in request)
+            {
+                var error = new MigrationLogRecord
+                                {
+                                    Id = errorId--,
+                                    Type = EnMigrationLogRecordType.Error,
+                                    Started = DateTimeOffset.Now,
+                                    ConfigurationId = this.StateData.Migration.ToConfigurationId,
+                                    MigratorTemplateCode = resourceUpgrade.TemplateCode,
+                                    MigratorTypeName = resourceUpgrade.MigratorTypeName,
+                                    ResourceCode = resourceUpgrade.ResourceCode
+                                };
+
+                var template =
+                    this.StateData.MigrationState?.TemplateStates.FirstOrDefault(
+                        t => t.Code == resourceUpgrade.TemplateCode);
+                if (template == null)
+                {
+                    error.Message = "Migrator template was not found";
+                    errors.Add(error);
+                    continue;
+                }
+
+                error.MigratorTemplateName = template.DestinationTemplate?.Name ?? template.SourceTemplate?.Name;
+
+                var migrator = template.Migrators.FirstOrDefault(m => m.TypeName == resourceUpgrade.MigratorTypeName);
+                if (migrator == null)
+                {
+                    error.Message = "Migrator was not found";
+                    errors.Add(error);
+                    continue;
+                }
+
+                error.MigratorName = migrator.Name;
+
+                var resource = migrator.Resources.FirstOrDefault(r => r.Code == resourceUpgrade.ResourceCode);
+                if (resource == null)
+                {
+                    error.Message = "Resource was not found";
+                    errors.Add(error);
+                    continue;
+                }
+
+                error.ResourceName = resource.Name;
+
+                var executionSide = resourceUpgrade.Target == EnMigrationSide.Destination
+                                        ? resource.MigrationToDestinationExecutor
+                                        : resource.MigrationToSourceExecutor;
+
+                if (!executionSide.HasValue)
+                {
+                    error.Message = "Resource can not be migrated";
+                    errors.Add(error);
+                    continue;
+                }
+
+                if (template.Code != currentTemplatePlan?.Template.Code || executionSide != currentTemplatePlan?.Side)
+                {
+                    currentTemplatePlan =
+                        new MigratorTemplatePlan
+                            {
+                                Side = executionSide.Value,
+                                Template = executionSide == EnMigrationSide.Destination
+                                               ? template.DestinationTemplate
+                                               : template.SourceTemplate
+                            };
+                    currentCommand = null;
+                    plan.Executions.Add(currentTemplatePlan);
+                }
+
+                if (migrator.TypeName != currentCommand?.TypeName || currentCommand == null)
+                {
+                    currentCommand = new MigratorMigrationsCommand { TypeName = migrator.TypeName };
+                    currentTemplatePlan.Commands.Add(currentCommand);
+                }
+
+                var migrationPoint = resourceUpgrade.Target == EnMigrationSide.Source
+                                         ? resource.SourcePoint
+                                         : resource.DestinationPoint;
+
+                var resourceMigrationCommand =
+                    new ResourceMigrationCommand { ResourceCode = resource.Code, MigrationPoint = migrationPoint };
+                currentCommand.Resources.Add(resourceMigrationCommand);
             }
 
             return plan;
@@ -494,23 +550,23 @@ namespace KlusterKite.NodeManager
         {
             var log = new List<MigrationLogRecord>();
             var configurationDir = side == EnMigrationSide.Source
-                                 ? Path.Combine(this.StateData.FromConfigurationExecutionDir, plan.Template.Code)
-                                 : Path.Combine(this.StateData.ToConfigurationExecutionDir, plan.Template.Code);
+                                       ? Path.Combine(this.StateData.FromConfigurationExecutionDir, plan.Template.Code)
+                                       : Path.Combine(this.StateData.ToConfigurationExecutionDir, plan.Template.Code);
 
             var configurationId = side == EnMigrationSide.Source
-                                ? this.StateData.Migration.FromConfiguration.Id
-                                : this.StateData.Migration.ToConfigurationId;
+                                      ? this.StateData.Migration.FromConfiguration.Id
+                                      : this.StateData.Migration.ToConfigurationId;
 
             Context.GetLogger().Info(
                 "{Type}: preparing for migration resources of {MigratorTemplateCode} of configuration {ConfigurationId}. {ResourceCount} resources will be migrated",
                 this.GetType().Name,
                 plan.Template.Code,
                 configurationId,
-                plan.MigratorPlans.Values.SelectMany(m => m.Resources.Values).Count());
+                plan.Commands.SelectMany(m => m.Resources).Count());
 
             try
             {
-                var collector = new MigrationExecutor { Commands = plan.MigratorPlans.Values.ToList() };
+                var collector = new MigrationExecutor { Commands = plan.Commands };
 
                 Context.GetLogger().Info(
                     "{Type}: {MigratorTemplateCode} of configuration {ConfigurationId} migration executor was created",
@@ -522,10 +578,7 @@ namespace KlusterKite.NodeManager
                 var operations = collector.Result;
                 foreach (var logMessage in collector.Logs)
                 {
-                    Context.GetLogger().Info(
-                        "{Type}: migration log - {LogMessage}",
-                        this.GetType().Name,
-                        logMessage);
+                    Context.GetLogger().Info("{Type}: migration log - {LogMessage}", this.GetType().Name, logMessage);
                 }
 
                 Context.GetLogger().Info(
@@ -545,26 +598,24 @@ namespace KlusterKite.NodeManager
 
                         if (operation.Type.HasFlag(EnMigrationLogRecordType.Error))
                         {
-                            Context.GetLogger()
-                                .Error(
-                                    "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage} \n {ErrorStackTrace}",
-                                    this.GetType().Name,
-                                    plan.Template.Code,
-                                    configurationId,
-                                    operation.ErrorMessage,
-                                    operation.ErrorStackTrace);
+                            Context.GetLogger().Error(
+                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage} \n {ErrorStackTrace}",
+                                this.GetType().Name,
+                                plan.Template.Code,
+                                configurationId,
+                                operation.Message,
+                                operation.ErrorStackTrace);
                         }
                         else
                         {
-                            Context.GetLogger()
-                                .Info(
-                                    "{Type}: Migration for template {MigratorTemplateCode} of configuration {ConfigurationId} {ResourceCode} was successfully migrated from {SourcePoint} to {DestinationPoint}",
-                                    this.GetType().Name,
-                                    plan.Template.Code,
-                                    configurationId,
-                                    operation.ResourceCode,
-                                    operation.SourcePoint,
-                                    operation.DestinationPoint);
+                            Context.GetLogger().Info(
+                                "{Type}: Migration for template {MigratorTemplateCode} of configuration {ConfigurationId} {ResourceCode} was successfully migrated from {SourcePoint} to {DestinationPoint}",
+                                this.GetType().Name,
+                                plan.Template.Code,
+                                configurationId,
+                                operation.ResourceCode,
+                                operation.SourcePoint,
+                                operation.DestinationPoint);
                         }
                     }
 
@@ -583,30 +634,29 @@ namespace KlusterKite.NodeManager
                                     MigrationId = this.StateData.Migration.Id,
                                     MigratorTemplateCode = plan.Template.Code,
                                     MigratorTemplateName = plan.Template.Name,
-                                    ErrorMessage = $"Error while executing migration: {error}"
+                                    Message = $"Error while executing migration: {error}"
                                 });
 
-                        Context.GetLogger()
-                            .Error(
-                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}",
-                                this.GetType().Name,
-                                plan.Template.Code,
-                                configurationId,
-                                error);
+                        Context.GetLogger().Error(
+                            "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}",
+                            this.GetType().Name,
+                            plan.Template.Code,
+                            configurationId,
+                            error);
                     }
                 }
             }
             catch (Exception exception)
             {
                 log.Add(
-                        new MigrationLogRecord
+                    new MigrationLogRecord
                         {
                             Type = EnMigrationLogRecordType.Error,
                             ConfigurationId = configurationId,
                             MigrationId = this.StateData.Migration.Id,
                             MigratorTemplateCode = plan.Template.Code,
                             MigratorTemplateName = plan.Template.Name,
-                            ErrorMessage = exception.Message,
+                            Message = exception.Message,
                             Exception = exception
                         });
             }
@@ -630,8 +680,7 @@ namespace KlusterKite.NodeManager
 
             try
             {
-                var collector = new MigrationExecutor();
-                collector.Commands = plan.MigratorPlans.Values.ToList();
+                var collector = new MigrationExecutor { Commands = plan.Commands };
                 collector = this.ExecuteMigrator(configurationDir, collector);
 
                 var operations = collector.Result;
@@ -645,14 +694,13 @@ namespace KlusterKite.NodeManager
 
                         if (operation.Type.HasFlag(EnMigrationLogRecordType.Error))
                         {
-                            Context.GetLogger()
-                                .Error(
-                                    "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage} \n {ErrorStackTrace}",
-                                    this.GetType().Name,
-                                    plan.Template.Code,
-                                    this.StateData.Configuration.Id,
-                                    operation.ErrorMessage,
-                                    operation.ErrorStackTrace);
+                            Context.GetLogger().Error(
+                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage} \n {ErrorStackTrace}",
+                                this.GetType().Name,
+                                plan.Template.Code,
+                                this.StateData.Configuration.Id,
+                                operation.Message,
+                                operation.ErrorStackTrace);
                         }
                     }
 
@@ -670,33 +718,224 @@ namespace KlusterKite.NodeManager
                                     ConfigurationId = this.StateData.Configuration.Id,
                                     MigratorTemplateCode = plan.Template.Code,
                                     MigratorTemplateName = plan.Template.Name,
-                                    ErrorMessage = $"Error while executing migration: {error}"
+                                    Message = $"Error while executing migration: {error}"
                                 });
-                        Context.GetLogger()
-                            .Error(
-                                "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}",
-                                this.GetType().Name,
-                                plan.Template.Code,
-                                this.StateData.Configuration.Id,
-                                error);
+                        Context.GetLogger().Error(
+                            "{Type}: Error while executing migration for template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}",
+                            this.GetType().Name,
+                            plan.Template.Code,
+                            this.StateData.Configuration.Id,
+                            error);
                     }
                 }
             }
             catch (Exception exception)
             {
                 log.Add(
-                        new MigrationLogRecord
+                    new MigrationLogRecord
                         {
                             Type = EnMigrationLogRecordType.Error,
                             ConfigurationId = this.StateData.Configuration.Id,
                             MigratorTemplateCode = plan.Template.Code,
                             MigratorTemplateName = plan.Template.Name,
-                            ErrorMessage = exception.Message,
+                            Message = exception.Message,
                             Exception = exception
                         });
             }
 
             return log;
+        }
+
+        /// <summary>
+        /// Executes the <see cref="MigrationCollector"/> from pre-installed service
+        /// </summary>
+        /// <typeparam name="T">The collector end-type</typeparam>
+        /// <param name="installedPath">The service installation path</param>
+        /// <param name="instance">The collector instance</param>
+        /// <returns>The executed collector</returns>
+        private T ExecuteMigrator<T>(string installedPath, T instance)
+            where T : MigrationCollector
+        {
+#if APPDOMAIN
+            var isMono = Type.GetType("Mono.Runtime") != null;
+            
+
+// ReSharper disable once InconsistentNaming
+            var ExecutableFileName =
+isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.Executor.exe");
+            
+
+// ReSharper disable once InconsistentNaming
+            var ExecutableArguments = isMono ? "./KlusterKite.NodeManager.Migrator.Executor.exe" : string.Empty;
+#elif CORECLR
+            const string ExecutableFileName = "dotnet";
+            const string ExecutableArguments = "./KlusterKite.NodeManager.Migrator.Executor.dll";
+#endif
+
+            var process = new Process
+                              {
+                                  StartInfo =
+                                      {
+                                          UseShellExecute = false,
+                                          WorkingDirectory = installedPath,
+                                          FileName = ExecutableFileName,
+                                          Arguments = ExecutableArguments,
+                                          RedirectStandardOutput = true,
+                                          RedirectStandardInput = true,
+                                          RedirectStandardError = true,
+#if APPDOMAIN
+                                          ErrorDialog = false,
+#endif
+                                      }
+                              };
+
+            process.Start();
+
+            string readLine = null;
+            while (readLine != ProcessHelper.EOF && !process.HasExited)
+            {
+                readLine = process.StandardOutput.ReadLine();
+            }
+
+            T output;
+            string error;
+            try
+            {
+                process.StandardInput.Send(instance);
+                output = process.StandardOutput.Receive() as T;
+                process.WaitForExit();
+            }
+            catch (Exception exception)
+            {
+                Context.GetLogger().Error(exception, "{Type}: Migrator communication failed", this.GetType().Name);
+                error = process.StandardError.ReadToEnd();
+                Context.GetLogger().Error(
+                    "{Type}: Migrator exited with error {Error}. Installed on {InstalledPath}",
+                    this.GetType().Name,
+                    error,
+                    installedPath);
+                throw;
+            }
+
+            error = process.StandardError.ReadToEnd();
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                Context.GetLogger().Error(
+                    "{Type}: Migrator exited with error {Error}. Installed on {InstalledPath}",
+                    this.GetType().Name,
+                    error,
+                    installedPath);
+            }
+
+            process.Dispose();
+            return output;
+        }
+
+        /// <summary>
+        /// Extracts packages for the <see cref="MigratorTemplate"/>
+        /// </summary>
+        /// <param name="configuration">
+        /// The configuration
+        /// </param>
+        /// <param name="migrationId">
+        /// The possible migration id
+        /// </param>
+        /// <param name="migratorTemplate">
+        /// The migrator template to extract
+        /// </param>
+        /// <param name="executionDirectory">
+        /// The execution directory
+        /// </param>
+        /// <param name="forceExtract">
+        /// Whether to overwrite previous extraction
+        /// </param>
+        /// <param name="tempDir">
+        /// The temporary data directory
+        /// </param>
+        /// <param name="errors">
+        /// The list of errors to fill
+        /// </param>
+        /// <param name="context">
+        /// The actor context in order not to loose it during async operations
+        /// </param>
+        /// <returns>
+        /// The async task
+        /// </returns>
+        private async Task ExtractConfigurationMigrationTemplateAsync(
+            Configuration configuration,
+            int? migrationId,
+            MigratorTemplate migratorTemplate,
+            string executionDirectory,
+            bool forceExtract,
+            string tempDir,
+            List<MigrationLogRecord> errors,
+            IActorContext context)
+        {
+            var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
+            if (Directory.Exists(migratorExecutionDirectory))
+            {
+                if (forceExtract)
+                {
+                    Directory.Delete(migratorExecutionDirectory, true);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            var migratorTempDirectory = Path.Combine(tempDir, migratorTemplate.Code);
+            Directory.CreateDirectory(migratorExecutionDirectory);
+            Directory.CreateDirectory(migratorTempDirectory);
+
+            try
+            {
+                List<PackageDescription> packagesToInstall;
+                if (!migratorTemplate.PackagesToInstall.TryGetValue(
+                        PackageRepositoryExtensions.CurrentRuntime,
+                        out packagesToInstall))
+                {
+                    throw new Exception($"Framework {PackageRepositoryExtensions.CurrentRuntime} is not supported");
+                }
+
+                var packages = packagesToInstall.Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version)))
+                    .ToList();
+                await this.nugetRepository.CreateServiceAsync(
+                    packages,
+                    this.runtime,
+                    PackageRepositoryExtensions.CurrentRuntime,
+                    migratorExecutionDirectory,
+                    "KlusterKite.NodeManager.Migrator.Executor");
+            }
+            catch (Exception exception)
+            {
+                context.GetLogger().Error(
+                    exception,
+                    "{Type} Error on creating service for migrator template {MigratorTemplateCode} of configuration {ConfigurationId}",
+                    this.GetType().Name,
+                    migratorTemplate.Code,
+                    configuration.Id);
+
+                errors.Add(
+                    new MigrationLogRecord
+                        {
+                            Type = EnMigrationLogRecordType.Error,
+                            ConfigurationId = configuration.Id,
+                            MigrationId = migrationId,
+                            MigratorTemplateCode = migratorTemplate.Code,
+                            MigratorTemplateName = migratorTemplate.Name,
+                            Message = $"error on creating service: {exception.Message}",
+                            Exception = exception
+                        });
+            }
+
+            if (errors.Any())
+            {
+                Directory.Delete(migratorExecutionDirectory, true);
+                return;
+            }
+
+            File.WriteAllText(Path.Combine(migratorExecutionDirectory, "config.hocon"), migratorTemplate.Configuration);
         }
 
         /// <summary>
@@ -735,6 +974,7 @@ namespace KlusterKite.NodeManager
             Directory.CreateDirectory(tempDir);
             try
             {
+                var context = Context;
                 foreach (var migratorTemplate in configuration.Settings.MigratorTemplates)
                 {
                     try
@@ -746,7 +986,8 @@ namespace KlusterKite.NodeManager
                             executionDirectory,
                             forceExtract,
                             tempDir,
-                            errors);
+                            errors,
+                            context);
                     }
                     catch (Exception exception)
                     {
@@ -758,7 +999,7 @@ namespace KlusterKite.NodeManager
                                     MigrationId = migrationId,
                                     MigratorTemplateCode = migratorTemplate.Code,
                                     MigratorTemplateName = migratorTemplate.Name,
-                                    ErrorMessage = $"error on extracting template: {exception.Message}",
+                                    Message = $"error on extracting template: {exception.Message}",
                                     Exception = exception
                                 });
                     }
@@ -773,126 +1014,99 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// Extracts packages for the <see cref="MigratorTemplate"/>
+        /// Gets the state of the configuration
         /// </summary>
         /// <param name="configuration">
-        /// The configuration
-        /// </param>
-        /// <param name="migrationId">
-        /// The possible migration id
-        /// </param>
-        /// <param name="migratorTemplate">
-        /// The migrator template to extract
+        /// The configuration to check
         /// </param>
         /// <param name="executionDirectory">
-        /// The execution directory
+        /// The execution Directory.
         /// </param>
-        /// <param name="forceExtract">
-        /// Whether to overwrite previous extraction
-        /// </param>
-        /// <param name="tempDir">
-        /// The temporary data directory
+        /// <param name="migrationId">
+        /// The current migration id
         /// </param>
         /// <param name="errors">
-        /// The list of errors to fill
+        /// The list of execution errors
         /// </param>
         /// <returns>
-        /// The async task
+        /// The state of configuration resources
         /// </returns>
-        private async Task ExtractConfigurationMigrationTemplateAsync(Configuration configuration, int? migrationId, MigratorTemplate migratorTemplate, string executionDirectory, bool forceExtract, string tempDir, List<MigrationLogRecord> errors)
+        private List<MigratorTemplateConfigurationState> GetConfigurationResourcesState(
+            Configuration configuration,
+            string executionDirectory,
+            int? migrationId,
+            out List<MigrationLogRecord> errors)
         {
-            var migratorExecutionDirectory = Path.Combine(executionDirectory, migratorTemplate.Code);
-            if (Directory.Exists(migratorExecutionDirectory))
+            var result = new List<MigratorTemplateConfigurationState>();
+            errors = new List<MigrationLogRecord>();
+
+            foreach (var migratorTemplate in configuration.Settings.MigratorTemplates.OrderByDescending(
+                mt => mt.Priority))
             {
-                if (forceExtract)
-                {
-                    Directory.Delete(migratorExecutionDirectory, true);
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            var migratorTempDirectory = Path.Combine(tempDir, migratorTemplate.Code);
-            Directory.CreateDirectory(migratorExecutionDirectory);
-            Directory.CreateDirectory(migratorTempDirectory);
-
-            try
-            {
-                if (!migratorTemplate.PackagesToInstall.TryGetValue(PackageRepositoryExtensions.CurrentRuntime, out var packagesToInstall))
-                {
-                    throw new Exception($"Framework {PackageRepositoryExtensions.CurrentRuntime} is not supported");
-                }
-
-                var packages = packagesToInstall.Select(p => new PackageIdentity(p.Id, NuGetVersion.Parse(p.Version))).ToList();
-                await this.nugetRepository.CreateServiceAsync(
-                    packages,
-                    this.runtime,
-                    PackageRepositoryExtensions.CurrentRuntime,
-                    migratorExecutionDirectory,
-                    "KlusterKite.NodeManager.Migrator.Executor");
-            }
-            catch (Exception exception)
-            {
-                Context.GetLogger().Error(
-                    exception,
-                    "{Type} Error on creating service for migrator template {MigratorTemplateCode} of configuration {ConfigurationId}",
-                    this.GetType().Name,
-                    migratorTemplate.Code,
-                    configuration.Id);
-
-                errors.Add(
-                    new MigrationLogRecord
+                var state =
+                    new MigratorTemplateConfigurationState
                         {
-                            Type = EnMigrationLogRecordType.Error,
-                            ConfigurationId = configuration.Id,
-                            MigrationId = migrationId,
-                            MigratorTemplateCode = migratorTemplate.Code,
-                            MigratorTemplateName = migratorTemplate.Name,
-                            ErrorMessage = $"error on creating service: {exception.Message}",
-                            Exception = exception
-                        });
+                            Code = migratorTemplate.Code,
+                            Template = migratorTemplate
+                        };
+                var configurationDir = Path.Combine(executionDirectory, migratorTemplate.Code);
+                try
+                {
+                    var collector = new ConfigurationStateCollector();
+                    collector = this.ExecuteMigrator(configurationDir, collector);
+                    var collectorErrors = collector.Errors;
+                    var migratorConfigurationStates = collector.Result;
+
+                    if (collectorErrors.Any())
+                    {
+                        foreach (var error in collector.Errors)
+                        {
+                            error.ConfigurationId = configuration.Id;
+                            error.MigrationId = migrationId;
+                            error.MigratorTemplateCode = migratorTemplate.Code;
+                            error.MigratorTemplateName = migratorTemplate.Name;
+                            errors.Add(error);
+
+                            Context.GetLogger().Error(
+                                "{Type}: Error while requesting migration state for migrator "
+                                + "template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}\n {ErrorStackTrace}",
+                                this.GetType().Name,
+                                migratorTemplate.Code,
+                                configuration.Id,
+                                error.Message,
+                                error.ErrorStackTrace);
+                        }
+
+                        continue;
+                    }
+
+                    state.MigratorsStates = migratorConfigurationStates;
+                    result.Add(state);
+                }
+                catch (Exception exception)
+                {
+                    errors.Add(
+                        new MigrationLogRecord
+                            {
+                                Type = EnMigrationLogRecordType.Error,
+                                ConfigurationId = configuration.Id,
+                                MigrationId = migrationId,
+                                MigratorTemplateCode = migratorTemplate.Code,
+                                MigratorTemplateName = migratorTemplate.Name,
+                                Message =
+                                    $"Error while requesting migration state: {exception.Message}",
+                                Exception = exception
+                            });
+                    Context.GetLogger().Error(
+                        exception,
+                        "{Type}: Error while requesting migration state for migrator template {MigratorTemplateCode} of configuration {ConfigurationId}",
+                        this.GetType().Name,
+                        migratorTemplate.Code,
+                        configuration.Id);
+                }
             }
 
-            if (errors.Any())
-            {
-                Directory.Delete(migratorExecutionDirectory, true);
-                return;
-            }
-
-            File.WriteAllText(Path.Combine(migratorExecutionDirectory, "config.hocon"), migratorTemplate.Configuration);
-        }
-
-        /// <summary>
-        /// Calculates the migration direction according to the defined migration points
-        /// </summary>
-        /// <param name="sourcePoints">The list of migration points in the source configuration</param>
-        /// <param name="destinationPoints">The list of migration points in the destination configuration</param>
-        /// <returns>The migration direction</returns>
-        private EnMigrationDirection GetDirection(
-            IEnumerable<string> sourcePoints,
-            IEnumerable<string> destinationPoints)
-        {
-            var source = string.Join(", ", sourcePoints.Select(p => $"\"{p.Replace("\\", "\\\\")}\""));
-            var destination = string.Join(", ", destinationPoints.Select(p => $"\"{p.Replace("\\", "\\\\")}\""));
-
-            if (source == destination)
-            {
-                return EnMigrationDirection.Stay;
-            }
-
-            if (destination.IndexOf(source, StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                return EnMigrationDirection.Upgrade;
-            }
-
-            if (source.IndexOf(destination, StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                return EnMigrationDirection.Downgrade;
-            }
-
-            return EnMigrationDirection.Undefined;
+            return result;
         }
 
         /// <summary>
@@ -930,212 +1144,53 @@ namespace KlusterKite.NodeManager
                 return null;
             }
 
-            var state = this.CreateMigrationState(sourceStates, destinationStates).ToList();
-            EnMigrationActorMigrationPosition position;
-
-            var resourcePositions = state.SelectMany(s => s.Migrators).SelectMany(m => m.Resources)
-                .Select(r => r.Position).ToList();
-
-            if (!resourcePositions.Any() || resourcePositions.All(p => p == EnResourcePosition.SourceAndDestination))
-            {
-                position = EnMigrationActorMigrationPosition.NoMigrationNeeded;
-            }
-            else if (resourcePositions.All(
-                p => p == EnResourcePosition.SourceAndDestination || p == EnResourcePosition.Source))
-            {
-                position = EnMigrationActorMigrationPosition.Source;
-            }
-            else if (resourcePositions.All(
-                p => p == EnResourcePosition.SourceAndDestination || p == EnResourcePosition.Destination))
-            {
-                position = EnMigrationActorMigrationPosition.Destination;
-            }
-            else if (resourcePositions.Any(p => p == EnResourcePosition.Undefined))
-            {
-                position = EnMigrationActorMigrationPosition.Broken;
-            }
-            else
-            {
-                position = EnMigrationActorMigrationPosition.PartiallyMigrated;
-            }
-
-            var result = new MigrationActorMigrationState { TemplateStates = state, Position = position };
+            var state = CreateMigrationState(sourceStates, destinationStates).ToList();
+            var result = new MigrationActorMigrationState { TemplateStates = state };
             return result;
         }
 
         /// <summary>
-        /// Executes the <see cref="MigrationCollector"/> from pre-installed service
-        /// </summary>
-        /// <typeparam name="T">The collector end-type</typeparam>
-        /// <param name="installedPath">The service installation path</param>
-        /// <param name="instance">The collector instance</param>
-        /// <returns>The executed collector</returns>
-        private T ExecuteMigrator<T>(string installedPath, T instance) where T : MigrationCollector
-        {
-#if APPDOMAIN
-            var isMono = Type.GetType("Mono.Runtime") != null;
-            // ReSharper disable once InconsistentNaming
-            var ExecutableFileName = isMono ? "mono" : Path.Combine(installedPath, "KlusterKite.NodeManager.Migrator.Executor.exe");
-            // ReSharper disable once InconsistentNaming
-            var ExecutableArguments = isMono ? "./KlusterKite.NodeManager.Migrator.Executor.exe" : string.Empty;
-#elif CORECLR
-            const string ExecutableFileName = "dotnet";
-            const string ExecutableArguments = "./KlusterKite.NodeManager.Migrator.Executor.dll";
-#endif
-
-            var process = new Process
-                              {
-                                  StartInfo =
-                                      {
-                                          UseShellExecute = false,
-                                          WorkingDirectory = installedPath,
-                                          FileName = ExecutableFileName,
-                                          Arguments = ExecutableArguments,
-                                          RedirectStandardOutput = true,
-                                          RedirectStandardInput = true,
-                                          RedirectStandardError = true,
-#if APPDOMAIN
-                                          ErrorDialog = false,
-#endif
-                                      }
-            };
-
-            process.Start();
-
-            string readLine = null;
-            while (readLine != ProcessHelper.EOF && !process.HasExited)
-            {
-                readLine = process.StandardOutput.ReadLine();
-            }
-
-            T output;
-            string error;
-            try
-            {
-                process.StandardInput.Send(instance);
-                output = process.StandardOutput.Receive() as T;
-                process.WaitForExit();
-            }
-            catch (Exception exception)
-            {
-                Context.GetLogger().Error(
-                    exception,
-                    "{Type}: Migrator communication failed",
-                    this.GetType().Name);
-                error = process.StandardError.ReadToEnd();
-                Context.GetLogger().Error(
-                    "{Type}: Migrator exited with error {Error}. Installed on {InstalledPath}",
-                    this.GetType().Name,
-                    error,
-                    installedPath);
-                throw;
-            }
-
-            error = process.StandardError.ReadToEnd();
-            if (!string.IsNullOrWhiteSpace(error))
-            {
-                Context.GetLogger().Error(
-                    "{Type}: Migrator exited with error {Error}. Installed on {InstalledPath}",
-                    this.GetType().Name,
-                    error,
-                    installedPath);
-            }
-
-            process.Dispose();
-            return output;
-        }
-
-        /// <summary>
-        /// Gets the state of the configuration
+        /// Loads current state without active migration
         /// </summary>
         /// <param name="configuration">
-        /// The configuration to check
+        /// The currently active configuration
         /// </param>
-        /// <param name="executionDirectory">
-        /// The execution Directory.
+        /// <param name="forceExtract">
+        /// A value indicating whether configuration Nuget packages should be overwritten
         /// </param>
-        /// <param name="migrationId">
-        /// The current migration id
-        /// </param>
-        /// <param name="errors">
-        /// The list of execution errors
+        /// <param name="data">
+        /// Current actor state data
         /// </param>
         /// <returns>
-        /// The state of configuration resources
+        /// The next actor state
         /// </returns>
-        private List<MigratorTemplateConfigurationState> GetConfigurationResourcesState(
-            Configuration configuration,
-            string executionDirectory,
-            int? migrationId,
-            out List<MigrationLogRecord> errors)
+        private State<EnState, Data> LoadConfigurationState(Configuration configuration, bool forceExtract, Data data)
         {
-            var result = new List<MigratorTemplateConfigurationState>();
-            errors = new List<MigrationLogRecord>();
-
-            foreach (var migratorTemplate in configuration.Settings.MigratorTemplates.OrderByDescending(
-                mt => mt.Priority))
+            var configurationExecutionDir = data?.ConfigurationExecutionDir
+                                            ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            data = new Data { ConfigurationExecutionDir = configurationExecutionDir, Configuration = configuration };
+            var extractionErrors = this
+                .ExtractConfigurationMigratorsAsync(configuration, configurationExecutionDir, null, forceExtract)
+                .GetAwaiter().GetResult();
+            if (extractionErrors.Any())
             {
-                var state = new MigratorTemplateConfigurationState { Code = migratorTemplate.Code, Template = migratorTemplate };
-                var configurationDir = Path.Combine(executionDirectory, migratorTemplate.Code);
-                try
-                {
-                    var collector = new ConfigurationStateCollector();
-                    collector = this.ExecuteMigrator(configurationDir, collector);
-                    var collectorErrors = collector.Errors;
-                    var migratorConfigurationStates = collector.Result;
-
-                    if (collectorErrors.Any())
-                    {
-                        foreach (var error in collector.Errors)
-                        {
-                            error.ConfigurationId = configuration.Id;
-                            error.MigrationId = migrationId;
-                            error.MigratorTemplateCode = migratorTemplate.Code;
-                            error.MigratorTemplateName = migratorTemplate.Name;
-                            errors.Add(error);
-
-                            Context.GetLogger()
-                                .Error(
-                                    "{Type}: Error while requesting migration state for migrator "
-                                    + "template {MigratorTemplateCode} of configuration {ConfigurationId}: {ErrorMessage}\n {ErrorStackTrace}",
-                                    this.GetType().Name,
-                                    migratorTemplate.Code,
-                                    configuration.Id,
-                                    error.ErrorMessage,
-                                    error.ErrorStackTrace);
-                        }
-
-                        continue;
-                    }
-
-                    state.MigratorsStates = migratorConfigurationStates;
-                    result.Add(state);
-                }
-                catch (Exception exception)
-                {
-                    errors.Add(
-                        new MigrationLogRecord
-                            {
-                                Type = EnMigrationLogRecordType.Error,
-                                ConfigurationId = configuration.Id,
-                                MigrationId = migrationId,
-                                MigratorTemplateCode = migratorTemplate.Code,
-                                MigratorTemplateName = migratorTemplate.Name,
-                                ErrorMessage =
-                                    $"Error while requesting migration state: {exception.Message}",
-                                Exception = exception
-                            });
-                    Context.GetLogger()
-                        .Error(
-                            exception,
-                            "{Type}: Error while requesting migration state for migrator template {MigratorTemplateCode} of configuration {ConfigurationId}",
-                            this.GetType().Name,
-                            migratorTemplate.Code,
-                            configuration.Id);
-                }
+                this.Parent.Tell(new MigrationActorInitializationFailed { Errors = extractionErrors });
+                return new State<EnState, Data>(EnState.InitializationFailed, data);
             }
 
-            return result;
+            List<MigrationLogRecord> errors;
+            var configurationStates = this
+                .GetConfigurationResourcesState(configuration, configurationExecutionDir, null, out errors).ToList();
+            if (errors.Any())
+            {
+                this.Parent.Tell(new MigrationActorInitializationFailed { Errors = errors });
+                return new State<EnState, Data>(EnState.InitializationFailed, data);
+            }
+
+            data.ConfigurationState = new MigrationActorConfigurationState { States = configurationStates };
+
+            this.Parent.Tell(data.ConfigurationState);
+            return new State<EnState, Data>(EnState.Idle, data);
         }
 
         /// <summary>
@@ -1148,20 +1203,22 @@ namespace KlusterKite.NodeManager
         private State<EnState, Data> LoadMigrationState(Migration migration, bool forceExtract, Data data)
         {
             var fromConfigurationExecutionDir = data?.FromConfigurationExecutionDir
-                                          ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+                                                ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             var toConfigurationExecutionDir = data?.ToConfigurationExecutionDir
-                                        ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+                                              ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
 
             var extractionErrors = this
-                .ExtractConfigurationMigratorsAsync(migration.FromConfiguration, fromConfigurationExecutionDir, migration.Id, forceExtract)
-                .GetAwaiter().GetResult()
+                .ExtractConfigurationMigratorsAsync(
+                    migration.FromConfiguration,
+                    fromConfigurationExecutionDir,
+                    migration.Id,
+                    forceExtract).GetAwaiter().GetResult()
                 .Union(
                     this.ExtractConfigurationMigratorsAsync(
                         migration.ToConfiguration,
                         toConfigurationExecutionDir,
                         migration.Id,
-                        forceExtract).GetAwaiter().GetResult())
-                .ToList();
+                        forceExtract).GetAwaiter().GetResult()).ToList();
 
             if (extractionErrors.Any())
             {
@@ -1187,51 +1244,6 @@ namespace KlusterKite.NodeManager
             data.MigrationState = state;
             this.Parent.Tell(state);
             return new State<EnState, Data>(EnState.Migration, data);
-        }
-
-        /// <summary>
-        /// Loads current state without active migration
-        /// </summary>
-        /// <param name="configuration">
-        /// The currently active configuration
-        /// </param>
-        /// <param name="forceExtract">
-        /// A value indicating whether configuration Nuget packages should be overwritten
-        /// </param>
-        /// <param name="data">
-        /// Current actor state data
-        /// </param>
-        /// <returns>
-        /// The next actor state
-        /// </returns>
-        private State<EnState, Data> LoadConfigurationState(Configuration configuration, bool forceExtract, Data data)
-        {
-            var configurationExecutionDir = data?.ConfigurationExecutionDir
-                                      ?? Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            data = new Data { ConfigurationExecutionDir = configurationExecutionDir, Configuration = configuration };
-            var extractionErrors = this.ExtractConfigurationMigratorsAsync(configuration, configurationExecutionDir, null, forceExtract).GetAwaiter().GetResult();
-            if (extractionErrors.Any())
-            {
-                this.Parent.Tell(new MigrationActorInitializationFailed { Errors = extractionErrors });
-                return new State<EnState, Data>(EnState.InitializationFailed, data);
-            }
-
-            var configurationStates = this.GetConfigurationResourcesState(configuration, configurationExecutionDir, null, out var errors).ToList();
-            if (errors.Any())
-            {
-                this.Parent.Tell(new MigrationActorInitializationFailed { Errors = errors });
-                return new State<EnState, Data>(EnState.InitializationFailed, data);
-            }
-
-            data.ConfigurationState =
-                new MigrationActorConfigurationState
-                    {
-                        States =
-                            configurationStates
-                    };
-
-            this.Parent.Tell(data.ConfigurationState);
-            return new State<EnState, Data>(EnState.Idle, data);
         }
 
         /// <summary>
@@ -1289,10 +1301,10 @@ namespace KlusterKite.NodeManager
             this.Sender.Tell(new RequestAcknowledged());
             this.Parent.Tell(new ProcessingTheRequest());
 
-            var migrationLog = plan.SourceExecution.Values.Aggregate(
+            var log = plan.Executions.Aggregate(
                 (IEnumerable<MigrationLogRecord>)new List<MigrationLogRecord>(),
-                (list, templatePlan) => list.Union(this.ExecuteMigration(templatePlan))).ToList();
-            this.Parent.Tell(migrationLog);
+                (list, templatePlan) => list.Union(this.ExecuteMigration(templatePlan)));
+            this.Parent.Tell(log.ToList());
             return this.LoadState();
         }
 
@@ -1307,23 +1319,18 @@ namespace KlusterKite.NodeManager
 
             if (errors.Count != 0 || this.StateData.MigrationState == null)
             {
-                Context.GetLogger()
-                    .Error(
-                        "{Type}: Failed to fulfill migration request. Could not create migration plan.",
-                        this.GetType().Name);
+                Context.GetLogger().Error(
+                    "{Type}: Failed to fulfill migration request. Could not create migration plan.",
+                    this.GetType().Name);
                 this.Parent.Tell(errors.ToList());
                 return this.Stay();
             }
 
-            var sourceLog = plan.SourceExecution.Values.Aggregate(
+            var log = plan.Executions.Aggregate(
                 (IEnumerable<MigrationLogRecord>)new List<MigrationLogRecord>(),
-                (list, templatePlan) => list.Union(this.ExecuteMigration(EnMigrationSide.Source, templatePlan)));
+                (list, templatePlan) => list.Union(this.ExecuteMigration(templatePlan.Side, templatePlan)));
 
-            var destinationLog = plan.DestinationExecution.Values.Aggregate(
-                (IEnumerable<MigrationLogRecord>)new List<MigrationLogRecord>(),
-                (list, templatePlan) => list.Union(this.ExecuteMigration(EnMigrationSide.Destination, templatePlan)));
-
-            this.Parent.Tell(sourceLog.Union(destinationLog).ToList());
+            this.Parent.Tell(log.ToList());
             return this.LoadState();
         }
 
@@ -1332,21 +1339,6 @@ namespace KlusterKite.NodeManager
         /// </summary>
         public class Data
         {
-            /// <summary>
-            /// Gets or sets the directory to extract migrator code for the initial configuration configuration
-            /// </summary>
-            public string FromConfigurationExecutionDir { get; set; }
-
-            /// <summary>
-            /// Gets or sets the current migration
-            /// </summary>
-            public Migration Migration { get; set; }
-
-            /// <summary>
-            /// Gets or sets the migration state
-            /// </summary>
-            public MigrationActorMigrationState MigrationState { get; set; }
-
             /// <summary>
             /// Gets or sets the current configuration
             /// </summary>
@@ -1363,6 +1355,21 @@ namespace KlusterKite.NodeManager
             public MigrationActorConfigurationState ConfigurationState { get; set; }
 
             /// <summary>
+            /// Gets or sets the directory to extract migrator code for the initial configuration configuration
+            /// </summary>
+            public string FromConfigurationExecutionDir { get; set; }
+
+            /// <summary>
+            /// Gets or sets the current migration
+            /// </summary>
+            public Migration Migration { get; set; }
+
+            /// <summary>
+            /// Gets or sets the migration state
+            /// </summary>
+            public MigrationActorMigrationState MigrationState { get; set; }
+
+            /// <summary>
             /// Gets or sets the directory to extract migrator code for the destination configuration configuration
             /// </summary>
             public string ToConfigurationExecutionDir { get; set; }
@@ -1374,16 +1381,9 @@ namespace KlusterKite.NodeManager
         private class MigrationPlan
         {
             /// <summary>
-            /// Gets the list of migrations that should be performed with the destination configuration code
+            /// Gets the list of migrator executions
             /// </summary>
-            public Dictionary<string, MigratorTemplatePlan> DestinationExecution { get; } =
-                new Dictionary<string, MigratorTemplatePlan>();
-
-            /// <summary>
-            /// Gets the list of migrations that should be performed with the source configuration code
-            /// </summary>
-            public Dictionary<string, MigratorTemplatePlan> SourceExecution { get; } =
-                new Dictionary<string, MigratorTemplatePlan>();
+            public List<MigratorTemplatePlan> Executions { get; } = new List<MigratorTemplatePlan>();
         }
 
         /// <summary>
@@ -1392,15 +1392,20 @@ namespace KlusterKite.NodeManager
         private class MigratorTemplatePlan
         {
             /// <summary>
-            /// Gets the list of command to execute with migrators
+            /// Gets the list of commands to execute with migrators
             /// </summary>
-            public Dictionary<string, MigratorMigrationsCommand> MigratorPlans { get; } =
-                new Dictionary<string, MigratorMigrationsCommand>();
+            public List<MigratorMigrationsCommand> Commands { get; } =
+                new List<MigratorMigrationsCommand>();
 
             /// <summary>
             /// Gets or sets the migrator template
             /// </summary>
             public MigratorTemplate Template { get; set; }
+
+            /// <summary>
+            /// Gets or sets the execution side
+            /// </summary>
+            public EnMigrationSide Side { get; set; }
         }
     }
 }

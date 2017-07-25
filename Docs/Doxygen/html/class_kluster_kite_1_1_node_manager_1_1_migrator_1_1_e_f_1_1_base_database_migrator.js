@@ -6,6 +6,8 @@ var class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_m
     [ "GetDefaultResourceId", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#aef45978a1dfa5173afdcdc3733a7a439", null ],
     [ "GetMigratableResources", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#af9481ce20f43d175ce56774f3b9356d6", null ],
     [ "Migrate", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#ab6a8a5350dde015897c7c0d0af023d96", null ],
+    [ "DependencyType", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#aa2591c6a948537508365549dfeec208a", null ],
     [ "LatestPoint", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#a6f40db8b7a896d55f52f8bf4b3a9fc6e", null ],
-    [ "Name", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#a007664b608add7f4ffd812d261d8884a", null ]
+    [ "Name", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#a007664b608add7f4ffd812d261d8884a", null ],
+    [ "Priority", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#abd2a40c7cd8891a8bfc18cc10c9b77f8", null ]
 ];

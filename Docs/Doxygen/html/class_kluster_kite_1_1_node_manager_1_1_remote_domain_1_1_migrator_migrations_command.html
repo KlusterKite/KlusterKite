@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('class_kluster_kite_1_1_node_manager_1_
 </div><!--header-->
 <div class="contents">
 
-<p>The description of migrator action to migrate resources  
+<p>The description of migrator action to migrate resources within same migrator  
  <a href="class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_migrator_migrations_command.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
@@ -97,17 +97,17 @@ Properties</h2></td></tr>
 <tr class="memitem:a989c40cb4bad00869934082051a17b58"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_migrator_migrations_command.html#a989c40cb4bad00869934082051a17b58">TypeName</a><code> [get, set]</code></td></tr>
 <tr class="memdesc:a989c40cb4bad00869934082051a17b58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets or sets the migrator type name  <a href="#a989c40cb4bad00869934082051a17b58">More...</a><br /></td></tr>
 <tr class="separator:a989c40cb4bad00869934082051a17b58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd9db39bfbf62981748973acedfb380b"><td class="memItemLeft" align="right" valign="top">Dictionary&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_migrator_migrations_command.html#abd9db39bfbf62981748973acedfb380b">Resources</a><code> [get, set]</code></td></tr>
-<tr class="memdesc:abd9db39bfbf62981748973acedfb380b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets or sets the list of resources to migrate (pair of resource code and desired migration point)  <a href="#abd9db39bfbf62981748973acedfb380b">More...</a><br /></td></tr>
-<tr class="separator:abd9db39bfbf62981748973acedfb380b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb57fcd7612fe867a23093e266983aeb"><td class="memItemLeft" align="right" valign="top">List&lt; <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_resource_migration_command.html">ResourceMigrationCommand</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_migrator_migrations_command.html#acb57fcd7612fe867a23093e266983aeb">Resources</a><code> [get, set]</code></td></tr>
+<tr class="memdesc:acb57fcd7612fe867a23093e266983aeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets or sets the list of resources to migrate  <a href="#acb57fcd7612fe867a23093e266983aeb">More...</a><br /></td></tr>
+<tr class="separator:acb57fcd7612fe867a23093e266983aeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The description of migrator action to migrate resources </p>
+<div class="textblock"><p>The description of migrator action to migrate resources within same migrator </p>
 
-<p class="definition">Definition at line <a class="el" href="_migrator_migrations_command_8cs_source.html#l00017">17</a> of file <a class="el" href="_migrator_migrations_command_8cs_source.html">MigratorMigrationsCommand.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_migrator_migrations_command_8cs_source.html#l00019">19</a> of file <a class="el" href="_migrator_migrations_command_8cs_source.html">MigratorMigrationsCommand.cs</a>.</p>
 </div><h2 class="groupheader">Property Documentation</h2>
-<a id="abd9db39bfbf62981748973acedfb380b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd9db39bfbf62981748973acedfb380b">&#9670;&nbsp;</a></span>Resources</h2>
+<a id="acb57fcd7612fe867a23093e266983aeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb57fcd7612fe867a23093e266983aeb">&#9670;&nbsp;</a></span>Resources</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -116,7 +116,7 @@ Properties</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Dictionary&lt;string, string&gt; KlusterKite.NodeManager.RemoteDomain.MigratorMigrationsCommand.Resources</td>
+          <td class="memname">List&lt;<a class="el" href="class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_resource_migration_command.html">ResourceMigrationCommand</a>&gt; KlusterKite.NodeManager.RemoteDomain.MigratorMigrationsCommand.Resources</td>
         </tr>
       </table>
   </td>
@@ -126,9 +126,9 @@ Properties</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Gets or sets the list of resources to migrate (pair of resource code and desired migration point) </p>
+<p>Gets or sets the list of resources to migrate </p>
 
-<p class="definition">Definition at line <a class="el" href="_migrator_migrations_command_8cs_source.html#l00027">27</a> of file <a class="el" href="_migrator_migrations_command_8cs_source.html">MigratorMigrationsCommand.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_migrator_migrations_command_8cs_source.html#l00030">30</a> of file <a class="el" href="_migrator_migrations_command_8cs_source.html">MigratorMigrationsCommand.cs</a>.</p>
 
 </div>
 </div>
@@ -154,7 +154,7 @@ Properties</h2></td></tr>
 
 <p>Gets or sets the migrator type name </p>
 
-<p class="definition">Definition at line <a class="el" href="_migrator_migrations_command_8cs_source.html#l00022">22</a> of file <a class="el" href="_migrator_migrations_command_8cs_source.html">MigratorMigrationsCommand.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_migrator_migrations_command_8cs_source.html#l00024">24</a> of file <a class="el" href="_migrator_migrations_command_8cs_source.html">MigratorMigrationsCommand.cs</a>.</p>
 
 </div>
 </div>

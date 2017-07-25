@@ -11,24 +11,17 @@ namespace KlusterKite.NodeManager.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.IO;
     using System.Linq;
-    using System.Runtime.Versioning;
-    using System.Threading.Tasks;
-
-    using JetBrains.Annotations;
 
     using KlusterKite.API.Client;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.ConfigurationSource;
     using KlusterKite.NodeManager.Launcher.Messages;
-    using KlusterKite.NodeManager.Launcher.Utils;
+    using KlusterKite.NodeManager.Tests.Mock;
 
     using NuGet.Frameworks;
     using NuGet.Packaging;
     using NuGet.Packaging.Core;
-    using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
 
     using Xunit.Abstractions;
@@ -242,188 +235,6 @@ namespace KlusterKite.NodeManager.Tests
             foreach (var error in errors)
             {
                 this.Output.WriteLine($"{error.Field}: {error.Message}");
-            }
-        }
-
-        /// <summary>
-        /// The test package representation
-        /// </summary>
-        [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty", Justification = "This is test implementation")]
-        internal class TestPackage : IPackageSearchMetadata
-        {
-            /// <inheritdoc />
-            public TestPackage(string id, string version)
-            {
-                this.Identity = new PackageIdentity(id, NuGetVersion.Parse(version));
-                this.DependencySets = new List<PackageDependencyGroup>();
-            }
-
-            /// <inheritdoc />
-            public string Authors { get; }
-
-            /// <inheritdoc />
-            public IEnumerable<PackageDependencyGroup> DependencySets { get; set; }
-
-            /// <inheritdoc />
-            public string Description { get; }
-
-            /// <inheritdoc />
-            public long? DownloadCount { get; }
-
-            /// <summary>
-            /// Gets or sets the extract action
-            /// </summary>
-            public Func<string, string, string, IEnumerable<string>> Extract { get; set; }
-
-            /// <inheritdoc />
-            public Uri IconUrl { get; }
-
-            /// <inheritdoc />
-            public PackageIdentity Identity { get; set; }
-
-            /// <inheritdoc />
-            public bool IsListed { get; }
-
-            /// <inheritdoc />
-            public Uri LicenseUrl { get; }
-
-            /// <inheritdoc />
-            public string Owners { get; }
-
-            /// <inheritdoc />
-            public Uri ProjectUrl { get; }
-
-            /// <inheritdoc />
-            public DateTimeOffset? Published { get; }
-
-            /// <inheritdoc />
-            public Uri ReportAbuseUrl { get; }
-
-            /// <inheritdoc />
-            public bool RequireLicenseAcceptance { get; }
-
-            /// <inheritdoc />
-            public string Summary { get; }
-
-            /// <inheritdoc />
-            public string Tags { get; }
-
-            /// <inheritdoc />
-            public string Title { get; }
-
-            /// <inheritdoc />
-            public Task<IEnumerable<VersionInfo>> GetVersionsAsync()
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// The test package file  representation
-        /// </summary>
-        internal class TestPackageFile : IPackageFile
-        {
-            /// <inheritdoc />
-            public string EffectivePath { get; set; }
-
-            /// <summary>
-            /// Gets or sets a delegate for <see cref="IPackageFile.GetStream"/>
-            /// </summary>
-            public Func<Stream> GetStreamAction { get; set; }
-
-            /// <inheritdoc />
-            public string Path { get; set; }
-
-            /// <inheritdoc />
-            public IEnumerable<FrameworkName> SupportedFrameworks { get; set; }
-
-            /// <inheritdoc />
-            public FrameworkName TargetFramework { get; set; }
-
-            /// <inheritdoc />
-            public Stream GetStream()
-            {
-                if (this.GetStreamAction == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return this.GetStreamAction();
-            }
-        }
-
-        /// <summary>
-        /// The test nuget repository
-        /// </summary>
-        internal class TestRepository : IPackageRepository
-        {
-            /// <inheritdoc />
-            public TestRepository(params TestPackage[] packages)
-            {
-                this.Packages = packages?.ToList() ?? new List<TestPackage>();
-            }
-
-            /// <summary>
-            /// Gets the list of defined packages packages.
-            /// </summary>
-            [UsedImplicitly]
-            public List<TestPackage> Packages { get; }
-
-            /// <inheritdoc />
-            public Task<IEnumerable<string>> ExtractPackage(
-                IPackageSearchMetadata package,
-                string frameworkName,
-                string executionDir,
-                string tmpDir)
-            {
-                var testPackage = package as TestPackage;
-                if (testPackage == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                return Task.FromResult(testPackage.Extract(frameworkName, executionDir, tmpDir));
-            }
-
-            /// <inheritdoc />
-            public Task<IPackageSearchMetadata> GetAsync(string id)
-            {
-                return Task.FromResult<IPackageSearchMetadata>(
-                    this.Packages.Where(p => p.Identity.Id == id).OrderByDescending(p => p.Identity.Version)
-                        .FirstOrDefault());
-            }
-
-            /// <inheritdoc />
-            public Task<IPackageSearchMetadata> GetAsync(string id, NuGetVersion version)
-            {
-                return Task.FromResult<IPackageSearchMetadata>(
-                    this.Packages.FirstOrDefault(p => p.Identity.Id == id && p.Identity.Version == version));
-            }
-
-            /// <inheritdoc />
-            public Task<IEnumerable<IPackageSearchMetadata>> SearchAsync(string terms, bool includePreRelease)
-            {
-                return Task.FromResult(
-                    this.Packages.Where(p => p.Identity.Id.ToLowerInvariant().Contains(terms.ToLowerInvariant()))
-                        .Cast<IPackageSearchMetadata>());
-            }
-
-            /// <inheritdoc />
-            public async Task<Dictionary<PackageIdentity, IEnumerable<string>>> ExtractPackage(
-                IEnumerable<PackageIdentity> packages,
-                string runtime,
-                string frameworkName,
-                string executionDir,
-                string tmpDir,
-                Action<string> logAction = null)
-            {
-                var packagesToExtract = packages.Select(p => this.Packages.First(m => m.Identity.Equals(p)));
-                var tasks = packagesToExtract.ToDictionary(
-                    p => p.Identity,
-                    async p => await this.ExtractPackage(p, frameworkName, executionDir, tmpDir));
-                await Task.WhenAll(tasks.Values);
-
-                return tasks.ToDictionary(p => p.Key, p => p.Value.Result);
             }
         }
     }

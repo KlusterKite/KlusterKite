@@ -82,12 +82,7 @@ namespace KlusterKite.NodeManager
         protected override void RegisterComponents(ContainerBuilder container, Config config)
         {
             container.RegisterAssemblyTypes(typeof(Installer).GetTypeInfo().Assembly).Where(t => t.GetTypeInfo().IsSubclassOf(typeof(ActorBase)));
-
-            // container.RegisterType<NugetPackagesFactory>().As<DataFactory<string, IPackage, string>>();
             container.RegisterType<ApiProvider>().As<API.Provider.ApiProvider>();
-            
-            // var nugetUrl = config.GetString("KlusterKite.NodeManager.PackageRepository");
-            // container.Register(c => PackageRepositoryFactory.Default.CreateRepository(nugetUrl)).As<IPackageRepository>();
         }
     }
 }

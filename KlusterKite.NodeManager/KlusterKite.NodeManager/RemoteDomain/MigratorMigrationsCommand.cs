@@ -11,8 +11,10 @@ namespace KlusterKite.NodeManager.RemoteDomain
 {
     using System.Collections.Generic;
 
+    using JetBrains.Annotations;
+
     /// <summary>
-    /// The description of migrator action to migrate resources
+    /// The description of migrator action to migrate resources within same migrator
     /// </summary>
     public class MigratorMigrationsCommand 
     {
@@ -22,8 +24,9 @@ namespace KlusterKite.NodeManager.RemoteDomain
         public string TypeName { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of resources to migrate (pair of resource code and desired migration point)
+        /// Gets or sets the list of resources to migrate
         /// </summary>
-        public Dictionary<string, string> Resources { get; set; } = new Dictionary<string, string>();
+        [UsedImplicitly]
+        public List<ResourceMigrationCommand> Resources { get; set; } = new List<ResourceMigrationCommand>();
     }
 }

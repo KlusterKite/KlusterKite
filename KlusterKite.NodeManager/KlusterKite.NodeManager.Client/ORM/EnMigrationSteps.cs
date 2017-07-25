@@ -24,6 +24,18 @@ namespace KlusterKite.NodeManager.Client.ORM
         Start,
 
         /// <summary>
+        /// The resources are in the update stage
+        /// </summary>
+        [ApiDescription("The resources that should be updated prior to nodes are in the update stage")]
+        PreNodesResourcesUpdating,
+
+        /// <summary>
+        /// The resources were successfully updated
+        /// </summary>
+        [ApiDescription("The resources that should be updated prior to nodes were successfully updated")]
+        PreNodeResourcesUpdated,
+
+        /// <summary>
         /// The nodes are in the update state
         /// </summary>
         [ApiDescription("The nodes are in the update state")]
@@ -38,14 +50,8 @@ namespace KlusterKite.NodeManager.Client.ORM
         /// <summary>
         /// The resources are in the update stage
         /// </summary>
-        [ApiDescription("The resources are in the update stage")]
-        ResourcesUpdating,
-
-        /// <summary>
-        /// The resources were successfully updated
-        /// </summary>
-        [ApiDescription("The resources were successfully updated")]
-        ResourcesUpdated,
+        [ApiDescription("The resources that should be updated after nodes are in the update stage")]
+        PostNodesResourcesUpdating,
 
         /// <summary>
         /// The migration is finished
@@ -56,7 +62,13 @@ namespace KlusterKite.NodeManager.Client.ORM
         /// <summary>
         /// The migration is broken
         /// </summary>
-        [ApiDescription("The migration is broken")]
-        Broken
+        [ApiDescription("The migration is broken, requires manual recovery")]
+        Broken,
+
+        /// <summary>
+        /// The migration is broken, but can be recovered
+        /// </summary>
+        [ApiDescription("The migration is broken, but can be recovered")]
+        Recovery,
     }
 }

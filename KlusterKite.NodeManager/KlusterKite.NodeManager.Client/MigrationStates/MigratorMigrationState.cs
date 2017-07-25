@@ -13,6 +13,8 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     using System.Collections.Generic;
     using System.Linq;
 
+    using JetBrains.Annotations;
+
     using KlusterKite.API.Attributes;
     using KlusterKite.NodeManager.Client.ORM;
     using KlusterKite.NodeManager.Migrator;
@@ -54,36 +56,43 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
         public EnMigrationDirection Direction { get; set; }
 
         /// <summary>
+        /// Gets or sets the migrator execution priority
+        /// </summary>
+        [DeclareField("the migrator execution priority")]
+        [UsedImplicitly]
+        public decimal Priority { get; set; }
+
+        /// <summary>
+        /// Gets or sets the resource dependency type
+        /// </summary>
+        [DeclareField("the resource dependency type")]
+        public EnResourceDependencyType DependencyType { get; set; }
+
+        /// <summary>
         /// Creates <see cref="MigratorMigrationState"/> from <see cref="MigratorConfigurationState"/>
         /// </summary>
+        /// <param name="templateCode">The migrator template code</param>
         /// <param name="state">The state of template</param>
         /// <param name="position">The migration position</param>
         /// <returns>The new <see cref="MigratorTemplateMigrationState"/></returns>
-        public static MigratorMigrationState CreateFrom(MigratorConfigurationState state, EnMigratorPosition position)
+        public static MigratorMigrationState CreateFrom(string templateCode, MigratorConfigurationState state, EnMigratorPosition position)
         {
             if (position != EnMigratorPosition.New && position != EnMigratorPosition.Obsolete)
             {
                 throw new ArgumentException(@"Can be called only for new or obsolete templates", nameof(position));
             }
 
-            var direction = position == EnMigratorPosition.New
-                                ? EnMigrationDirection.Upgrade
-                                : EnMigrationDirection.Stay;
+            var resources = state.Resources.Select(r => ResourceMigrationState.CreateFrom(templateCode, state, r, position)).ToList();
 
             return new MigratorMigrationState
                        {
                            Name = state.Name,
                            TypeName = state.TypeName,
                            Position = position,
-                           Direction = direction,
-                           Resources =
-                               state.Resources
-                                   .Select(
-                                       r => ResourceMigrationState.CreateFrom(
-                                           state,
-                                           r,
-                                           position))
-                                   .ToList()
+                           Direction = EnMigrationDirection.Stay,
+                           DependencyType = state.DependencyType,
+                           Priority = state.Priority,
+                           Resources = resources
                        };
         }
     }

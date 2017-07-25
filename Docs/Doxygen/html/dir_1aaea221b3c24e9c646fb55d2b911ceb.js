@@ -1,7 +1,6 @@
 var dir_1aaea221b3c24e9c646fb55d2b911ceb =
 [
     [ "Mock", "dir_d7c7748393d5521690c31b190abce273.html", "dir_d7c7748393d5521690c31b190abce273" ],
-    [ "obj", "dir_c71617ebfdc5f6c8902ea8afe8a9f6e6.html", "dir_c71617ebfdc5f6c8902ea8afe8a9f6e6" ],
     [ "ApiHandlerActorTests.cs", "_api_handler_actor_tests_8cs.html", [
       [ "ApiHandlerActorTests", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_handler_actor_tests.html", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_handler_actor_tests" ],
       [ "Configurator", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_handler_actor_tests_1_1_configurator.html", "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_handler_actor_tests_1_1_configurator" ]

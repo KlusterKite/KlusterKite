@@ -2,13 +2,17 @@ import React from 'react'
 import Relay from 'react-relay'
 import { browserHistory } from 'react-router'
 
-import UserForm from '../../components/UserForm/UserForm'
+import UserForm from '../../components/UserEdit/UserForm'
+import ResetPassword from '../../components/UserEdit/ResetPassword'
+import RolesAccess from '../../components/UserEdit/RolesAccess'
 
 import { hasPrivilege } from '../../utils/privileges';
 
-// import CreateReleaseMutation from './mutations/CreateReleaseMutation'
+import CreateUserMutation from './mutations/CreateUserMutation'
 import UpdateUserMutation from './mutations/UpdateUserMutation'
-// import DeleteFeedMutation from './mutations/DeleteFeedMutation'
+import UserGrantRoleMutation from './mutations/UserGrantRoleMutation'
+import UserWithdrawRoleMutation from './mutations/UserWithdrawRoleMutation'
+import ResetPasswordMutation from './mutations/ResetPasswordMutation'
 
 class UserPage extends React.Component {
 
@@ -33,50 +37,58 @@ class UserPage extends React.Component {
     return !this.props.params.hasOwnProperty('id')
   };
 
-  onSubmit = (releaseModel) => {
-    console.log('submitting release', releaseModel);
-    console.log('current model', this.props.api.release);
+  onSubmit = (configurationModel) => {
+    console.log('submitting configuration', configurationModel);
+    console.log('current model', this.props.api.configuration);
 
     if (this.isAddNew()){
-      // this.addNode(releaseModel);
+      this.addNode(configurationModel);
     } else {
-      // this.editNode(releaseModel);
+      this.editNode(configurationModel);
     }
   };
 
   addNode = (model) => {
     console.log('create', model);
-    // Relay.Store.commitUpdate(
-    //   new CreateReleaseMutation(
-    //     {
-    //       majorVersion: model.majorVersion,
-    //       minorVersion: model.minorVersion,
-    //       name: model.name,
-    //       notes: model.notes,
-    //     }),
-    //   {
-    //     onSuccess: (response) => {
-    //       console.log('response', response);
-    //       if (response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors &&
-    //         response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges) {
-    //         const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.errors.edges);
-    //
-    //         this.setState({
-    //           saving: false,
-    //           saveErrors: messages
-    //         });
-    //       } else {
-    //         console.log('success', response);
-    //         this.setState({
-    //           saving: false,
-    //           saveErrors: null
-    //         });
-    //         browserHistory.push(`/klusterkite/Release/${response.klusterKiteNodeApi_klusterKiteNodesApi_releases_create.node.id}`);
-    //       }
-    //     },
-    //     onFailure: (transaction) => console.log(transaction),
-    //   },
-    // )
+    this.setState({
+      saving: true
+    });
+
+    Relay.Store.commitUpdate(
+      new CreateUserMutation(
+        {
+          login: model.login,
+          isBlocked: model.isBlocked,
+          isDeleted: model.isDeleted,
+        }),
+      {
+        onSuccess: (response) => {
+          const data = response.klusterKiteNodeApi_klusterKiteNodesApi_users_create;
+
+          if (data.errors &&
+            data.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(data.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            this.setState({
+              saving: false,
+              saveErrors: null
+            });
+            browserHistory.push(`/klusterkite/Users/${data.node.id}`);
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            saving: false,
+            saveErrors: ['Bad request']
+          });
+          console.log(transaction)},
+      },
+    )
   };
 
   editNode = (model) => {
@@ -92,13 +104,17 @@ class UserPage extends React.Component {
           nodeId: this.props.params.id,
           uid: model.uid,
           login: model.login,
+          isBlocked: model.isBlocked,
+          isDeleted: model.isDeleted,
         }),
       {
         onSuccess: (response) => {
           console.log('response', response);
-          if (response.klusterKiteNodeApi_klusterKiteNodesApi_users_update.errors &&
-            response.klusterKiteNodeApi_klusterKiteNodesApi_users_update.errors.edges) {
-            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_users_update.errors.edges);
+          const data = response.klusterKiteNodeApi_klusterKiteNodesApi_users_update;
+
+          if (data.errors &&
+            data.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(data.errors.edges);
 
             this.setState({
               saving: false,
@@ -137,10 +153,158 @@ class UserPage extends React.Component {
     // )
   }
 
+  onResetPassword(model, userUid) {
+    this.setState({
+      saving: true
+    });
+
+    Relay.Store.commitUpdate(
+      new ResetPasswordMutation(
+        {
+          password: model.password,
+          userUid: userUid,
+        }),
+      {
+        onSuccess: (response) => {
+          console.log('response', response);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_users_resetPassword.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_users_resetPassword.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_users_resetPassword.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            this.setState({
+              saving: false,
+              saveErrors: null
+            });
+
+            browserHistory.push(`/klusterkite/Users/`);
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            saving: false,
+            saveErrors: ['Bad request']
+          });
+          console.log(transaction)},
+      },
+    )
+  }
+
+  /**
+   * Grants of revokes role
+   * @param roleUid {string} Role uid
+   * @param userUid {string} User uid
+   * @param hasRole {boolean} Does user have this role at this moment?
+   */
+  onGrantOrRevokeRole(roleUid, userUid, hasRole) {
+    console.log('roleUid, userUid', roleUid, userUid);
+    if (!hasRole) {
+      this.grantRole(roleUid, userUid);
+    } else {
+      this.withdrawRole(roleUid, userUid);
+    }
+  }
+
+  /**
+   * Grants role
+   * @param roleUid {string} Role uid
+   * @param userUid {string} User uid
+   */
+  grantRole(roleUid, userUid) {
+    this.setState({
+      saving: true
+    });
+
+    Relay.Store.commitUpdate(
+      new UserGrantRoleMutation(
+        {
+          roleUid: roleUid,
+          userUid: userUid,
+        }),
+      {
+        onSuccess: (response) => {
+          console.log('response', response);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_users_grantRole.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_users_grantRole.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_users_grantRole.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            this.setState({
+              saving: false,
+              saveErrors: null
+            });
+
+            this.props.relay.forceFetch();
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            saving: false,
+            saveErrors: ['Bad request']
+          });
+          console.log(transaction)},
+      },
+    )
+  }
+
+  /**
+   * Revokes role
+   * @param roleUid {string} Role uid
+   * @param userUid {string} User uid
+   */
+  withdrawRole(roleUid, userUid) {
+    this.setState({
+      saving: true
+    });
+
+    Relay.Store.commitUpdate(
+      new UserWithdrawRoleMutation(
+        {
+          roleUid: roleUid,
+          userUid: userUid,
+        }),
+      {
+        onSuccess: (response) => {
+          console.log('response', response);
+          if (response.klusterKiteNodeApi_klusterKiteNodesApi_users_withdrawRole.errors &&
+            response.klusterKiteNodeApi_klusterKiteNodesApi_users_withdrawRole.errors.edges) {
+            const messages = this.getErrorMessagesFromEdge(response.klusterKiteNodeApi_klusterKiteNodesApi_users_withdrawRole.errors.edges);
+
+            this.setState({
+              saving: false,
+              saveErrors: messages
+            });
+          } else {
+            this.setState({
+              saving: false,
+              saveErrors: null
+            });
+
+            this.props.relay.forceFetch();
+          }
+        },
+        onFailure: (transaction) => {
+          this.setState({
+            saving: false,
+            saveErrors: ['Bad request']
+          });
+          console.log(transaction)},
+      },
+    )
+  }
+
   render () {
     const model = this.props.api.user;
     const canEdit = hasPrivilege('KlusterKite.NodeManager.User.Update');
-    const roles = this.props.api.klusterKiteNodesApi.roles && this.props.api.klusterKiteNodesApi.roles.edges.map(x => x.node.name);
+    const roles = this.props.api.klusterKiteNodesApi.roles && this.props.api.klusterKiteNodesApi.roles.edges.map(x => x.node);
 
     return (
       <div>
@@ -151,8 +315,23 @@ class UserPage extends React.Component {
           saving={this.state.saving}
           saveErrors={this.state.saveErrors}
           canEdit={canEdit}
-          roles={roles}
         />
+        {model &&
+          <ResetPassword
+            onSubmit={this.onResetPassword.bind(this)}
+            initialValues={model}
+            saving={this.state.saving}
+            saveErrors={this.state.saveErrors}
+            canEdit={canEdit}
+          />
+        }
+        {model &&
+          <RolesAccess
+            initialValues={model}
+            roles={roles}
+            onGrantOrRevokeRole={this.onGrantOrRevokeRole.bind(this)}
+          />
+        }
       </div>
     )
   }
@@ -177,10 +356,14 @@ export default Relay.createContainer(
               id
               uid
               login
+              isBlocked
+              isDeleted
               roles {
                 edges {
                   node {
-                    name
+                    role {
+                      name
+                    }
                   }
                 }
               }
@@ -190,6 +373,8 @@ export default Relay.createContainer(
             roles {
               edges {
                 node {
+                  id
+                  uid
                   name
                 }
               }

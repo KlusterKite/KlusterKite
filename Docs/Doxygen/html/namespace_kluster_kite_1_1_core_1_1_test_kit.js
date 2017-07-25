@@ -1,6 +1,7 @@
 var namespace_kluster_kite_1_1_core_1_1_test_kit =
 [
     [ "BaseActorTest", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test" ],
+    [ "ClusterExtensions", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_cluster_extensions.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_cluster_extensions" ],
     [ "HackedBaseActorTest", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_hacked_base_actor_test.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_hacked_base_actor_test" ],
     [ "IMessageWithPath", "interface_kluster_kite_1_1_core_1_1_test_kit_1_1_i_message_with_path.html", "interface_kluster_kite_1_1_core_1_1_test_kit_1_1_i_message_with_path" ],
     [ "Installer", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_installer.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_installer" ],

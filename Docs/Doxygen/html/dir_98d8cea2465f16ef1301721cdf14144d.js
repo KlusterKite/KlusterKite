@@ -1,6 +1,5 @@
 var dir_98d8cea2465f16ef1301721cdf14144d =
 [
-    [ "obj", "dir_67645ffd694d406496b4c23c6733c1ea.html", "dir_67645ffd694d406496b4c23c6733c1ea" ],
     [ "BaseCrudActor.cs", "_base_crud_actor_8cs.html", [
       [ "BaseCrudActor", "class_kluster_kite_1_1_data_1_1_base_crud_actor.html", "class_kluster_kite_1_1_data_1_1_base_crud_actor" ]
     ] ],

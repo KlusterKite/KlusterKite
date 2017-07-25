@@ -9,6 +9,7 @@ var class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_mutation =
     ] ],
     [ "ApiMutation", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_mutation.html#a1775e8ff09cfc8fbc4b80ddcf9db0afe", null ],
     [ "ApiMutation", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_mutation.html#aa1db4ec5c74808cf41bfddb3dff7e19d", null ],
+    [ "CreateFromField", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_mutation.html#a5126bae4beb312415703d2c9b492aebe", null ],
     [ "Path", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_mutation.html#a15fc8a87275da57553826f063098ebf6", null ],
     [ "Type", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_api_mutation.html#a43df76d46378b15a21745dcfe1a7b264", null ]
 ];

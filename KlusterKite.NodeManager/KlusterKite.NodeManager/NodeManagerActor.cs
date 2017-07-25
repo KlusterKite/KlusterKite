@@ -55,7 +55,8 @@ namespace KlusterKite.NodeManager
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        public const string ConfigConnectionStringPath = "KlusterKite.NodeManager.ConfigurationDatabaseConnectionString";
+        public const string ConfigConnectionStringPath =
+            "KlusterKite.NodeManager.ConfigurationDatabaseConnectionString";
 
         /// <summary>
         /// Akka configuration path to connection string
@@ -65,7 +66,8 @@ namespace KlusterKite.NodeManager
         /// <summary>
         /// Akka configuration path to connection string
         /// </summary>
-        public const string ConfigDatabaseProviderNamePath = "KlusterKite.NodeManager.ConfigurationDatabaseProviderName";
+        public const string ConfigDatabaseProviderNamePath =
+            "KlusterKite.NodeManager.ConfigurationDatabaseProviderName";
 
         /// <summary>
         /// Akka configuration path to connection string
@@ -162,19 +164,24 @@ namespace KlusterKite.NodeManager
         private Address clusterLeader;
 
         /// <summary>
+        /// Child actor to update configurations
+        /// </summary>
+        private IActorRef configurationManager;
+
+        /// <summary>
         /// The database connection string
         /// </summary>
         private string connectionString;
 
         /// <summary>
-        /// The current active cluster migration
-        /// </summary>
-        private Migration currentMigration;
-
-        /// <summary>
         /// The current active cluster configuration
         /// </summary>
         private Configuration currentConfiguration;
+
+        /// <summary>
+        /// The current active cluster migration
+        /// </summary>
+        private Migration currentMigration;
 
         /// <summary>
         /// The database name
@@ -202,11 +209,6 @@ namespace KlusterKite.NodeManager
         private IActorRef workers;
 
         /// <summary>
-        /// Child actor to update configurations
-        /// </summary>
-        private IActorRef configurationManager;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="NodeManagerActor"/> class.
         /// </summary>
         /// <param name="componentContext">
@@ -225,7 +227,8 @@ namespace KlusterKite.NodeManager
             IComponentContext componentContext,
             UniversalContextFactory contextFactory,
             IMessageRouter router,
-            IPackageRepository nugetRepository) : base(componentContext)
+            IPackageRepository nugetRepository)
+            : base(componentContext)
         {
             this.contextFactory = contextFactory;
             this.router = router;
@@ -355,10 +358,9 @@ namespace KlusterKite.NodeManager
         /// <param name="context">The data context</param>
         private void GetCurrentConfiguration(ConfigurationContext context)
         {
-            var configurations = context.Configurations
-                .Include(nameof(Configuration.CompatibleTemplatesBackward))
-                .Include($"{nameof(Configuration.MigrationLogs)}")
-                .Where(r => r.State == EnConfigurationState.Active).ToList();
+            var configurations = context.Configurations.Include(nameof(Configuration.CompatibleTemplatesBackward))
+                .Include($"{nameof(Configuration.MigrationLogs)}").Where(r => r.State == EnConfigurationState.Active)
+                .ToList();
             this.currentConfiguration = configurations.SingleOrDefault();
 
             if (this.currentConfiguration == null)
@@ -367,6 +369,86 @@ namespace KlusterKite.NodeManager
                     "{Type}: Could not find any active configuration in database",
                     this.GetType().Name);
             }
+        }
+
+        /// <summary>
+        /// Gets the current migration step
+        /// </summary>
+        /// <returns>The migration step</returns>
+        private EnMigrationSteps? GetCurrentMigrationStep()
+        {
+            var allResources = this.resourceState.MigrationState.TemplateStates.SelectMany(t => t.Migrators)
+                .SelectMany(m => m.Resources);
+
+            if (allResources.Any(r => r.Position == EnResourcePosition.OutOfScope))
+            {
+                return EnMigrationSteps.Broken;
+            }
+
+            if (this.resourceState.MigrationState.TemplateStates.SelectMany(t => t.Migrators)
+                .Any(m => m.Direction == EnMigrationDirection.Undefined))
+            {
+                return EnMigrationSteps.Broken;
+            }
+
+            var preNodeResources = this.resourceState.MigrationState.GetPreNodesMigratableResources().ToList();
+            var postNodeResources = this.resourceState.MigrationState.GetPostNodesMigratableResources().ToList();
+            var nodesAreUpgrading = this.nodeDescriptions.Values.Any(n => n.IsObsolete);
+            var nodesAtSource = this.currentConfiguration.Id == this.currentMigration.FromConfigurationId;
+            var nodesAtDestination = this.currentConfiguration.Id == this.currentMigration.ToConfigurationId;
+            var preNodeResourcesAtSource = !preNodeResources.Any()
+                                           || preNodeResources.All(
+                                               r => r.Position == EnResourcePosition.Source
+                                                    || r.Position == EnResourcePosition.NotCreated
+                                                    || r.Position == EnResourcePosition.Obsolete);
+            var preNodeResourcesAtDestination = !preNodeResources.Any()
+                                                || preNodeResources.All(
+                                                    r => r.Position == EnResourcePosition.Destination);
+            var postNodeResourcesAtSource = !postNodeResources.Any()
+                                            || postNodeResources.All(
+                                                r => r.Position == EnResourcePosition.Source
+                                                     || r.Position == EnResourcePosition.NotCreated
+                                                     || r.Position == EnResourcePosition.Obsolete);
+            var postNodeResourcesAtDestination = !postNodeResources.Any()
+                                                 || postNodeResources.All(
+                                                     r => r.Position == EnResourcePosition.Destination);
+
+            if (nodesAtSource && preNodeResourcesAtSource && postNodeResourcesAtSource && !nodesAreUpgrading)
+            {
+                return EnMigrationSteps.Start;
+            }
+
+            if (nodesAtSource && postNodeResourcesAtSource && !preNodeResourcesAtDestination)
+            {
+                return EnMigrationSteps.PreNodesResourcesUpdating;
+            }
+
+            if (nodesAtSource && preNodeResourcesAtDestination && postNodeResourcesAtSource && !nodesAreUpgrading)
+            {
+                return EnMigrationSteps.PreNodeResourcesUpdated;
+            }
+
+            if (preNodeResourcesAtDestination && postNodeResourcesAtSource && nodesAreUpgrading)
+            {
+                return EnMigrationSteps.NodesUpdating;
+            }
+
+            if (nodesAtDestination && preNodeResourcesAtDestination && postNodeResourcesAtSource)
+            {
+                return postNodeResources.Any() ? EnMigrationSteps.NodesUpdated : EnMigrationSteps.Finish;
+            }
+
+            if (nodesAtDestination && preNodeResourcesAtDestination && !postNodeResourcesAtDestination)
+            {
+                return EnMigrationSteps.PostNodesResourcesUpdating;
+            }
+
+            if (nodesAtDestination && preNodeResourcesAtDestination)
+            {
+                return EnMigrationSteps.Finish;
+            }
+
+            return EnMigrationSteps.Recovery;
         }
 
         /// <summary>
@@ -446,8 +528,7 @@ namespace KlusterKite.NodeManager
             {
                 this.GetCurrentConfiguration(context);
                 this.currentMigration = context.Migrations.Include(nameof(Migration.FromConfiguration))
-                    .Include(nameof(Migration.ToConfiguration))
-                    .Include($"{nameof(Migration.Logs)}")
+                    .Include(nameof(Migration.ToConfiguration)).Include($"{nameof(Migration.Logs)}")
                     .FirstOrDefault(m => m.IsActive);
             }
 
@@ -527,21 +608,14 @@ namespace KlusterKite.NodeManager
 
             if ((hasUpgradingResources && hasDowngradingResources) || hasBrokenResources)
             {
+                this.resourceState.CleanCanBits();
+
                 this.resourceState.CanCancelMigration = true;
-                this.resourceState.CanFinishMigration = false;
-                this.resourceState.CanMigrateResources = false;
-                this.resourceState.CanUpdateNodesToDestination = false;
-                this.resourceState.CanUpdateNodesToSource = false;
                 this.resourceState.MigrationSteps = new List<EnMigrationSteps> { EnMigrationSteps.Broken };
                 this.resourceState.CurrentMigrationStep = EnMigrationSteps.Broken;
                 return;
             }
 
-            var direction = hasUpgradingResources
-                                ? EnMigrationDirection.Upgrade
-                                : hasDowngradingResources
-                                    ? EnMigrationDirection.Downgrade
-                                    : EnMigrationDirection.Stay;
             using (var ds = this.GetContext())
             {
                 var migration = ds.Migrations.FirstOrDefault(m => m.IsActive);
@@ -551,185 +625,10 @@ namespace KlusterKite.NodeManager
                 }
 
                 migration.State = EnMigrationState.Ready;
-                migration.Direction = direction;
                 ds.SaveChanges();
             }
 
             this.InitDatabase();
-        }
-
-        /// <summary>
-        /// Checks current resource state with active migration and without resource operation in progress
-        /// </summary>
-        private void InitResourceMigrationState()
-        {
-            this.resourceState.ConfigurationState = null;
-            this.resourceState.CanCreateMigration = false;
-
-            if (this.resourceState.MigrationState == null)
-            {
-                this.resourceState.CanCancelMigration = this.currentMigration.State == EnMigrationState.Preparing;
-                this.resourceState.CanFinishMigration = false;
-                this.resourceState.CanMigrateResources = false;
-                this.resourceState.CanUpdateNodesToDestination = false;
-                this.resourceState.CanUpdateNodesToSource = false;
-                this.resourceState.CurrentMigrationStep = null;
-                this.resourceState.MigrationSteps = null;
-                return;
-            }
-
-            if (this.currentMigration.State == EnMigrationState.Preparing)
-            {
-                this.InitMigration();
-                return;
-            }
-
-            // checking for broken migration record
-            if (!this.currentMigration.Direction.HasValue
-                || this.currentMigration.Direction == EnMigrationDirection.Undefined)
-            {
-                Context.GetLogger().Error(
-                    "{Type}: current migration is marked ready but has invalid direction value",
-                    this.GetType().Name);
-                this.resourceState.CanCancelMigration = false;
-                this.resourceState.CanFinishMigration = false;
-                this.resourceState.CanMigrateResources = false;
-                this.resourceState.CanUpdateNodesToDestination = false;
-                this.resourceState.CanUpdateNodesToSource = false;
-                this.resourceState.MigrationSteps = new List<EnMigrationSteps> { EnMigrationSteps.Broken };
-                this.resourceState.CurrentMigrationStep = EnMigrationSteps.Broken;
-                return;
-            }
-
-            this.resourceState.MigrationSteps = this.GetMigrationSteps().ToList();
-
-            this.resourceState.CanCancelMigration =
-                (this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.Source
-                 || this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.NoMigrationNeeded)
-                && this.currentConfiguration.Id == this.currentMigration.FromConfigurationId
-                && this.nodeDescriptions.Values.All(n => !n.IsObsolete);
-
-            this.resourceState.CanFinishMigration =
-                (this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.Destination
-                 || this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.NoMigrationNeeded)
-                && this.currentConfiguration.Id == this.currentMigration.ToConfigurationId
-                && this.nodeDescriptions.Values.All(n => !n.IsObsolete);
-
-            // we cannot migrate resources in 3 cases:
-            // 1. Resources does not need migration
-            // 2. We are upgrading and already migrated resources and nodes
-            // 3. We are downgrading and nodes not yet migrated
-            // 4. This is bad idea to upgrade nodes and resources simultaneously
-            var cannotMigrateResources = this.currentMigration.Direction == EnMigrationDirection.Stay
-                                         || (this.currentMigration.Direction == EnMigrationDirection.Upgrade
-                                             && this.resourceState.MigrationState.Position
-                                             == EnMigrationActorMigrationPosition.Destination
-                                             && this.currentConfiguration.Id == this.currentMigration.ToConfigurationId)
-                                         || (this.currentMigration.Direction == EnMigrationDirection.Downgrade
-                                             && this.resourceState.MigrationState.Position
-                                             == EnMigrationActorMigrationPosition.Source
-                                             && this.currentConfiguration.Id == this.currentMigration.FromConfigurationId)
-                                         || this.nodeDescriptions.Values.Any(n => n.IsObsolete);
-
-            this.resourceState.CanMigrateResources = !cannotMigrateResources;
-
-            this.resourceState.CanUpdateNodesToDestination =
-                this.currentConfiguration.Id == this.currentMigration.FromConfigurationId
-                && (this.currentMigration.Direction == EnMigrationDirection.Stay
-                    || (this.currentMigration.Direction == EnMigrationDirection.Upgrade
-                        && this.resourceState.MigrationState.Position == EnMigrationActorMigrationPosition.Destination)
-                    || this.currentMigration.Direction == EnMigrationDirection.Downgrade);
-
-            this.resourceState.CanUpdateNodesToSource = this.currentConfiguration.Id == this.currentMigration.ToConfigurationId
-                                                        && (this.currentMigration.Direction == EnMigrationDirection.Stay
-                                                            || (this.currentMigration.Direction == EnMigrationDirection
-                                                                    .Downgrade && this.resourceState.MigrationState
-                                                                    .Position == EnMigrationActorMigrationPosition
-                                                                    .Source) || this.currentMigration.Direction
-                                                            == EnMigrationDirection.Upgrade);
-
-            this.resourceState.CurrentMigrationStep = this.GetCurrentMigrationStep();
-        }
-
-        /// <summary>
-        /// Gets the current migration step
-        /// </summary>
-        /// <returns>The migration step</returns>
-        private EnMigrationSteps? GetCurrentMigrationStep()
-        {
-            if (this.resourceState.CanCancelMigration)
-            {
-                return EnMigrationSteps.Start;
-            }
-
-            if (this.resourceState.CanFinishMigration)
-            {
-                return EnMigrationSteps.Finish;
-            }
-
-            switch (this.currentMigration.Direction)
-            {
-                case EnMigrationDirection.Upgrade:
-                    if (this.resourceState.MigrationState.Position != EnMigrationActorMigrationPosition.Destination)
-                    {
-                        return EnMigrationSteps.ResourcesUpdating;
-                    }
-                    else if (this.nodeDescriptions.Values.Any(n => n.IsObsolete))
-                    {
-                        return EnMigrationSteps.NodesUpdating;
-                    }
-                    else
-                    {
-                        return EnMigrationSteps.ResourcesUpdated;
-                    }
-
-                case EnMigrationDirection.Downgrade:
-                    if (this.nodeDescriptions.Values.Any(n => n.IsObsolete))
-                    {
-                        return EnMigrationSteps.NodesUpdating;
-                    }
-                    else if (this.resourceState.MigrationState.Position != EnMigrationActorMigrationPosition.Source)
-                    {
-                        return EnMigrationSteps.ResourcesUpdating;
-                    }
-                    else
-                    {
-                        return EnMigrationSteps.NodesUpdated;
-                    }
-
-                case EnMigrationDirection.Stay: return EnMigrationSteps.NodesUpdating;
-                default: return EnMigrationSteps.Broken;
-            }
-        }
-
-        /// <summary>
-        /// Gets the list of migration steps
-        /// </summary>
-        /// <returns>the list of migration steps</returns>
-        private IEnumerable<EnMigrationSteps> GetMigrationSteps()
-        {
-            switch (this.currentMigration.Direction)
-            {
-                case EnMigrationDirection.Upgrade:
-                    yield return EnMigrationSteps.Start;
-                    yield return EnMigrationSteps.ResourcesUpdating;
-                    yield return EnMigrationSteps.ResourcesUpdated;
-                    yield return EnMigrationSteps.NodesUpdating;
-                    yield return EnMigrationSteps.Finish;
-                    break;
-                case EnMigrationDirection.Downgrade:
-                    yield return EnMigrationSteps.Start;
-                    yield return EnMigrationSteps.NodesUpdating;
-                    yield return EnMigrationSteps.NodesUpdated;
-                    yield return EnMigrationSteps.ResourcesUpdating;
-                    yield return EnMigrationSteps.Finish;
-                    break;
-                case EnMigrationDirection.Stay:
-                    yield return EnMigrationSteps.Start;
-                    yield return EnMigrationSteps.NodesUpdating;
-                    yield return EnMigrationSteps.Finish;
-                    break;
-            }
         }
 
         /// <summary>
@@ -760,6 +659,8 @@ namespace KlusterKite.NodeManager
                 return;
             }
 
+            this.resourceState.ConfigurationState.MigratableResources = new List<ResourceConfigurationState>();
+
             // checking if there is any resource that is not of the current configuration state
             var unmigratedTemplates = this.resourceState.ConfigurationState.States
                 .Where(t => t.MigratorsStates.Any(m => m.Resources.Any(r => r.CurrentPoint != m.LastDefinedPoint)))
@@ -771,8 +672,115 @@ namespace KlusterKite.NodeManager
             }
 
             this.resourceState.CanCreateMigration = false;
-            this.resourceState.CanMigrateResources = this.resourceState.ConfigurationState.States.All(
-                t => t.MigratorsStates.All(m => m.Resources.All(r => m.MigrationPoints.Contains(r.CurrentPoint))));
+            this.resourceState.ConfigurationState.MigratableResources = this.resourceState.ConfigurationState.States
+                .SelectMany(t => t.MigratorsStates)
+                .SelectMany(
+                    m => m.Resources
+                        .Where(
+                            r => r.CurrentPoint != m.LastDefinedPoint
+                                 && (m.MigrationPoints.Contains(r.CurrentPoint) || r.CurrentPoint == null))
+                        .Select(r => new
+                                         {
+                                             m, r
+                                         })).OrderByDescending(r => r.m.Priority).Select(r => r.r).ToList();
+
+            this.resourceState.CanMigrateResources = this.resourceState.ConfigurationState.MigratableResources.Any();
+        }
+
+        /// <summary>
+        /// Checks current resource state with active migration and without resource operation in progress
+        /// </summary>
+        private void InitResourceMigrationState()
+        {
+            this.resourceState.ConfigurationState = null;
+            this.resourceState.CanCreateMigration = false;
+
+            if (this.resourceState.MigrationState == null)
+            {
+                this.resourceState.CleanCanBits();
+                this.resourceState.CanCancelMigration = this.currentMigration.State == EnMigrationState.Preparing;
+                this.resourceState.CurrentMigrationStep = null;
+                this.resourceState.MigrationSteps = null;
+                return;
+            }
+
+            if (this.currentMigration.State == EnMigrationState.Preparing)
+            {
+                this.InitMigration();
+                return;
+            }
+
+            this.resourceState.CleanCanBits();
+            this.resourceState.MigrationSteps = this.resourceState.MigrationState.GetMigrationSteps().ToList();
+            this.resourceState.CurrentMigrationStep = this.GetCurrentMigrationStep();
+
+            var preNodesMigratableResources = this.resourceState.MigrationState.GetPreNodesMigratableResources()
+                .ToList();
+            var postNodesMigratableResources = this.resourceState.MigrationState.GetPostNodesMigratableResources()
+                .ToList();
+
+            switch (this.resourceState.CurrentMigrationStep)
+            {
+                case EnMigrationSteps.Start:
+                    this.resourceState.CanCancelMigration = true;
+                    this.resourceState.CanUpdateNodesToDestination = !preNodesMigratableResources.Any();
+                    this.resourceState.CanMigrateResources = preNodesMigratableResources.Any();
+                    this.resourceState.MigrationState.MigratableResources = preNodesMigratableResources;
+                    break;
+                case EnMigrationSteps.PreNodesResourcesUpdating:
+                    this.resourceState.CanMigrateResources = true;
+                    this.resourceState.MigrationState.MigratableResources = preNodesMigratableResources;
+                    break;
+                case EnMigrationSteps.PreNodeResourcesUpdated:
+                    this.resourceState.CanMigrateResources = true;
+                    this.resourceState.MigrationState.MigratableResources = preNodesMigratableResources;
+                    this.resourceState.CanUpdateNodesToDestination = true;
+                    break;
+                case EnMigrationSteps.NodesUpdating:
+                    this.resourceState.CanUpdateNodesToDestination =
+                        this.currentConfiguration.Id == this.currentMigration.FromConfigurationId;
+                    this.resourceState.CanUpdateNodesToSource =
+                        this.currentConfiguration.Id == this.currentMigration.ToConfigurationId;
+                    break;
+                case EnMigrationSteps.NodesUpdated:
+                    this.resourceState.CanMigrateResources = true;
+                    this.resourceState.CanUpdateNodesToSource = true;
+                    this.resourceState.MigrationState.MigratableResources = postNodesMigratableResources;
+                    break;
+                case EnMigrationSteps.PostNodesResourcesUpdating:
+                    this.resourceState.CanMigrateResources = true;
+                    this.resourceState.MigrationState.MigratableResources = postNodesMigratableResources;
+                    break;
+                case EnMigrationSteps.Finish:
+                    this.resourceState.CanFinishMigration = true;
+                    this.resourceState.MigrationState.MigratableResources = postNodesMigratableResources;
+                    this.resourceState.CanMigrateResources = postNodesMigratableResources.Any();
+                    this.resourceState.CanUpdateNodesToSource = !postNodesMigratableResources.Any();
+                    break;
+                case EnMigrationSteps.Recovery:
+                    this.resourceState.CanUpdateNodesToSource =
+                        this.currentConfiguration.Id != this.currentMigration.FromConfigurationId;
+                    this.resourceState.CanUpdateNodesToDestination =
+                        this.currentConfiguration.Id != this.currentMigration.ToConfigurationId;
+                    this.resourceState.CanMigrateResources =
+                        preNodesMigratableResources.Any() || postNodesMigratableResources.Any();
+                    this.resourceState.MigrationState.MigratableResources = preNodesMigratableResources
+                        .Union(postNodesMigratableResources).ToList();
+                    break;
+                case EnMigrationSteps.Broken:
+                    if (this.currentConfiguration.Id == this.currentMigration.FromConfigurationId && this.resourceState
+                            .MigrationState.TemplateStates.SelectMany(t => t.Migrators).SelectMany(m => m.Resources)
+                            .All(
+                                r => r.Position == EnResourcePosition.Source
+                                     || r.Position == EnResourcePosition.SourceAndDestination
+                                     || r.Position == EnResourcePosition.NotCreated
+                                     || r.Position == EnResourcePosition.Obsolete))
+                    {
+                        this.resourceState.CanCancelMigration = true;
+                    }
+
+                    break;
+            }
         }
 
         /// <summary>
@@ -782,12 +790,7 @@ namespace KlusterKite.NodeManager
         {
             if (this.resourceState.OperationIsInProgress)
             {
-                this.resourceState.CanCancelMigration = false;
-                this.resourceState.CanCreateMigration = false;
-                this.resourceState.CanFinishMigration = false;
-                this.resourceState.CanMigrateResources = false;
-                this.resourceState.CanUpdateNodesToDestination = false;
-                this.resourceState.CanUpdateNodesToSource = false;
+                this.resourceState.CleanCanBits();
                 return;
             }
 
@@ -834,6 +837,36 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
+        /// The <see cref="MigrationActor"/> updated resource state without active migration
+        /// </summary>
+        /// <param name="state">The initialization error</param>
+        private void OnMigrationActorConfigurationState(MigrationActorConfigurationState state)
+        {
+            this.resourceState.OperationIsInProgress = false;
+            if (this.currentMigration != null)
+            {
+                Context.GetLogger().Error(
+                    "{Type}: received a MigrationActorConfigurationState with active migration in progress",
+                    this.GetType().Name);
+                return;
+            }
+
+            this.resourceState.ConfigurationState = state;
+
+            var resources = state.States.SelectMany(t => t.MigratorsStates)
+                .SelectMany(m => m.Resources.Select(r => new { m, r }));
+
+            foreach (var res in resources)
+            {
+                res.r.SetPosition(res.m);
+            }
+
+            this.resourceState.MigrationState = null;
+            Context.GetLogger().Info("{Type}: received a MigrationActorConfigurationState", this.GetType().Name);
+            this.InitDatabase();
+        }
+
+        /// <summary>
         /// The <see cref="MigrationActor"/> encountered errors on resource check state
         /// </summary>
         /// <param name="state">The initialization error</param>
@@ -845,7 +878,7 @@ namespace KlusterKite.NodeManager
                 Context.GetLogger().Error(
                     "{Type}: MigrationActor error - {ErrorMessage}\n{ErrorStackTrace}",
                     this.GetType().Name,
-                    error.ErrorMessage,
+                    error.Message,
                     error.ErrorStackTrace);
             }
 
@@ -878,27 +911,6 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
-        /// The <see cref="MigrationActor"/> updated resource state without active migration
-        /// </summary>
-        /// <param name="state">The initialization error</param>
-        private void OnMigrationActorConfigurationState(MigrationActorConfigurationState state)
-        {
-            this.resourceState.OperationIsInProgress = false;
-            if (this.currentMigration != null)
-            {
-                Context.GetLogger().Error(
-                    "{Type}: received a MigrationActorConfigurationState with active migration in progress",
-                    this.GetType().Name);
-                return;
-            }
-
-            this.resourceState.ConfigurationState = state;
-            this.resourceState.MigrationState = null;
-            Context.GetLogger().Info("{Type}: received a MigrationActorConfigurationState", this.GetType().Name);
-            this.InitDatabase();
-        }
-
-        /// <summary>
         /// Processes the cancel migration request
         /// </summary>
         private void OnMigrationCancel()
@@ -915,7 +927,8 @@ namespace KlusterKite.NodeManager
 
             using (var ds = this.GetContext())
             {
-                var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
+                var migration = ds.Migrations.Include(nameof(Migration.Logs))
+                    .FirstOrDefault(m => m.Id == this.currentMigration.Id);
                 if (migration == null)
                 {
                     this.Sender.Tell(false);
@@ -933,6 +946,27 @@ namespace KlusterKite.NodeManager
                 migration.Finished = DateTimeOffset.Now;
                 migration.State = EnMigrationState.Failed;
                 migration.IsActive = false;
+
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.FromConfigurationId,
+                            Type = EnMigrationLogRecordType.CanceledFromConfiguration,
+                            Message = "The migration from this configuration was canceled"
+                        });
+
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.ToConfigurationId,
+                            Type = EnMigrationLogRecordType.CanceledToConfiguration,
+                            Message = "The migration to this configuration was canceled"
+                        });
+
                 ds.SaveChanges();
             }
 
@@ -942,12 +976,7 @@ namespace KlusterKite.NodeManager
             this.resourceState.MigrationState = null;
             this.resourceState.ConfigurationState = null;
             this.resourceState.OperationIsInProgress = true;
-            this.resourceState.CanCreateMigration = false;
-            this.resourceState.CanCancelMigration = false;
-            this.resourceState.CanFinishMigration = false;
-            this.resourceState.CanMigrateResources = false;
-            this.resourceState.CanUpdateNodesToDestination = false;
-            this.resourceState.CanUpdateNodesToSource = false;
+            this.resourceState.CleanCanBits();
         }
 
         /// <summary>
@@ -967,7 +996,8 @@ namespace KlusterKite.NodeManager
 
             using (var ds = this.GetContext())
             {
-                var migration = ds.Migrations.FirstOrDefault(m => m.Id == this.currentMigration.Id);
+                var migration = ds.Migrations.Include(nameof(Migration.Logs))
+                    .FirstOrDefault(m => m.Id == this.currentMigration.Id);
                 if (migration == null)
                 {
                     this.Sender.Tell(false);
@@ -985,6 +1015,26 @@ namespace KlusterKite.NodeManager
                 migration.Finished = DateTimeOffset.Now;
                 migration.State = EnMigrationState.Completed;
                 migration.IsActive = false;
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.FromConfigurationId,
+                            Type = EnMigrationLogRecordType.FinishedFromConfiguration,
+                            Message = "The migration from this configuration was finished"
+                        });
+
+                migration.Logs.Add(
+                    new MigrationLogRecord
+                        {
+                            Started = migration.Finished.Value,
+                            MigrationId = migration.Id,
+                            ConfigurationId = migration.ToConfigurationId,
+                            Type = EnMigrationLogRecordType.FinishedToConfiguration,
+                            Message = "The migration to this configuration was finished"
+                        });
+
                 ds.SaveChanges();
             }
 
@@ -994,12 +1044,7 @@ namespace KlusterKite.NodeManager
             this.resourceState.MigrationState = null;
             this.resourceState.ConfigurationState = null;
             this.resourceState.OperationIsInProgress = true;
-            this.resourceState.CanCreateMigration = false;
-            this.resourceState.CanCancelMigration = false;
-            this.resourceState.CanFinishMigration = false;
-            this.resourceState.CanMigrateResources = false;
-            this.resourceState.CanUpdateNodesToDestination = false;
-            this.resourceState.CanUpdateNodesToSource = false;
+            this.resourceState.CleanCanBits();
         }
 
         /// <summary>
@@ -1038,22 +1083,20 @@ namespace KlusterKite.NodeManager
 
             using (var ds = this.GetContext())
             {
-                var sourceConfiguration = ds.Configurations.First(r => r.Id == this.currentMigration.FromConfigurationId);
-                var destinationConfiguration = ds.Configurations.First(r => r.Id == this.currentMigration.ToConfigurationId);
+                var sourceConfiguration =
+                    ds.Configurations.First(r => r.Id == this.currentMigration.FromConfigurationId);
+                var destinationConfiguration =
+                    ds.Configurations.First(r => r.Id == this.currentMigration.ToConfigurationId);
 
                 if (request.Target == EnMigrationSide.Source)
                 {
-                    destinationConfiguration.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
-                                                   ? EnConfigurationState.Obsolete
-                                                   : EnConfigurationState.Faulted;
+                    destinationConfiguration.State = EnConfigurationState.Faulted;
                     sourceConfiguration.State = EnConfigurationState.Active;
                 }
                 else
                 {
                     destinationConfiguration.State = EnConfigurationState.Active;
-                    sourceConfiguration.State = this.currentMigration.Direction == EnMigrationDirection.Downgrade
-                                              ? EnConfigurationState.Faulted
-                                              : EnConfigurationState.Obsolete;
+                    sourceConfiguration.State = EnConfigurationState.Archived;
                 }
 
                 ds.SaveChanges();
@@ -1074,10 +1117,9 @@ namespace KlusterKite.NodeManager
         /// Processes the request to upgrade resources during migration
         /// </summary>
         /// <param name="request">The request</param>
-        private void OnMigrationResourceUpgrade(List<ResourceUpgrade> request)
+        private void OnResourceUpgradeRequest(List<ResourceUpgrade> request)
         {
-            if (this.resourceState.OperationIsInProgress || this.currentMigration == null
-                || !this.resourceState.CanMigrateResources || this.resourceState.MigrationState == null)
+            if (!this.resourceState.CanMigrateResources)
             {
                 Context.GetLogger().Warning(
                     "{Type}: received ResourceUpgrade request in inappropriate state",
@@ -1086,36 +1128,49 @@ namespace KlusterKite.NodeManager
                 return;
             }
 
-            foreach (var upgrade in request)
+            var migratableResources = this.resourceState.ConfigurationState?.MigratableResources ?? this.resourceState
+                                          .MigrationState?.MigratableResources.Cast<ResourceConfigurationState>().ToList();
+
+            if (migratableResources == null || migratableResources.Count == 0)
             {
-                var template =
-                    this.resourceState.MigrationState.TemplateStates
-                        .FirstOrDefault(t => t.Code == upgrade.TemplateCode);
-                var migrator = template?.Migrators.FirstOrDefault(m => m.TypeName == upgrade.MigratorTypeName);
-                var resource = migrator?.Resources.FirstOrDefault(r => r.Code == upgrade.ResourceCode);
-                if (resource == null)
-                {
-                    Context.GetLogger().Warning(
-                        "{Type}: received ResourceUpgrade request with unknown resource {TemplateCode} {MigratorTypeName} {ResourceCode}",
-                        this.GetType().Name,
-                        upgrade.TemplateCode,
-                        upgrade.MigratorTypeName,
-                        upgrade.ResourceCode);
-                    this.Sender.Tell(false);
-                    return;
-                }
+                Context.GetLogger().Warning(
+                    "{Type}: received ResourceUpgrade request, but there is no resources to migrate",
+                    this.GetType().Name);
+                this.Sender.Tell(false);
+                return;
+            }
+
+            var resourcesToUpgrade = request.Select(
+                u =>
+                    {
+                        var resource = migratableResources.FirstOrDefault(
+                            r => r.TemplateCode == u.TemplateCode && r.MigratorTypeName == u.MigratorTypeName
+                                 && r.Code == u.ResourceCode);
+                        if (resource == null)
+                        {
+                            Context.GetLogger().Warning(
+                                "{Type}: received ResourceUpgrade request with unknown resource {TemplateCode} {MigratorTypeName} {ResourceCode}",
+                                this.GetType().Name,
+                                u.TemplateCode,
+                                u.MigratorTypeName,
+                                u.ResourceCode);
+                            return null;
+                        }
+
+                        return new { R = u, Position = migratableResources.IndexOf(resource) };
+                    }).Where(r => r != null).OrderBy(r => r.Position).Select(r => r.R).ToList();
+
+            if (resourcesToUpgrade.Count != request.Count)
+            {
+                this.Sender.Tell(false);
+                return;
             }
 
             this.Sender.Tell(true);
             this.resourceMigrator.Tell(request, this.Self);
             this.resourceState.OperationIsInProgress = true;
-            this.resourceState.CanCreateMigration = false;
-            this.resourceState.CanCancelMigration = false;
-            this.resourceState.CanFinishMigration = false;
-            this.resourceState.CanMigrateResources = false;
-            this.resourceState.CanUpdateNodesToDestination = false;
-            this.resourceState.CanUpdateNodesToSource = false;
-            this.resourceState.CurrentMigrationStep = EnMigrationSteps.ResourcesUpdating;
+            this.resourceState.CleanCanBits();
+            this.resourceState.CurrentMigrationStep = EnMigrationSteps.PreNodesResourcesUpdating;
         }
 
         /// <summary>
@@ -1431,6 +1486,18 @@ namespace KlusterKite.NodeManager
         }
 
         /// <summary>
+        /// Reloads current state from the database and environment
+        /// </summary>
+        private void OnRecheckState()
+        {
+            this.resourceState.CleanCanBits();
+            this.resourceState.OperationIsInProgress = true;
+            this.Sender.Tell(true);
+            this.InitDatabase();
+            this.resourceMigrator.Tell(new RecheckState(), this.Self);
+        }
+
+        /// <summary>
         /// Sends new description request to foreign node
         /// </summary>
         /// <param name="message">Notification message</param>
@@ -1588,7 +1655,9 @@ namespace KlusterKite.NodeManager
                     if (request.Id == this.currentConfiguration.Id)
                     {
                         this.Sender.Tell(
-                            CrudActionResponse<Migration>.Error(new Exception("This configuration is already set"), null));
+                            CrudActionResponse<Migration>.Error(
+                                new Exception("This configuration is already set"),
+                                null));
                         return;
                     }
 
@@ -1618,17 +1687,36 @@ namespace KlusterKite.NodeManager
                                         };
                     ds.Migrations.Add(migration);
                     ds.SaveChanges();
+
+                    migration.Logs = new List<MigrationLogRecord>();
+                    migration.Logs.Add(
+                        new MigrationLogRecord
+                            {
+                                Started = migration.Started,
+                                MigrationId = migration.Id,
+                                ConfigurationId = migration.FromConfigurationId,
+                                Type = EnMigrationLogRecordType.StartedFromConfiguration,
+                                Message = "The migration from this configuration was started"
+                            });
+
+                    migration.Logs.Add(
+                        new MigrationLogRecord
+                            {
+                                Started = migration.Started,
+                                MigrationId = migration.Id,
+                                ConfigurationId = migration.ToConfigurationId,
+                                Type = EnMigrationLogRecordType.StartedToConfiguration,
+                                Message = "The migration to this configuration was started"
+                            });
+                    ds.SaveChanges();
+
                     this.currentMigration = migration;
                     this.resourceState.OperationIsInProgress = true;
-                    this.resourceState.CanCancelMigration = false;
-                    this.resourceState.CanCreateMigration = false;
-                    this.resourceState.CanFinishMigration = false;
-                    this.resourceState.CanMigrateResources = false;
-                    this.resourceState.CanUpdateNodesToDestination = false;
-                    this.resourceState.CanUpdateNodesToSource = false;
+                    this.resourceState.CleanCanBits();
                     this.resourceState.ConfigurationState = null;
                     this.resourceState.MigrationState = null;
                     this.resourceMigrator.Tell(new RecheckState(), this.Self);
+
                     this.Sender.Tell(CrudActionResponse<Migration>.Success(migration, null));
                 }
             }
@@ -1697,6 +1785,7 @@ namespace KlusterKite.NodeManager
             this.Receive<UpdateClusterRequest>(r => this.OnUpdateCluster(r));
             this.Receive<CollectionRequest<Migration>>(m => this.workers.Forward(m));
 
+            this.Receive<RecheckState>(m => this.OnRecheckState());
             this.Receive<ProcessingTheRequest>(m => this.resourceState.OperationIsInProgress = true);
             this.Receive<MigrationActorMigrationState>(s => this.OnMigrationActorMigrationState(s));
             this.Receive<MigrationActorConfigurationState>(s => this.OnMigrationActorConfigurationState(s));
@@ -1704,7 +1793,7 @@ namespace KlusterKite.NodeManager
             this.Receive<List<MigrationLogRecord>>(r => this.OnMigrationLogRecords(r));
             this.Receive<MigrationCancel>(r => this.OnMigrationCancel());
             this.Receive<MigrationFinish>(r => this.OnMigrationFinish());
-            this.Receive<List<ResourceUpgrade>>(r => this.OnMigrationResourceUpgrade(r));
+            this.Receive<List<ResourceUpgrade>>(r => this.OnResourceUpgradeRequest(r));
             this.Receive<NodesUpgrade>(r => this.OnMigrationNodesUpgrade(r));
 
             this.Receive<ResourceStateRequest>(r => this.Sender.Tell(this.resourceState));
@@ -1785,11 +1874,6 @@ namespace KlusterKite.NodeManager
         private class Worker : BaseCrudActorWithNotifications<ConfigurationContext>
         {
             /// <summary>
-            /// The database provider name
-            /// </summary>
-            private readonly string databaseProviderName;
-
-            /// <summary>
             /// The database connection string
             /// </summary>
             private readonly string connectionString;
@@ -1803,6 +1887,11 @@ namespace KlusterKite.NodeManager
             /// The database name
             /// </summary>
             private readonly string databaseName;
+
+            /// <summary>
+            /// The database provider name
+            /// </summary>
+            private readonly string databaseProviderName;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Worker"/> class.
@@ -1882,7 +1971,8 @@ namespace KlusterKite.NodeManager
             {
                 using (var ds = this.GetContext())
                 {
-                    var factory = DataFactory<ConfigurationContext, User, string>.CreateFactory(this.ComponentContext, ds);
+                    var factory =
+                        DataFactory<ConfigurationContext, User, string>.CreateFactory(this.ComponentContext, ds);
                     try
                     {
                         var user = await factory.Get(request.Login);
@@ -1914,7 +2004,8 @@ namespace KlusterKite.NodeManager
             {
                 using (var ds = this.GetContext())
                 {
-                    var factory = DataFactory<ConfigurationContext, User, Guid>.CreateFactory(this.ComponentContext, ds);
+                    var factory =
+                        DataFactory<ConfigurationContext, User, Guid>.CreateFactory(this.ComponentContext, ds);
                     try
                     {
                         var user = await factory.Get(request.Uid);

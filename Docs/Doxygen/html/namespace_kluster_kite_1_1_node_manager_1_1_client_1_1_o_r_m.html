@@ -150,7 +150,8 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a5e7ae3e4a7e0fe36be725f784b38cdcca4d3d769b812b6faa6b76e1a8abaece2d">EnConfigurationState.Active</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a5e7ae3e4a7e0fe36be725f784b38cdcca2b310d05c23325e2935ec87b25a60b8f">EnConfigurationState.Faulted</a>, 
 <br />
-&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a5e7ae3e4a7e0fe36be725f784b38cdccaec30c235d0eb792797af1aa1d11759a7">EnConfigurationState.Obsolete</a>
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a5e7ae3e4a7e0fe36be725f784b38cdccaec30c235d0eb792797af1aa1d11759a7">EnConfigurationState.Obsolete</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a5e7ae3e4a7e0fe36be725f784b38cdcca7d69b3cb4cada18ae61811304f8fbcb5">EnConfigurationState.Archived</a>
 <br />
  }<tr class="memdesc:a5e7ae3e4a7e0fe36be725f784b38cdcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The list of configuration states  <a href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a5e7ae3e4a7e0fe36be725f784b38cdcc">More...</a><br /></td></tr>
 </td></tr>
@@ -162,9 +163,19 @@ Enumerations</h2></td></tr>
  }<tr class="memdesc:a70b83f75ce1586e2a36e5f86a935b2a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The direction of cluster migration  <a href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a70b83f75ce1586e2a36e5f86a935b2a2">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:a70b83f75ce1586e2a36e5f86a935b2a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a103280098686d407dd1010662fd9e4bc"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bc">EnMigrationLogRecordType</a> { <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bca2a78ed76450c3cb42320882b3e055b31">EnMigrationLogRecordType.Operation</a> = 1, 
+<tr class="memitem:a103280098686d407dd1010662fd9e4bc"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bc">EnMigrationLogRecordType</a> { <br />
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bca2a78ed76450c3cb42320882b3e055b31">EnMigrationLogRecordType.Operation</a> = 1, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bca902b0d55fddef6f8d651fe1035b7d4bd">EnMigrationLogRecordType.Error</a> = 2, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bcab01eaa036a4b08b1ee607003fd2ce886">EnMigrationLogRecordType.OperationError</a> = 3
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bcab01eaa036a4b08b1ee607003fd2ce886">EnMigrationLogRecordType.OperationError</a> = 3, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bca9d840e56142a41e871a25cfdb656c768">EnMigrationLogRecordType.StartedFromConfiguration</a> = 4, 
+<br />
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bcaefbd1fa6751b463c2ec0b42e4d3e9365">EnMigrationLogRecordType.FinishedFromConfiguration</a> = 5, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bcab21b752e39e66e6ba1fc01726e1682f0">EnMigrationLogRecordType.CanceledFromConfiguration</a> = 6, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bcab9ef9c432a596224564bd60414684745">EnMigrationLogRecordType.StartedToConfiguration</a> = 7, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bca9a03847f79b0f956332aaa39446bd19e">EnMigrationLogRecordType.FinishedToConfiguration</a> = 8, 
+<br />
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bca8260d54a6c23548a6a3ccb6e5ef74b26">EnMigrationLogRecordType.CanceledToConfiguration</a> = 9
+<br />
  }<tr class="memdesc:a103280098686d407dd1010662fd9e4bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The types of migration log records  <a href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#a103280098686d407dd1010662fd9e4bc">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:a103280098686d407dd1010662fd9e4bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -181,13 +192,16 @@ Enumerations</h2></td></tr>
 <tr class="separator:a9ff9c8e6da11ac5ce2ccdd0c37a963c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af195cb63ca84b9747ec68426de29b807"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807">EnMigrationSteps</a> { <br />
 &#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807aa6122a65eaa676f700ae68d393054a37">EnMigrationSteps.Start</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a57503465ff3675093fe18024e54814af">EnMigrationSteps.PreNodesResourcesUpdating</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a7251fab22aa3595a37b6c3a0d29e862e">EnMigrationSteps.PreNodeResourcesUpdated</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a1d6179ee101e1ae8e61fab2021c9adcd">EnMigrationSteps.NodesUpdating</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ad0e3508f9962df90b0a96a057b211aaf">EnMigrationSteps.NodesUpdated</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a52e51cda22be28a757253bc60730894c">EnMigrationSteps.ResourcesUpdating</a>, 
 <br />
-&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a63347f5368177cc6dfc6c1d4fda102a2">EnMigrationSteps.ResourcesUpdated</a>, 
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ad0e3508f9962df90b0a96a057b211aaf">EnMigrationSteps.NodesUpdated</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807aae4c1d7bfbf9c2b88616e893fff0d2ea">EnMigrationSteps.PostNodesResourcesUpdating</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807aa20ddccbb6f808ec42cd66323e6c6061">EnMigrationSteps.Finish</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ac98dbc22f49f1b4a644307551924f8da">EnMigrationSteps.Broken</a>
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ac98dbc22f49f1b4a644307551924f8da">EnMigrationSteps.Broken</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ad8afbc541b39d23648c823057cffe3a5">EnMigrationSteps.Recovery</a>
 <br />
  }<tr class="memdesc:af195cb63ca84b9747ec68426de29b807"><td class="mdescLeft">&#160;</td><td class="mdescRight">The list of migration procedure steps  <a href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807">More...</a><br /></td></tr>
 </td></tr>
@@ -262,7 +276,9 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a5e7ae3e4a7e0fe36be725f784b38cdcca2b310d05c23325e2935ec87b25a60b8f"></a>Faulted&#160;</td><td class="fielddoc"><p>This configuration was faulted and cluster roll-backed to the latest stable configuration (or some other) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5e7ae3e4a7e0fe36be725f784b38cdccaec30c235d0eb792797af1aa1d11759a7"></a>Obsolete&#160;</td><td class="fielddoc"><p>This configuration is obsolete and was replaced by some new one </p>
+<tr><td class="fieldname"><a id="a5e7ae3e4a7e0fe36be725f784b38cdccaec30c235d0eb792797af1aa1d11759a7"></a>Obsolete&#160;</td><td class="fielddoc"><p>This configuration is obsolete </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5e7ae3e4a7e0fe36be725f784b38cdcca7d69b3cb4cada18ae61811304f8fbcb5"></a>Archived&#160;</td><td class="fielddoc"><p>This configuration was once published, but now is replaced with the new one </p>
 </td></tr>
 </table>
 
@@ -334,9 +350,21 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a103280098686d407dd1010662fd9e4bcab01eaa036a4b08b1ee607003fd2ce886"></a>OperationError&#160;</td><td class="fielddoc"><p>The faulted operation </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a103280098686d407dd1010662fd9e4bca9d840e56142a41e871a25cfdb656c768"></a>StartedFromConfiguration&#160;</td><td class="fielddoc"><p>The new migration from this configuration was started </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a103280098686d407dd1010662fd9e4bcaefbd1fa6751b463c2ec0b42e4d3e9365"></a>FinishedFromConfiguration&#160;</td><td class="fielddoc"><p>The migration from this configuration was finished </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a103280098686d407dd1010662fd9e4bcab21b752e39e66e6ba1fc01726e1682f0"></a>CanceledFromConfiguration&#160;</td><td class="fielddoc"><p>The migration from this configuration was canceled </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a103280098686d407dd1010662fd9e4bcab9ef9c432a596224564bd60414684745"></a>StartedToConfiguration&#160;</td><td class="fielddoc"><p>The new migration to this configuration was started </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a103280098686d407dd1010662fd9e4bca9a03847f79b0f956332aaa39446bd19e"></a>FinishedToConfiguration&#160;</td><td class="fielddoc"><p>The migration to this configuration was finished </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a103280098686d407dd1010662fd9e4bca8260d54a6c23548a6a3ccb6e5ef74b26"></a>CanceledToConfiguration&#160;</td><td class="fielddoc"><p>The migration to this configuration was canceled </p>
+</td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="_en_migration_log_record_type_8cs_source.html#l00021">21</a> of file <a class="el" href="_en_migration_log_record_type_8cs_source.html">EnMigrationLogRecordType.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_en_migration_log_record_type_8cs_source.html#l00018">18</a> of file <a class="el" href="_en_migration_log_record_type_8cs_source.html">EnMigrationLogRecordType.cs</a>.</p>
 
 </div>
 </div>
@@ -403,17 +431,21 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807aa6122a65eaa676f700ae68d393054a37"></a>Start&#160;</td><td class="fielddoc"><p>The initial migration position, nothing is done </p>
 </td></tr>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a57503465ff3675093fe18024e54814af"></a>PreNodesResourcesUpdating&#160;</td><td class="fielddoc"><p>The resources are in the update stage </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a7251fab22aa3595a37b6c3a0d29e862e"></a>PreNodeResourcesUpdated&#160;</td><td class="fielddoc"><p>The resources were successfully updated </p>
+</td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a1d6179ee101e1ae8e61fab2021c9adcd"></a>NodesUpdating&#160;</td><td class="fielddoc"><p>The nodes are in the update state </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807ad0e3508f9962df90b0a96a057b211aaf"></a>NodesUpdated&#160;</td><td class="fielddoc"><p>The nodes were successfully updated </p>
 </td></tr>
-<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a52e51cda22be28a757253bc60730894c"></a>ResourcesUpdating&#160;</td><td class="fielddoc"><p>The resources are in the update stage </p>
-</td></tr>
-<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a63347f5368177cc6dfc6c1d4fda102a2"></a>ResourcesUpdated&#160;</td><td class="fielddoc"><p>The resources were successfully updated </p>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807aae4c1d7bfbf9c2b88616e893fff0d2ea"></a>PostNodesResourcesUpdating&#160;</td><td class="fielddoc"><p>The resources are in the update stage </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807aa20ddccbb6f808ec42cd66323e6c6061"></a>Finish&#160;</td><td class="fielddoc"><p>The migration is finished </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807ac98dbc22f49f1b4a644307551924f8da"></a>Broken&#160;</td><td class="fielddoc"><p>The migration is broken </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807ad8afbc541b39d23648c823057cffe3a5"></a>Recovery&#160;</td><td class="fielddoc"><p>The migration is broken, but can be recovered </p>
 </td></tr>
 </table>
 

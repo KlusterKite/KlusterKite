@@ -5,7 +5,9 @@ var dir_a6a70212f87694d48e3131071fee624e =
     [ "EnumResolver.cs", "_enum_resolver_8cs.html", [
       [ "EnumResolver", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_enum_resolver.html", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_enum_resolver" ]
     ] ],
-    [ "Extensions.cs", "_kluster_kite_8_a_p_i_2_kluster_kite_8_a_p_i_8_provider_2_resolvers_2_extensions_8cs.html", null ],
+    [ "Extensions.cs", "_kluster_kite_8_a_p_i_2_kluster_kite_8_a_p_i_8_provider_2_resolvers_2_extensions_8cs.html", [
+      [ "Extensions", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_extensions.html", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_extensions" ]
+    ] ],
     [ "ForwarderResolver.cs", "_forwarder_resolver_8cs.html", [
       [ "ForwarderResolver", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_forwarder_resolver.html", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_forwarder_resolver" ]
     ] ],

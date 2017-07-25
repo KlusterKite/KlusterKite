@@ -26,6 +26,22 @@ namespace KlusterKite.Data.EF
     public static class SelectBuilder
     {
         /// <summary>
+        /// The relation type
+        /// </summary>
+        private enum EnRelationType
+        {
+            /// <summary>
+            /// The one-to-one relation
+            /// </summary>
+            OneToOne,
+
+            /// <summary>
+            /// The one-to-many relation
+            /// </summary>
+            OneToMany
+        }
+
+        /// <summary>
         /// Creates includes to the query according to the api request fields
         /// </summary>
         /// <typeparam name="T">The type of queried object</typeparam>
@@ -51,8 +67,12 @@ namespace KlusterKite.Data.EF
         /// </summary>
         /// <typeparam name="T">The type of an object</typeparam>
         /// <typeparam name="TContext">The type of context</typeparam>
-        [SuppressMessage("ReSharper", "StaticMemberInGenericType", Justification = "Making use of static generic classes")]
-        private static class PathCreator<T, TContext> where TContext : DbContext
+        [SuppressMessage(
+            "ReSharper",
+            "StaticMemberInGenericType",
+            Justification = "Making use of static generic classes")]
+        private static class PathCreator<T, TContext>
+            where TContext : DbContext
         {
             /// <summary>
             /// The internal lock
@@ -62,8 +82,8 @@ namespace KlusterKite.Data.EF
             /// <summary>
             /// The list of cached helpers
             /// </summary>
-            private static readonly Dictionary<string, PropertyDescription<TContext>> NavigationProperties
-                = new Dictionary<string, PropertyDescription<TContext>>();
+            private static readonly Dictionary<string, PropertyDescription<TContext>> NavigationProperties =
+                new Dictionary<string, PropertyDescription<TContext>>();
 
             /// <summary>
             /// A value indicating whether the type was initialized
@@ -99,7 +119,17 @@ namespace KlusterKite.Data.EF
                                           : $"{prefix}.{description.PropertyName}";
 
                     yield return currentPath;
-                    foreach (var nestedPath in description.CreatePaths(currentPath, context, field))
+
+                    var subRequest = description.RelationType == EnRelationType.OneToOne
+                                         ? field
+                                         : field.Fields.FirstOrDefault(f => f.FieldName == "items");
+
+                    if (subRequest == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var nestedPath in description.CreatePaths(currentPath, context, subRequest))
                     {
                         yield return nestedPath;
                     }
@@ -140,11 +170,24 @@ namespace KlusterKite.Data.EF
                         var propertyName = declareFieldAttribute?.Name
                                            ?? ApiDescriptionAttribute.ToCamelCase(navigation.PropertyInfo.Name);
 
-                        var propertyType = navigation.PropertyInfo.PropertyType.GetInterfaces()
-                                               .FirstOrDefault(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                                               ?.GetGenericArguments()[0] ?? navigation.PropertyInfo.PropertyType;
+                        var toManyType = navigation.PropertyInfo.PropertyType.GetInterfaces()
+                            .FirstOrDefault(
+                                i => i.GetTypeInfo().IsGenericType
+                                     && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                            ?.GetGenericArguments()[0];
 
-                        NavigationProperties[propertyName] = new PropertyDescription<TContext>(navigation.Name, propertyType);
+                        if (toManyType != null)
+                        {
+                            NavigationProperties[propertyName] =
+                                new PropertyDescription<TContext>(navigation.Name, toManyType, EnRelationType.OneToMany);
+                        }
+                        else
+                        {
+                            NavigationProperties[propertyName] = new PropertyDescription<TContext>(
+                                navigation.Name,
+                                navigation.PropertyInfo.PropertyType, 
+                                EnRelationType.OneToOne);
+                        }
                     }
                 }
             }
@@ -154,17 +197,18 @@ namespace KlusterKite.Data.EF
         /// The property description
         /// </summary>
         /// <typeparam name="TContext">The type of data context</typeparam>
-        private class PropertyDescription<TContext> where TContext : DbContext
+        private class PropertyDescription<TContext>
+            where TContext : DbContext
         {
-            /// <summary>
-            /// the property type
-            /// </summary>
-            private readonly Type propertyType;
-
             /// <summary>
             /// Internal lock object to make thread-safe initialization
             /// </summary>
             private readonly object lockObject = new object();
+
+            /// <summary>
+            /// the property type
+            /// </summary>
+            private readonly Type propertyType;
 
             /// <summary>
             /// The resolved path creation function
@@ -180,16 +224,25 @@ namespace KlusterKite.Data.EF
             /// <param name="propertyType">
             /// The property type.
             /// </param>
-            public PropertyDescription(string propertyName, Type propertyType)
+            /// <param name="relationType">
+            /// The relation type.
+            /// </param>
+            public PropertyDescription(string propertyName, Type propertyType, EnRelationType relationType)
             {
                 this.PropertyName = propertyName;
                 this.propertyType = propertyType;
+                this.RelationType = relationType;
             }
 
             /// <summary>
             /// Gets the property type
             /// </summary>
             public string PropertyName { get; }
+            
+            /// <summary>
+            /// Gets the relation type
+            /// </summary>
+            public EnRelationType RelationType { get; }
 
             /// <summary>
             /// Calls the create path function for current property
@@ -214,11 +267,12 @@ namespace KlusterKite.Data.EF
                     {
                         if (this.createPathsFunc == null)
                         {
-                            var creatorType = typeof(PathCreator<,>).MakeGenericType(this.propertyType, typeof(TContext));
+                            var creatorType =
+                                typeof(PathCreator<,>).MakeGenericType(this.propertyType, typeof(TContext));
                             var func = creatorType.GetMethod("CreatePaths", BindingFlags.Static | BindingFlags.Public);
                             this.createPathsFunc =
-                                (Func<string, TContext, ApiRequest, IEnumerable<string>>)
-                                func.CreateDelegate(typeof(Func<string, TContext, ApiRequest, IEnumerable<string>>));
+                                (Func<string, TContext, ApiRequest, IEnumerable<string>>)func.CreateDelegate(
+                                    typeof(Func<string, TContext, ApiRequest, IEnumerable<string>>));
                         }
                     }
                 }

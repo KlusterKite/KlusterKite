@@ -38,7 +38,6 @@ export class FinishMigration extends React.Component {
         new FinishMigrationMutation({}),
         {
           onSuccess: (response) => {
-            console.log('response', response);
             const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationFinish;
 
             if (responsePayload.errors &&
@@ -51,7 +50,6 @@ export class FinishMigration extends React.Component {
                 processErrors: messages
               });
             } else {
-              console.log('result finish migration', responsePayload.result);
               // total success
               this.setState({
                 isProcessing: false,

@@ -19,4 +19,7 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\KlusterKite.API\KlusterKite.API.Attributes\KlusterKite.API.Attributes.csproj" />
+  </ItemGroup>
 </Project>

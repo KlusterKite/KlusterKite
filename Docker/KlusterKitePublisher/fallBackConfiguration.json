@@ -52,6 +52,50 @@
       "Version": "2.1.1"
     },
     {
+      "Id": "docopt.net",
+      "Version": "0.6.1.9"
+    },
+    {
+      "Id": "DotNetty.Buffers",
+      "Version": "0.4.3"
+    },
+    {
+      "Id": "DotNetty.Codecs",
+      "Version": "0.4.3"
+    },
+    {
+      "Id": "DotNetty.Common",
+      "Version": "0.4.3"
+    },
+    {
+      "Id": "DotNetty.Handlers",
+      "Version": "0.4.3"
+    },
+    {
+      "Id": "DotNetty.Transport",
+      "Version": "0.4.3"
+    },
+    {
+      "Id": "Elasticsearch.Net",
+      "Version": "2.4.2"
+    },
+    {
+      "Id": "Google.Protobuf",
+      "Version": "3.3.0"
+    },
+    {
+      "Id": "Google.ProtocolBuffers",
+      "Version": "2.4.1.555"
+    },
+    {
+      "Id": "Hyperion",
+      "Version": "0.9.5"
+    },
+    {
+      "Id": "JetBrains.Annotations",
+      "Version": "10.4.0"
+    },
+    {
       "Id": "KlusterKite.API.Attributes",
       "Version": "0.0.0-local"
     },
@@ -114,50 +158,6 @@
     {
       "Id": "KlusterKite.Web.NginxConfigurator",
       "Version": "0.0.0-local"
-    },
-    {
-      "Id": "docopt.net",
-      "Version": "0.6.1.9"
-    },
-    {
-      "Id": "DotNetty.Buffers",
-      "Version": "0.4.3"
-    },
-    {
-      "Id": "DotNetty.Codecs",
-      "Version": "0.4.3"
-    },
-    {
-      "Id": "DotNetty.Common",
-      "Version": "0.4.3"
-    },
-    {
-      "Id": "DotNetty.Handlers",
-      "Version": "0.4.3"
-    },
-    {
-      "Id": "DotNetty.Transport",
-      "Version": "0.4.3"
-    },
-    {
-      "Id": "Elasticsearch.Net",
-      "Version": "2.4.2"
-    },
-    {
-      "Id": "Google.Protobuf",
-      "Version": "3.3.0"
-    },
-    {
-      "Id": "Google.ProtocolBuffers",
-      "Version": "2.4.1.555"
-    },
-    {
-      "Id": "Hyperion",
-      "Version": "0.9.5"
-    },
-    {
-      "Id": "JetBrains.Annotations",
-      "Version": "10.4.0"
     },
     {
       "Id": "Libuv",

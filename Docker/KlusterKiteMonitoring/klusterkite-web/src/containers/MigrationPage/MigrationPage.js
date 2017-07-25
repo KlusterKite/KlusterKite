@@ -1,14 +1,15 @@
 import React from 'react'
 import Relay from 'react-relay'
-// import { browserHistory } from 'react-router'
 
 import delay from 'lodash/delay'
-// import isEqual from 'lodash/isEqual'
 
 import NodesList from '../../components/NodesList/NodesList'
 import MigrationLogs from '../../components/MigrationOperations/MigrationLogs'
 import MigrationSteps from '../../components/MigrationOperations/MigrationSteps'
 import NodesWithTemplates from '../../components/NodesWithTemplates/index'
+import RecheckState from '../../components/RecheckState/RecheckState';
+import UpdateResources from '../../components/MigrationOperations/UpdateResources'
+import Warnings from '../../components/Warnings/Warnings';
 
 import { hasPrivilege } from '../../utils/privileges'
 import DateFormat from '../../utils/date'
@@ -33,6 +34,7 @@ class MigrationPage extends React.Component {
     };
 
     this.onStateChange = this.onStateChange.bind(this);
+    this.onError = this.onError.bind(this);
   }
 
   componentDidMount = () => {
@@ -74,8 +76,6 @@ class MigrationPage extends React.Component {
   };
 
   onStateChange() {
-    console.log('onStateChange.');
-
     this.setState({
       operationIsInProgress: true,
       processErrors: null,
@@ -83,8 +83,6 @@ class MigrationPage extends React.Component {
   }
 
   onError(errors) {
-    console.log('onError', errors);
-
     this.setState({
       processErrors: errors,
     });
@@ -98,6 +96,12 @@ class MigrationPage extends React.Component {
 
     return (
       <div>
+        <Warnings
+          klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
+          migratableResourcesWarning={true}
+          outOfScopeWarning={true}
+        />
+
         {this.state.migrationHasFinished &&
           <div className="alert alert-success" role="alert">
             <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
@@ -108,7 +112,7 @@ class MigrationPage extends React.Component {
 
         {currentMigration &&
           <div>
-            <h2>Migration {currentMigration.fromRelease && currentMigration.fromRelease.name} → {currentMigration.toRelease && currentMigration.toRelease.name}</h2>
+            <h2>Migration {currentMigration.fromConfiguration && currentMigration.fromConfiguration.name} → {currentMigration.toConfiguration && currentMigration.toConfiguration.name} <RecheckState /></h2>
             <p>Created: {currentMigration.started && DateFormat.formatDateTime(new Date(currentMigration.started))}</p>
 
             {(nodesUpdating || this.state.operationIsInProgress) && !this.state.migrationHasFinished &&
@@ -161,15 +165,25 @@ class MigrationPage extends React.Component {
           />
         }
 
-        {currentMigration &&
-          <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
+        {currentMigration && resourceState.currentMigrationStep === 'NodesUpdating' &&
+        <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
         }
 
         {resourceState.currentMigrationStep === 'NodesUpdating' &&
-          <NodesList hasError={false}
-                     upgradeNodePrivilege={hasPrivilege('KlusterKite.NodeManager.UpgradeNode')}
-                     nodeDescriptions={this.props.api.klusterKiteNodesApi}
-                     hideDetails={true}
+        <NodesList hasError={false}
+                   upgradeNodePrivilege={hasPrivilege('KlusterKite.NodeManager.UpgradeNode')}
+                   nodeDescriptions={this.props.api.klusterKiteNodesApi}
+                   hideDetails={true}
+        />
+        }
+
+        {currentMigration &&
+          <UpdateResources
+            onStateChange={this.onStateChange}
+            onError={this.onError}
+            migrationState={resourceState.migrationState}
+            canMigrateResources={resourceState.canMigrateResources}
+            operationIsInProgress={this.state.operationIsInProgress}
           />
         }
 
@@ -194,10 +208,10 @@ export default Relay.createContainer(
               currentMigration {
                 state
                 started
-                fromRelease {
+                fromConfiguration {
                   name
                 }
-                toRelease {
+                toConfiguration {
                   name
                 }
                 ${MigrationLogs.getFragment('currentMigration')},
@@ -210,10 +224,14 @@ export default Relay.createContainer(
                 canMigrateResources
                 currentMigrationStep
                 ${MigrationSteps.getFragment('resourceState')},
+                migrationState {
+                  ${UpdateResources.getFragment('migrationState')},
+                }
               }
             }
             ${NodesWithTemplates.getFragment('data')},
             ${NodesList.getFragment('nodeDescriptions')},
+            ${Warnings.getFragment('klusterKiteNodesApi')},
           }
         }
       `,

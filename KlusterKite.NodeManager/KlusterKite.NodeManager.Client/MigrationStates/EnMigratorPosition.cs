@@ -19,16 +19,16 @@ namespace KlusterKite.NodeManager.Client.MigrationStates
     public enum EnMigratorPosition
     {
         /// <summary>
-        /// This entity was introduce in the destination configuration
+        /// This entity was introduced in the destination configuration
         /// </summary>
-        [ApiDescription("This entity was introduce in the destination configuration")]
+        [ApiDescription("This entity was introduced in the destination configuration")]
         New,
 
         /// <summary>
         /// This entity is located in both source and destination configuration
         /// </summary>
         [ApiDescription("This entity is located in both source and destination configuration")]
-        Merged,
+        Present,
 
         /// <summary>
         /// This entity is not present in the destination configuration

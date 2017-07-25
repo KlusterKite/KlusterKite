@@ -52,7 +52,7 @@ namespace KlusterKite.NodeManager.RemoteDomain
                             {
                                 Type = EnMigrationLogRecordType.Error,
                                 MigratorTypeName = command.TypeName,
-                                ErrorMessage = "Migrator is not defined"
+                                Message = "Migrator is not defined"
                             });
                     this.Logs.Add($"Migrator {command.TypeName} was not found");
                     continue;
@@ -63,24 +63,24 @@ namespace KlusterKite.NodeManager.RemoteDomain
                 var resources = migrator.GetMigratableResources().ToList();
                 var points = migrator.GetAllPoints().ToList();
 
-                foreach (var pair in command.Resources)
+                foreach (var resourceCommand in command.Resources)
                 {
                     var operation = new MigrationLogRecord
                                         {
                                             Type = EnMigrationLogRecordType.Operation,
                                             MigratorTypeName = command.TypeName,
                                             MigratorName = migrator.Name,
-                                            ResourceCode = pair.Key,
+                                            ResourceCode = resourceCommand.ResourceCode,
                                             Started = DateTimeOffset.Now
                                         };
                     result.Add(operation);
 
-                    var resource = resources.FirstOrDefault(r => r.Code == pair.Key);
+                    var resource = resources.FirstOrDefault(r => r.Code == resourceCommand.ResourceCode);
                     if (resource == null)
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage = "Resource is not defined in the migrator";
+                        operation.Message = "Resource is not defined in the migrator";
                         continue;
                     }
 
@@ -89,44 +89,44 @@ namespace KlusterKite.NodeManager.RemoteDomain
                     try
                     {
                         operation.SourcePoint = migrator.GetCurrentPoint(resource);
-                        operation.DestinationPoint = pair.Value;
+                        operation.DestinationPoint = resourceCommand.MigrationPoint;
                     }
                     catch (Exception exception)
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage =
+                        operation.Message =
                             $"Exception while checking resource current point: {exception.Message}";
                         operation.Exception = exception;
-                        this.Logs.Add($"Exception while checking resource {pair.Key} current point: {exception.Message}");
+                        this.Logs.Add($"Exception while checking resource {resourceCommand.ResourceCode} current point: {exception.Message}");
                         continue;
                     }
 
-                    if (!points.Contains(pair.Value))
+                    if (!points.Contains(resourceCommand.MigrationPoint))
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage = "Resource cannot migrate to point";
-                        this.Logs.Add($"Resource {pair.Key} cannot migrate to point");
+                        operation.Message = "Resource cannot migrate to point";
+                        this.Logs.Add($"Resource {resourceCommand.ResourceCode} cannot migrate to point");
                         continue;
                     }
 
                     try
                     {
-                        this.Logs.AddRange(migrator.Migrate(resource, pair.Value));
+                        this.Logs.AddRange(migrator.Migrate(resource, resourceCommand.MigrationPoint));
                     }
                     catch (Exception exception)
                     {
                         operation.Finished = DateTimeOffset.Now;
                         operation.Type = EnMigrationLogRecordType.OperationError;
-                        operation.ErrorMessage =
+                        operation.Message =
                             $"Exception while migrating resource: {exception.Message}";
                         operation.Exception = exception;
-                        this.Logs.Add($"Exception while migrating resource {pair.Key}: {exception.Message}");
+                        this.Logs.Add($"Exception while migrating resource {resourceCommand.ResourceCode}: {exception.Message}");
                     }
 
                     operation.Finished = DateTimeOffset.Now;
-                    this.Logs.Add($"Resource {pair.Key} was migrated successfully");
+                    this.Logs.Add($"Resource {resourceCommand.ResourceCode} was migrated successfully");
                 }
             }
 

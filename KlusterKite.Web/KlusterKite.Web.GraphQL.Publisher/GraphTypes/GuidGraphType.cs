@@ -29,7 +29,7 @@ namespace KlusterKite.Web.GraphQL.Publisher.GraphTypes
         /// <inheritdoc />
         public override object Serialize(object value)
         {
-            return this.ParseValue(value);
+            return this.ParseValue(value)?.ToString();
         }
 
         /// <inheritdoc />

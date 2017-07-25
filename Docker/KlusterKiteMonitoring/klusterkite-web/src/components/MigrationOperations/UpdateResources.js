@@ -14,6 +14,7 @@ export class UpdateResources extends React.Component {
       isProcessing: false,
       processSuccessful: false,
       processErrors: null,
+      selectedResources: [],
     };
   }
 
@@ -33,31 +34,19 @@ export class UpdateResources extends React.Component {
     return this.onStartUpdate('Source');
   };
 
-  onStartMigration = (templateCode, migratorTypeName, resourceCode, target) => {
-    console.log('migration', templateCode, migratorTypeName, resourceCode, target);
-
-  };
-
-  onStartMigration = (templateCode, migratorTypeName, resourceCode, target) => {
+  onStartMassMigration = () => {
     if (!this.state.isProcessing){
-
       this.setState({
         isProcessing: true,
         processSuccessful: false,
       });
 
-      console.log('updating resources');
-
       Relay.Store.commitUpdate(
         new UpdateResourcesMutation({
-          templateCode: templateCode,
-          migratorTypeName: migratorTypeName,
-          resourceCode: resourceCode,
-          target: target
+          resources: this.prepareResourceListForMigration(this.state.selectedResources)
         }),
         {
           onSuccess: (response) => {
-            console.log('response', response);
             const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate;
 
             if (responsePayload.errors &&
@@ -70,12 +59,13 @@ export class UpdateResources extends React.Component {
                 processErrors: messages,
               });
             } else {
-              console.log('result update nodes', responsePayload.result);
+              // console.log('result update nodes', responsePayload.result);
               // total success
               this.setState({
                 isProcessing: false,
                 processErrors: null,
                 processSuccessful: true,
+                selectedResources: [],
               });
 
               this.props.onStateChange();
@@ -91,68 +81,149 @@ export class UpdateResources extends React.Component {
     }
   };
 
+  /**
+   * Prepare resource list for migration by removal unnecessary keys
+   * @param resources {Object[]} Resources List
+   * @return {Object[]} Prepared resources list
+   */
+  prepareResourceListForMigration = (resources) => {
+    let resourceList = [];
+
+    resources.forEach((item) => {
+      resourceList.push({
+        templateCode: item.templateCode,
+        migratorTypeName: item.migratorTypeName,
+        resourceCode: item.resourceCode,
+        target: item.target,
+      })
+    });
+
+    return resourceList;
+  };
+
+  onSelectResource = (checked, key, templateCode, migratorTypeName, resourceCode, target) => {
+    const resource = {
+      templateCode: templateCode,
+      migratorTypeName: migratorTypeName,
+      resourceCode: resourceCode,
+      target: target,
+      key: key,
+    };
+
+    if (checked) {
+      this.setState((prevState) => ({
+        selectedResources: [
+          ...prevState.selectedResources,
+          resource,
+        ],
+      }));
+    } else {
+      this.setState((prevState) => ({
+        selectedResources: prevState.selectedResources.filter(item => item.key !== resource.key),
+      }));
+    }
+
+  };
+
   getErrorMessagesFromEdge = (edges) => {
     return edges.map(x => x.node).map(x => x.message);
   };
 
   render() {
-    let processClassName = '';
-    if (this.state.isProcessing) {
-      processClassName += ' fa-spin';
-    }
+    const upgradePossible = this.state.selectedResources.some(item => item.target === 'Destination');
+    const downgradePossible = this.state.selectedResources.some(item => item.target === 'Source');
+    const isProcessing = this.props.operationIsInProgress || this.state.isProcessing;
 
     return (
       <div>
         <h3>Resources list</h3>
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Position</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          {this.props.migrationState && this.props.migrationState.templateStates.edges && this.props.migrationState.templateStates.edges.map((edge) => {
-            const node = edge.node;
+        {isProcessing &&
+        <div className="alert alert-warning" role="alert">
+          <span className="glyphicon glyphicon-time fa-spin" aria-hidden="true"></span>
+          {' '}
+          Operation in progress, please wait…
+        </div>
+        }
 
-            return (
-              <tbody key={`${node.code}`}>
+        <button className="btn btn-primary" type="button" onClick={() => {this.onStartMassMigration()}} disabled={isProcessing || (!upgradePossible && !downgradePossible)}>
+          <Icon name='forward' />{' '}
+          {upgradePossible && !downgradePossible && <span>Upgrade</span>}
+          {downgradePossible && !upgradePossible && <span>Downgrade</span>}
+          {!upgradePossible && !downgradePossible && <span>Process</span>}
+          {downgradePossible && upgradePossible && <span>Upgrade and downgrade</span>}
+          {' '}selected{' '}
+          {this.state.selectedResources.length === 1 && <span>resouce</span>}
+          {this.state.selectedResources.length !== 1 && <span>resouces</span>}
+        </button>
+
+        {this.props.migrationState && this.props.migrationState.templateStates.edges && this.props.migrationState.templateStates.edges.map((edge) => {
+          const node = edge.node;
+          const migratableResources = this.props.migrationState.migratableResources.edges.map(edge => edge.node);
+
+          return (
+            <div key={node.code}>
+              <h4 className="migration-title">{node.code}</h4>
+              <table className="table table-hover">
+                <thead>
                 <tr>
-                  <th colSpan={4}>{node.code}</th>
+                  <th>Name</th>
+                  <th>Code</th>
+                  <th>Position</th>
+                  <th>Current point</th>
+                  <th className="migration-upgrade" title="Upgrade selected resources">↑</th>
+                  <th className="migration-downgrade" title="Downgrade selected resources">↓</th>
                 </tr>
+                </thead>
                 {node.migrators.edges.map((migratorEdge) => {
                   const migratorNode = migratorEdge.node;
                   const resources = migratorNode.resources.edges;
 
-                  return resources.map((resourceEdge) => {
-                    const resourceNode = resourceEdge.node;
-                    const direction = resourceNode.position === 'Source' ? 'Destination' : 'Source';
-                    const iconName = direction === 'Source' ? 'backward' : 'forward';
-                    const directionName = direction === 'Source' ? 'Downgrade resources' : 'Upgrade resources';
-
-                    return (
-                      <tr key={resourceNode.code}>
-                        <td className="migration-resources">{resourceNode.name}</td>
-                        <td className="migration-resources">{resourceNode.code}</td>
-                        <td className="migration-resources">{resourceNode.position}</td>
-                        <td>
-                          {this.props.canMigrateResources &&
-                            <button className="btn btn-primary" type="button" onClick={() => {this.onStartMigration(node.code, migratorNode.typeName, resourceNode.code, direction)}}>
-                              <Icon name={iconName} className={processClassName}/>{' '}{directionName}
-                            </button>
-                          }
-                        </td>
+                  return (
+                    <tbody key={migratorNode.typeName}>
+                      <tr>
+                        <th colSpan={5}>{migratorNode.name}</th>
                       </tr>
-                    );
-                  });
+                      {resources.map((resourceEdge) => {
+                        const resourceNode = resourceEdge.node;
+                        const direction = (resourceNode.position === 'Source' || resourceNode.position === 'NotCreated') ? 'Destination' : 'Source';
+                        const isMigratable = migratableResources.some(x => x.key === resourceNode.key);
 
+                        return (
+                          <tr key={resourceNode.code}>
+                            <td className="migration-resources">{resourceNode.name}</td>
+                            <td className="migration-resources">{resourceNode.code}</td>
+                            <td className="migration-resources">{resourceNode.position}</td>
+                            <td className="migration-resources">{resourceNode.currentPoint}</td>
+                            <td className="migration-resources migration-upgrade">
+                              {isMigratable && resourceNode.migrationToDestinationExecutor !== null &&
+                                <input
+                                  type="checkbox"
+                                  checked={this.state.selectedResources.some(item => item.target === direction && item.key === resourceNode.key)}
+                                  onChange={(element) => this.onSelectResource(element.target.checked, resourceNode.key, node.code, migratorNode.typeName, resourceNode.code, direction)}
+                                  disabled={isProcessing}
+                                />
+                              }
+                            </td>
+                            <td className="migration-resources migration-downgrade">
+                              {isMigratable && resourceNode.migrationToSourceExecutor !== null &&
+                                <input
+                                  type="checkbox"
+                                  checked={this.state.selectedResources.some(item => item.target === direction && item.key === resourceNode.key)}
+                                  onChange={(element) => this.onSelectResource(element.target.checked, resourceNode.key, node.code, migratorNode.typeName, resourceNode.code, direction)}
+                                  disabled={isProcessing}
+                                />
+                              }
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  )
                 })}
-              </tbody>
-            )
-          })
-          }
-        </table>
+              </table>
+            </div>
+          )
+        })}
       </div>
     );
   }
@@ -163,7 +234,7 @@ export default Relay.createContainer(
   {
     fragments: {
       migrationState: () => Relay.QL`fragment on IKlusterKiteNodeApi_MigrationActorMigrationState {
-        templateStates {
+        templateStates   {
           edges {
             node {
               code
@@ -178,6 +249,7 @@ export default Relay.createContainer(
                     resources {
                       edges {
                         node {
+                          key
                           sourcePoint
                           destinationPoint
                           position
@@ -192,6 +264,13 @@ export default Relay.createContainer(
                   }
                 }
               }
+            }
+          }
+        }
+        migratableResources {
+          edges {
+            node {
+              key,
             }
           }
         }

@@ -12,5 +12,8 @@ var dir_39efc1d70986be13555acc888df4ba30 =
     ] ],
     [ "MigratorMigrationsCommand.cs", "_migrator_migrations_command_8cs.html", [
       [ "MigratorMigrationsCommand", "class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_migrator_migrations_command.html", "class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_migrator_migrations_command" ]
+    ] ],
+    [ "ResourceMigrationCommand.cs", "_resource_migration_command_8cs.html", [
+      [ "ResourceMigrationCommand", "class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_resource_migration_command.html", "class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_resource_migration_command" ]
     ] ]
 ];

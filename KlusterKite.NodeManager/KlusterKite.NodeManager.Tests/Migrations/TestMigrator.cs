@@ -25,37 +25,40 @@ namespace KlusterKite.NodeManager.Tests.Migrations
     /// The test migrator
     /// </summary>
     [UsedImplicitly]
-    public class TestMigrator : IMigrator
+    public abstract class TestMigrator : IMigrator
     {
-        /// <summary>
-        /// The migrator config
-        /// </summary>
-        private readonly Config config;
-
-        /// <summary>
-        /// The list of defined migration points
-        /// </summary>
-        private readonly List<string> definedMigrationPoints;
-
-        /// <summary>
-        /// The list of defined migration resources
-        /// </summary>
-        private readonly List<string> resources;
-
         /// <inheritdoc />
         public TestMigrator(Config config)
         {
-            this.config = config;
-            this.definedMigrationPoints = config.GetStringList("TestMigrator.DefinedMigrationPoints").ToList();
-            this.resources = config.GetStringList("TestMigrator.Resources").ToList();
-            this.LatestPoint = this.definedMigrationPoints.Last();
+            this.Config = config;
         }
 
         /// <inheritdoc />
-        public string LatestPoint { get; }
+        public abstract EnResourceDependencyType DependencyType { get; }
 
         /// <inheritdoc />
-        public string Name => "Test migrator";
+        public string LatestPoint => this.DefinedMigrationPoints?.LastOrDefault();
+
+        /// <inheritdoc />
+        public abstract string Name { get; }
+
+        /// <inheritdoc />
+        public decimal Priority => 1M;
+
+        /// <summary>
+        /// Gets the migrator config
+        /// </summary>
+        protected Config Config { get; }
+
+        /// <summary>
+        /// Gets the list of defined migration points
+        /// </summary>
+        protected abstract List<string> DefinedMigrationPoints { get; }
+
+        /// <summary>
+        /// Gets the list of defined migration resources
+        /// </summary>
+        protected abstract List<string> Resources { get; }
 
         /// <summary>
         /// Sets the current migration point for the resource
@@ -70,41 +73,43 @@ namespace KlusterKite.NodeManager.Tests.Migrations
         /// <inheritdoc />
         public IEnumerable<string> GetAllPoints()
         {
-            if (this.config.GetBoolean("TestMigrator.ThrowOnGetAllPoints"))
+            if (this.Config.GetBoolean("TestMigrator.ThrowOnGetAllPoints"))
             {
                 throw new Exception("GetAllPoints failed");
             }
 
-            return this.definedMigrationPoints;
+            return this.DefinedMigrationPoints;
         }
 
         /// <inheritdoc />
         public string GetCurrentPoint(ResourceId resourceId)
         {
-            if (this.config.GetBoolean("TestMigrator.ThrowOnGetCurrentPoint"))
+            if (this.Config.GetBoolean("TestMigrator.ThrowOnGetCurrentPoint"))
             {
                 throw new Exception("GetCurrentPoint failed");
             }
 
-            if (!this.resources.Contains(resourceId.ConnectionString))
+            if (!this.Resources.Contains(resourceId.ConnectionString))
             {
                 throw new InvalidOperationException($"Unknown connection {resourceId.ConnectionString}");
             }
 
-            return File.Exists(resourceId.ConnectionString)
-                       ? File.ReadAllText(resourceId.ConnectionString)
-                       : this.definedMigrationPoints.Last();
+            var path = Path.Combine(this.Config.GetString("TestMigrator.Dir"), resourceId.ConnectionString);
+
+            return File.Exists(path)
+                       ? File.ReadAllText(path)
+                       : null;
         }
 
         /// <inheritdoc />
         public IEnumerable<ResourceId> GetMigratableResources()
         {
-            if (this.config.GetBoolean("TestMigrator.ThrowOnGetMigratableResources"))
+            if (this.Config.GetBoolean("TestMigrator.ThrowOnGetMigratableResources"))
             {
                 throw new Exception("GetMigratableResources failed");
             }
 
-            foreach (var resource in this.resources)
+            foreach (var resource in this.Resources)
             {
                 yield return new ResourceId
                                  {
@@ -118,23 +123,84 @@ namespace KlusterKite.NodeManager.Tests.Migrations
         /// <inheritdoc />
         public IEnumerable<string> Migrate(ResourceId resourceId, string pointToMigrate)
         {
-            if (this.config.GetBoolean("TestMigrator.ThrowOnMigrate"))
+            if (this.Config.GetBoolean("TestMigrator.ThrowOnMigrate"))
             {
                 throw new Exception("Migrate failed");
             }
 
-            if (!this.resources.Contains(resourceId.ConnectionString))
+            if (!this.Resources.Contains(resourceId.ConnectionString))
             {
                 throw new InvalidOperationException($"Unknown connection {resourceId.ConnectionString}");
             }
 
-            if (!this.definedMigrationPoints.Contains(pointToMigrate))
+            if (!this.DefinedMigrationPoints.Contains(pointToMigrate))
             {
-                throw new InvalidOperationException($"Unknown migration point {pointToMigrate}");
+                throw new InvalidOperationException($"Unknown migration point {pointToMigrate} among {string.Join(", ", this.DefinedMigrationPoints)}");
             }
 
-            SetMigrationPoint(resourceId.ConnectionString, pointToMigrate);
+            var path = Path.Combine(this.Config.GetString("TestMigrator.Dir"), resourceId.ConnectionString);
+            SetMigrationPoint(path, pointToMigrate);
             yield return "success";
+        }
+
+        /// <summary>
+        /// The dependence resource
+        /// </summary>
+        public class Dependence : TestMigrator
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TestMigrator.Dependence"/> class.
+            /// </summary>
+            /// <param name="config">
+            /// The config.
+            /// </param>
+            public Dependence(Config config)
+                : base(config)
+            {
+            }
+
+            /// <inheritdoc />
+            public override EnResourceDependencyType DependencyType => EnResourceDependencyType.CodeDependsOnResource;
+
+            /// <inheritdoc />
+            public override string Name => "Test dependence resource";
+
+            /// <inheritdoc />
+            protected override List<string> DefinedMigrationPoints => this.Config
+                .GetStringList("TestMigrator.Dependence.DefinedMigrationPoints").ToList();
+
+            /// <inheritdoc />
+            protected override List<string> Resources => this.Config.GetStringList("TestMigrator.Dependence.Resources").ToList();
+        }
+
+        /// <summary>
+        /// The dependent resource
+        /// </summary>
+        public class Dependent : TestMigrator
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TestMigrator.Dependent"/> class.
+            /// </summary>
+            /// <param name="config">
+            /// The config.
+            /// </param>
+            public Dependent(Config config)
+                : base(config)
+            {
+            }
+
+            /// <inheritdoc />
+            public override EnResourceDependencyType DependencyType => EnResourceDependencyType.ResourceDependsOnCode;
+
+            /// <inheritdoc />
+            public override string Name => "Test dependent resource";
+
+            /// <inheritdoc />
+            protected override List<string> DefinedMigrationPoints => this.Config
+                .GetStringList("TestMigrator.Dependent.DefinedMigrationPoints").ToList();
+
+            /// <inheritdoc />
+            protected override List<string> Resources => this.Config.GetStringList("TestMigrator.Dependent.Resources").ToList();
         }
     }
 }

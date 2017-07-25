@@ -41,11 +41,11 @@ export class NodesList extends React.Component {
   nodePopover(node) {
     return (
       <Popover title={`${node.nodeTemplate}`} id={`${node.nodeId}`}>
-        {false && node.modules.edges.map((subModuleEdge) => {
+        {node.modules.edges.map((subModuleEdge) => {
           const subModuleNode =  subModuleEdge.node;
           return (
             <span key={`${subModuleNode.id}`}>
-              <span className="label label-default">{subModuleNode.name}&nbsp;{subModuleNode.version}</span>{' '}
+              <span className="label label-default">{subModuleNode.__id}&nbsp;{subModuleNode.version}</span>{' '}
             </span>
           );
         })
@@ -268,6 +268,15 @@ export default Relay.createContainer(
                 port,
                 asString,
               },
+              modules {
+                edges {
+                  node {
+                    id,
+                    __id,
+                    version,
+                  }
+                }
+              },
             }
           }
         }
@@ -277,12 +286,4 @@ export default Relay.createContainer(
   },
 )
 
-// modules {
-//   edges {
-//     node {
-//       id,
-//         name,
-//         version,
-//     }
-//   }
-// }
+

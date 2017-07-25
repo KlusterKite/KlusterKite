@@ -83,7 +83,10 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
                                 };
             foreach (var enumValue in this.apiEnumType.Values)
             {
-                graphType.AddValue(enumValue, null, enumValue);
+                graphType.AddValue(
+                    enumValue,
+                    this.apiEnumType.Descriptions.TryGetValue(enumValue, out var description) ? description : null,
+                    enumValue);
             }
 
             return graphType;

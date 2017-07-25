@@ -19,7 +19,6 @@ namespace KlusterKite.Web.GraphQL.Publisher
 
     using JetBrains.Annotations;
 
-    using KlusterKite.Security.Attributes;
     using KlusterKite.Web.Authorization;
 
     using Microsoft.AspNetCore.Mvc;
@@ -124,7 +123,7 @@ namespace KlusterKite.Web.GraphQL.Publisher
                 inputs = ((JValue)variablesToken).ToObject<string>()?.ToInputs();
             }
 
-            RequestContext requestContext = this.GetRequestDescription();
+            var requestContext = this.GetRequestDescription();
             var schema = this.schemaProvider.CurrentSchema;
             if (schema == null)
             {

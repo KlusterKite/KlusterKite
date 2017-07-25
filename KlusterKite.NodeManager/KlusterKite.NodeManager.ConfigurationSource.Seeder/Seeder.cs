@@ -101,21 +101,24 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                     connectionString,
                     databaseName))
             {
-                var databaseCreator = context.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
-                if (databaseCreator == null)
+                if (databaseProviderName != "InMemory")
                 {
-                    Console.WriteLine(@"Error - could not check database existence. There is no IDatabaseCreator.");
-                    return;
+                    var databaseCreator = context.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+                    if (databaseCreator == null)
+                    {
+                        Console.WriteLine(@"Error - could not check database existence. There is no IDatabaseCreator.");
+                        return;
+                    }
+
+                    if (databaseCreator.Exists())
+                    {
+                        Console.WriteLine(@"KlusterKite configuration database is already existing");
+                        return;
+                    }
+
+                    context.Database.Migrate();
                 }
 
-                if (databaseCreator.Exists())
-                {
-                    Console.WriteLine(@"KlusterKite configuration database is already existing");
-                    return;
-                }
-
-                context.Database.Migrate();
-                
                 this.SetupUsers(context);
                 var configuration =
                     new ConfigurationSettings

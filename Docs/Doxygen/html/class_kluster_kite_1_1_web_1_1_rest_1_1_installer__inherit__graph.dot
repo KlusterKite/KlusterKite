@@ -1,8 +1,0 @@
-digraph "KlusterKite.Web.Rest.Installer"
-{
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  Node0 [label="KlusterKite.Web.Rest.Installer",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
-  Node1 -> Node0 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1 [label="BaseInstaller",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_kluster_kite_1_1_core_1_1_base_installer.html",tooltip="Base class to install KlusterKite plugin components "];
-}

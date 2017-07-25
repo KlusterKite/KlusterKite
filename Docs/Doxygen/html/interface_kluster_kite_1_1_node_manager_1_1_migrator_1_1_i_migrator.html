@@ -100,7 +100,11 @@ Inheritance diagram for KlusterKite.NodeManager.Migrator.IMigrator:</div>
   <map id="KlusterKite.NodeManager.Migrator.IMigrator_map" name="KlusterKite.NodeManager.Migrator.IMigrator_map">
 <area href="class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html" title="The base class for Entity Framework Code-first migrations " alt="KlusterKite.NodeManager.Migrator.EF.BaseDatabaseMigrator&lt; TContext &gt;" shape="rect" coords="0,56,435,80"/>
 <area href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html" title="Mock resource to test system migrations " alt="KlusterKite.NodeManager.Mock.MockResourceMigrator" shape="rect" coords="445,56,880,80"/>
-<area href="class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator.html" title="The test migrator " alt="KlusterKite.NodeManager.Tests.Migrations.TestMigrator" shape="rect" coords="890,56,1325,80"/>
+<area href="class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator.html" title="The test migrator " alt="KlusterKite.NodeManager.Tests.Migrations.TestMigrator" shape="rect" coords="1335,56,1770,80"/>
+<area href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependence.html" title="The mock resource to implement EnResourceDependencyType.CodeDependsOnResource " alt="KlusterKite.NodeManager.Mock.MockResourceMigratorDependence" shape="rect" coords="222,112,657,136"/>
+<area href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependent.html" title="The mock resource to implement EnResourceDependencyType.ResourceDependsOnCode " alt="KlusterKite.NodeManager.Mock.MockResourceMigratorDependent" shape="rect" coords="667,112,1102,136"/>
+<area href="class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator_1_1_dependence.html" title="The dependence resource " alt="KlusterKite.NodeManager.Tests.Migrations.TestMigrator.Dependence" shape="rect" coords="1112,112,1547,136"/>
+<area href="class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator_1_1_dependent.html" title="The dependent resource " alt="KlusterKite.NodeManager.Tests.Migrations.TestMigrator.Dependent" shape="rect" coords="1557,112,1992,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -127,6 +131,12 @@ Properties</h2></td></tr>
 <tr class="memitem:aacbb7b707c551184d169660830462cea"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#aacbb7b707c551184d169660830462cea">Name</a><code> [get]</code></td></tr>
 <tr class="memdesc:aacbb7b707c551184d169660830462cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the human-readable migrator name  <a href="#aacbb7b707c551184d169660830462cea">More...</a><br /></td></tr>
 <tr class="separator:aacbb7b707c551184d169660830462cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac85740451850fb2508c443265ca7d64e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_migrator.html#a535524003dc3ff11f85e4705762419cf">EnResourceDependencyType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#ac85740451850fb2508c443265ca7d64e">DependencyType</a><code> [get]</code></td></tr>
+<tr class="memdesc:ac85740451850fb2508c443265ca7d64e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the type of resource dependency  <a href="#ac85740451850fb2508c443265ca7d64e">More...</a><br /></td></tr>
+<tr class="separator:ac85740451850fb2508c443265ca7d64e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f87092677ace659642429a0e88620de"><td class="memItemLeft" align="right" valign="top">decimal&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#a2f87092677ace659642429a0e88620de">Priority</a><code> [get]</code></td></tr>
+<tr class="memdesc:a2f87092677ace659642429a0e88620de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the priority of execution. In case of migration, the migrators will be run in order of priority from largest to lowest  <a href="#a2f87092677ace659642429a0e88620de">More...</a><br /></td></tr>
+<tr class="separator:a2f87092677ace659642429a0e88620de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Base class for all cluster system migrations </p>
@@ -242,11 +252,37 @@ Properties</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The list of log messages</dd></dl>
 
-<p>Implemented in <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator.html#a0ed30cfb2fb70bd8d658f8cbff2adc31">KlusterKite.NodeManager.Tests.Migrations.TestMigrator</a>, <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#ab6a8a5350dde015897c7c0d0af023d96">KlusterKite.NodeManager.Migrator.EF.BaseDatabaseMigrator&lt; TContext &gt;</a>, and <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a3050e53e0e53a3e634a13eb7109c0d8b">KlusterKite.NodeManager.Mock.MockResourceMigrator</a>.</p>
+<p>Implemented in <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator.html#a0ed30cfb2fb70bd8d658f8cbff2adc31">KlusterKite.NodeManager.Tests.Migrations.TestMigrator</a>, <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a3050e53e0e53a3e634a13eb7109c0d8b">KlusterKite.NodeManager.Mock.MockResourceMigrator</a>, and <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html#ab6a8a5350dde015897c7c0d0af023d96">KlusterKite.NodeManager.Migrator.EF.BaseDatabaseMigrator&lt; TContext &gt;</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Property Documentation</h2>
+<a id="ac85740451850fb2508c443265ca7d64e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac85740451850fb2508c443265ca7d64e">&#9670;&nbsp;</a></span>DependencyType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_migrator.html#a535524003dc3ff11f85e4705762419cf">EnResourceDependencyType</a> KlusterKite.NodeManager.Migrator.IMigrator.DependencyType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the type of resource dependency </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_migrator_8cs_source.html#l00032">32</a> of file <a class="el" href="_i_migrator_8cs_source.html">IMigrator.cs</a>.</p>
+
+</div>
+</div>
 <a id="a2bc2ac96b487353d75aecfa141ad3361"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2bc2ac96b487353d75aecfa141ad3361">&#9670;&nbsp;</a></span>LatestPoint</h2>
 
@@ -296,6 +332,32 @@ Properties</h2></td></tr>
 <p>Gets the human-readable migrator name </p>
 
 <p class="definition">Definition at line <a class="el" href="_i_migrator_8cs_source.html#l00027">27</a> of file <a class="el" href="_i_migrator_8cs_source.html">IMigrator.cs</a>.</p>
+
+</div>
+</div>
+<a id="a2f87092677ace659642429a0e88620de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f87092677ace659642429a0e88620de">&#9670;&nbsp;</a></span>Priority</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">decimal KlusterKite.NodeManager.Migrator.IMigrator.Priority</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the priority of execution. In case of migration, the migrators will be run in order of priority from largest to lowest </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_migrator_8cs_source.html#l00037">37</a> of file <a class="el" href="_i_migrator_8cs_source.html">IMigrator.cs</a>.</p>
 
 </div>
 </div>

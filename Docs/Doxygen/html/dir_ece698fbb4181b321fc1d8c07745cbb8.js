@@ -1,10 +1,11 @@
 var dir_ece698fbb4181b321fc1d8c07745cbb8 =
 [
-    [ "obj", "dir_7d178cb3c1b54ed5348b481e7f5f20de.html", "dir_7d178cb3c1b54ed5348b481e7f5f20de" ],
     [ "BaseActorTest.cs", "_base_actor_test_8cs.html", [
       [ "BaseActorTest", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_base_actor_test" ]
     ] ],
-    [ "ClusterExtensions.cs", "_cluster_extensions_8cs.html", null ],
+    [ "ClusterExtensions.cs", "_cluster_extensions_8cs.html", [
+      [ "ClusterExtensions", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_cluster_extensions.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_cluster_extensions" ]
+    ] ],
     [ "HackedBaseActorTest.cs", "_hacked_base_actor_test_8cs.html", [
       [ "HackedBaseActorTest", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_hacked_base_actor_test.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_hacked_base_actor_test" ],
       [ "TestDescription", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_hacked_base_actor_test_1_1_test_description.html", "class_kluster_kite_1_1_core_1_1_test_kit_1_1_hacked_base_actor_test_1_1_test_description" ]

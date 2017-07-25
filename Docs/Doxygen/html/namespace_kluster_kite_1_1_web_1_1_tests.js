@@ -5,6 +5,7 @@ var namespace_kluster_kite_1_1_web_1_1_tests =
     [ "GraphQL", "namespace_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l.html", "namespace_kluster_kite_1_1_web_1_1_tests_1_1_graph_q_l" ],
     [ "ControllerTests", "class_kluster_kite_1_1_web_1_1_tests_1_1_controller_tests.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_controller_tests" ],
     [ "NginxConfiguratorTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_nginx_configurator_test.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_nginx_configurator_test" ],
+    [ "RestSharpUtils", "class_kluster_kite_1_1_web_1_1_tests_1_1_rest_sharp_utils.html", null ],
     [ "WebDescriptorTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_descriptor_test.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_descriptor_test" ],
     [ "WebTest", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_test.html", "class_kluster_kite_1_1_web_1_1_tests_1_1_web_test" ]
 ];

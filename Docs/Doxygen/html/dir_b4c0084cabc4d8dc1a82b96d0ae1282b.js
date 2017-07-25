@@ -1,6 +1,5 @@
 var dir_b4c0084cabc4d8dc1a82b96d0ae1282b =
 [
-    [ "obj", "dir_45f6da7fed71da1beef2d162e2987d25.html", "dir_45f6da7fed71da1beef2d162e2987d25" ],
     [ "EnParcelServerResponseCode.cs", "_en_parcel_server_response_code_8cs.html", "_en_parcel_server_response_code_8cs" ],
     [ "Installer.cs", "_kluster_kite_8_large_objects_2_kluster_kite_8_large_objects_8_client_2_installer_8cs.html", [
       [ "Installer", "class_kluster_kite_1_1_large_objects_1_1_client_1_1_installer.html", "class_kluster_kite_1_1_large_objects_1_1_client_1_1_installer" ]

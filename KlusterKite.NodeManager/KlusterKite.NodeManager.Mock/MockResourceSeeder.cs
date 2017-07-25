@@ -40,7 +40,16 @@ namespace KlusterKite.NodeManager.Mock
         public override void Seed()
         {
             Console.WriteLine(@"MockResourceSeeder: started");
-            var migrator = new MockResourceMigrator(this.config);
+            this.Seed(new MockResourceMigratorDependence(this.config));
+            this.Seed(new MockResourceMigratorDependent(this.config));
+        }
+
+        /// <summary>
+        /// Seeds all points of the migrator
+        /// </summary>
+        /// <param name="migrator">The migrator</param>
+        private void Seed(IMigrator migrator)
+        {
             foreach (var resource in migrator.GetMigratableResources())
             {
                 Console.WriteLine($@"MockResourceSeeder: migrating {resource.Code}");

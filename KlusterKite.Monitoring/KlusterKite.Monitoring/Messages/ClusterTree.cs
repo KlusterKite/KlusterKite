@@ -26,10 +26,34 @@ namespace KlusterKite.Monitoring.Messages
     public class ClusterTree
     {
         /// <summary>
+        /// Gets the maximum queue size among tree nodes
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("Gets the maximum queue size among tree nodes")]
+        public int MaxQueueSize
+        {
+            get
+            {
+                return (this.Nodes?.Count ?? 0) == 0
+                           ? 0
+
+                           // ReSharper disable once PossibleNullReferenceException
+                           : this.Nodes.Values.Max(n => Math.Max(n.MaxQueueSize, n.QueueSize));
+            }
+        }
+
+        /// <summary>
         /// Gets the list of nodes
         /// </summary>
         [DeclareField("Gets the list of nodes", Converter = typeof(DictionaryConverter<string, Node>))]
         public Dictionary<string, Node> Nodes { get; } = new Dictionary<string, Node>();
+
+        /// <summary>
+        /// Gets the nodes flat list
+        /// </summary>
+        [UsedImplicitly]
+        [DeclareField("Gets the  nodes flat list")]
+        public IEnumerable<Node> NodesFlat => this.FlattenTree(this.Nodes.Values);
 
         /// <summary>
         /// Gets the sum of queue size across tree
@@ -40,26 +64,31 @@ namespace KlusterKite.Monitoring.Messages
         {
             get
             {
-                return (this.Nodes?.Count ?? 0) == 0 
-                    ? 0 
-                      // ReSharper disable once PossibleNullReferenceException
-                    : this.Nodes.Values.Sum(n => n.QueueSizeSum + n.QueueSize);
+                return (this.Nodes?.Count ?? 0) == 0
+                           ? 0
+
+                           // ReSharper disable once PossibleNullReferenceException
+                           : this.Nodes.Values.Sum(n => n.QueueSizeSum + n.QueueSize);
             }
         }
 
         /// <summary>
-        /// Gets the maximum queue size among tree nodes
+        /// Flattens tree of nodes
         /// </summary>
-        [UsedImplicitly]
-        [DeclareField("Gets the maximum queue size among tree nodes")]
-        public int MaxQueueSize
+        /// <param name="nodesValues">The list of nodes</param>
+        /// <returns>The flattened tree of nodes</returns>
+        private IEnumerable<Node> FlattenTree(IEnumerable<Node> nodesValues)
         {
-            get
+            foreach (var node in nodesValues)
             {
-                return (this.Nodes?.Count ?? 0) == 0
-                    ? 0
-                    // ReSharper disable once PossibleNullReferenceException
-                    : this.Nodes.Values.Max(n => Math.Max(n.MaxQueueSize, n.QueueSize));
+                yield return node;
+                if (node.Children != null)
+                {
+                    foreach (var child in this.FlattenTree(node.Children))
+                    {
+                        yield return child;
+                    }
+                }
             }
         }
     }

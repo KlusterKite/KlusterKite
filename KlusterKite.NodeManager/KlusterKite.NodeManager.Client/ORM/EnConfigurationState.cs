@@ -42,9 +42,15 @@ namespace KlusterKite.NodeManager.Client.ORM
         Faulted,
 
         /// <summary>
-        /// This configuration is obsolete and was replaced by some new one
+        /// This configuration is obsolete
         /// </summary>
-        [ApiDescription("This configuration is obsolete and was replaced by some new one")]
-        Obsolete
+        [ApiDescription("This configuration is obsolete")]
+        Obsolete,
+
+        /// <summary>
+        /// This configuration was once published, but now is replaced with the new one
+        /// </summary>
+        [ApiDescription("This configuration was once published, but now is replaced with the new one")]
+        Archived
     }
 }

@@ -2,8 +2,8 @@ import Relay from 'react-relay'
 
 export default class UpdateFeedMutation extends Relay.Mutation {
   static fragments = {
-    configuration: () => Relay.QL`
-      fragment on IKlusterKiteNodeApi_ReleaseConfiguration {
+    settings: () => Relay.QL`
+      fragment on IKlusterKiteNodeApi_ConfigurationSettings {
         nodeTemplates {
           edges {
             node {
@@ -47,7 +47,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
           }
         }
         nugetFeed
-        packages {
+        packages(sort: id_asc) {
           edges {
             node {
               version
@@ -63,12 +63,12 @@ export default class UpdateFeedMutation extends Relay.Mutation {
   };
 
   getMutation () {
-    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_releases_update}`
+    return Relay.QL`mutation{klusterKiteNodeApi_klusterKiteNodesApi_configurations_update}`
   }
 
   getFatQuery () {
     return Relay.QL`
-      fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+      fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
         node
         edge
         errors {
@@ -81,7 +81,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
         }
         api {
           klusterKiteNodesApi {
-            releases
+            configurations
           }
         }
       }
@@ -93,7 +93,7 @@ export default class UpdateFeedMutation extends Relay.Mutation {
       type: 'REQUIRED_CHILDREN',
       children: [
         Relay.QL`
-          fragment on KlusterKiteNodeApi_Release_NodeMutationPayload {
+          fragment on KlusterKiteNodeApi_Configuration_NodeMutationPayload {
             errors {
               edges {
                 node {
@@ -119,6 +119,8 @@ export default class UpdateFeedMutation extends Relay.Mutation {
     const oldNodes = edges.map(x => x.node);
     const typeSingular = type.substring(0, type.length - 1);
 
+    // We iterate over old edge and search for updates of every record in this.props[typeSingular]
+    // Also we change id's (from __id to id) because ID types are different in input and output
     let nodes = [];
     oldNodes.forEach(node => {
       const keys = Object.keys(node);
@@ -173,6 +175,11 @@ export default class UpdateFeedMutation extends Relay.Mutation {
       nodes = this.props[typeSingular];
     }
 
+    // packagesList is passed as a simple object array, without id's
+    if (type === 'packages' && this.props['packagesList']) {
+      nodes = this.props['packagesList'];
+    }
+
     return nodes;
   }
 
@@ -182,8 +189,6 @@ export default class UpdateFeedMutation extends Relay.Mutation {
    * @return {string[]} Updated seed addresses list
    */
   updateSeedAddresses(seedAddresses) {
-    console.log('old seedAddresses', seedAddresses);
-    console.log('new seedAddresses', this.props.seedAddresses);
     if (this.props.seedAddresses) {
       return this.props.seedAddresses;
     }
@@ -193,15 +198,15 @@ export default class UpdateFeedMutation extends Relay.Mutation {
 
   getVariables () {
     return {
-      id: this.props.releaseId,
+      id: this.props.configurationId,
       newNode: {
-        id: this.props.releaseId,
-        configuration: {
-          nodeTemplates: this.convertEdgesToArray(this.props.configuration.nodeTemplates.edges, 'nodeTemplates'),
-          migratorTemplates: this.convertEdgesToArray(this.props.configuration.migratorTemplates.edges, 'migratorTemplates'),
-          nugetFeed: this.props.nugetFeed || this.props.configuration.nugetFeed,
-          packages: this.convertEdgesToArray(this.props.configuration.packages.edges, 'packages'),
-          seedAddresses: this.updateSeedAddresses(this.props.configuration.seedAddresses),
+        id: this.props.configurationId,
+        settings: {
+          nodeTemplates: this.convertEdgesToArray(this.props.settings.nodeTemplates.edges, 'nodeTemplates'),
+          migratorTemplates: this.convertEdgesToArray(this.props.settings.migratorTemplates.edges, 'migratorTemplates'),
+          nugetFeed: this.props.nugetFeed || this.props.settings.nugetFeed,
+          packages: this.convertEdgesToArray(this.props.settings.packages.edges, 'packages'),
+          seedAddresses: this.updateSeedAddresses(this.props.settings.seedAddresses),
         },
       }
     }
@@ -211,13 +216,13 @@ export default class UpdateFeedMutation extends Relay.Mutation {
     return {
       model: {
         id: this.props.nodeId,
-        configuration: {
-          nodeTemplates: this.props.configuration.nodeTemplates,
-          migratorTemplates: this.props.configuration.migratorTemplates,
-          nugetFeed: this.props.configuration.nugetFeed,
-          packages: this.props.configuration.packages,
-          seedAddresses: this.props.configuration.seedAddresses,
-          id: this.props.configuration.id
+        settings: {
+          nodeTemplates: this.props.settings.nodeTemplates,
+          migratorTemplates: this.props.settings.migratorTemplates,
+          nugetFeed: this.props.settings.nugetFeed,
+          packages: this.props.settings.packages,
+          seedAddresses: this.props.settings.seedAddresses,
+          id: this.props.settings.id
         },
       },
     }
