@@ -1,0 +1,4 @@
+var class_kluster_kite_1_1_node_manager_1_1_tests_1_1_configuration_source_tests_1_1_configurator =
+[
+    [ "GetPluginInstallers", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_configuration_source_tests_1_1_configurator.html#ad37771573379231331baf646fff230c7", null ]
+];

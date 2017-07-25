@@ -1,0 +1,14 @@
+group NetcoreBuild
+    source https://api.nuget.org/v3/index.json   
+    nuget Fake.Core.Targets prerelease
+	nuget Fake.Core.Environment prerelease
+	nuget Fake.Core.Process prerelease
+	nuget Fake.DotNet.MsBuild prerelease	
+	nuget Fake.DotNet.NuGet prerelease		
+	nuget Fake.IO.FileSystem prerelease	
+	nuget Microsoft.Build
+	nuget NuGet.Protocol.Core.v3
+	nuget Npm
+	nuget Microsoft.NETCore.UniversalWindowsPlatform 5.1.0
+
+	

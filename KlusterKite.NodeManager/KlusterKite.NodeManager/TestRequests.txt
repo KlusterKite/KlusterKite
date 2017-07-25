@@ -1,0 +1,210 @@
+﻿-- Create migration
+
+mutation newMigration {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCreate(input: {newConfigurationId: 2}) {
+    result {
+      result {
+        state,
+        direction,
+        started,
+        finished
+      }
+      errors {
+        count,
+        edges {
+          node {
+            number,
+            field,
+            message
+          }
+        }
+      }
+    }
+  }
+}
+
+
+--- Migration state
+{
+  api {
+    klusterKiteNodesApi {
+      clusterManagement {
+        currentConfiguration {
+          __id
+        }
+        currentMigration {
+          state          
+          started
+          finished
+          logs {
+            edges {
+              node {
+                started
+                finished
+                type
+                sourcePoint
+                destinationPoint
+                message
+                errorStackTrace
+                migratorTemplateCode
+                migratorTemplateName
+                migratorTypeName
+                migratorName
+                resourceCode
+                resourceName
+              }
+            }
+          }
+        }
+        resourceState {
+          operationIsInProgress
+          canCreateMigration
+          canMigrateResources
+          canUpdateNodesToDestination
+          canUpdateNodesToSource
+          canCancelMigration
+          canFinishMigration
+          migrationState {            
+            templateStates {
+              edges {
+                node {
+                  code
+                   migrators {
+                    edges {
+                      node {
+                        typeName
+                        name                        
+                        direction
+                        resources {
+                          edges {
+                            node {
+                              sourcePoint
+                              destinationPoint                              
+                              migrationToSourceExecutor
+                              migrationToDestinationExecutor
+                              name
+                              code
+                              currentPoint
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          configurationState {
+            states {
+              edges {
+                node {
+                  code
+                  template {
+                    id
+                  }
+                  migratorsStates {
+                    edges {
+                      node {
+                        typeName
+                        name
+                        migrationPoints
+                        lastDefinedPoint
+                        resources {
+                          edges {
+                            node {
+                              name
+                              code
+                              currentPoint
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+-- Update nodes
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationNodesUpdate(input: {target: Destination}) {
+    result
+  }
+}
+
+-- Update resources 
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "KlusterKite", migratorTypeName: "KlusterKite.NodeManager.ConfigurationSource.ConfigurationMigrator", resourceCode: "configDB", target: Destination}]}}) {
+    result 
+  }
+}
+
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "KlusterKite", migratorTypeName: "KlusterKite.NodeManager.Mock.MockResourceMigratorDependence", resourceCode: "resource-1", target: Destination}]}}) {
+    result 
+  }
+}
+
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationResourceUpdate(input: {request: {resources: [{templateCode: "KlusterKite", migratorTypeName: "KlusterKite.NodeManager.Mock.MockResourceMigratorDependent", resourceCode: "resource-1", target: Destination}]}}) {
+    result 
+  }
+}
+
+
+-- finish migration
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationFinish {
+    result
+  }
+}
+
+-- cancel migration
+mutation {
+  klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationCancel {
+    result
+  }
+}
+
+-- migrations data
+{
+  api {
+    klusterKiteNodesApi {
+      migrations {
+        count
+        edges {
+          node {
+            isActive
+            state
+            direction
+            started
+            finished
+            logs {
+              edges {
+                node {
+                  started
+                  finished
+                  type
+                  sourcePoint
+                  destinationPoint
+                  
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,47 @@
+@startuml
+
+() "Entry point"
+
+cloud {
+	package "fixed address nodes" {
+		[Publisher node 1]
+		[Publisher node 2]
+		[Publisher node ...]
+	}
+
+	package "flexible address nodes" {
+		[API 1 node 1]
+		[API 1 node 2]
+		[API 1 node ...]
+		[API 2 node 1]
+		[API 2 node 2]
+		[API 2 node ...]
+	}
+}
+
+() "Entry point" --> [Publisher node 1]
+() "Entry point" --> [Publisher node 2]
+() "Entry point" --> [Publisher node ...]
+
+[Publisher node 1] --> [API 1 node 1]
+[Publisher node 1] --> [API 1 node 2]
+[Publisher node 1] --> [API 1 node ...]
+[Publisher node 1] --> [API 2 node 1]
+[Publisher node 1] --> [API 2 node 2]
+[Publisher node 1] --> [API 2 node ...]
+
+[Publisher node 2] --> [API 1 node 1]
+[Publisher node 2] --> [API 1 node 2]
+[Publisher node 2] --> [API 1 node ...]
+[Publisher node 2] --> [API 2 node 1]
+[Publisher node 2] --> [API 2 node 2]
+[Publisher node 2] --> [API 2 node ...]
+
+[Publisher node ...] --> [API 1 node 1]
+[Publisher node ...] --> [API 1 node 2]
+[Publisher node ...] --> [API 1 node ...]
+[Publisher node ...] --> [API 2 node 1]
+[Publisher node ...] --> [API 2 node 2]
+[Publisher node ...] --> [API 2 node ...]
+
+@enduml

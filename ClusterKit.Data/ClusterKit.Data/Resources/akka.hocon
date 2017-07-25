@@ -1,9 +1,0 @@
-﻿{
-	#Limiting the maximum elements retrieved in one query. 0 - for unlimited
-	ClusterKit.Data.Crud.Query.Limits {
-		#The default limit value
-		Default = 100		
-		#You can set individual setting for the object type like this
-		#"Path.To.Namespace.ClassName" = 50
-	}
-}

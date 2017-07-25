@@ -1,0 +1,18 @@
+{	
+	akka.actor.deployment {
+	       /NodeManager {
+	    	IsNameSpace = true
+	       }
+
+               /NodeManager/Receiver {
+                        type = "KlusterKite.NodeManager.Client.NodeManagerReceiverActor, KlusterKite.NodeManager.Client"
+               }
+        
+                /NodeManager/NodeManagerProxy {
+        	       actor-type = SingletonProxy
+        	       singleton-name = NodeManager
+        	       singleton-path = "/user/NodeManager/Manager"
+        	       singleton-node-role = NodeManager            
+                }
+ 	}
+}

@@ -1,0 +1,4 @@
+var class_kluster_kite_1_1_security_1_1_tests_1_1_privilege_description_tests_1_1_nested_privileges =
+[
+    [ "NestedPrivilege", "class_kluster_kite_1_1_security_1_1_tests_1_1_privilege_description_tests_1_1_nested_privileges.html#a5a908bb31b8bff3ad99efcb8d3465e42", null ]
+];

@@ -1,5 +1,0 @@
-{
-	ClusterKit.Security.SessionRedis.RedisConnection = "redis:6379"
-	ClusterKit.Security.SessionRedis.RedisDb = 1
-	ClusterKit.Security.SessionRedis.TokenKeyPrefix = "ClusterKit.Security.SessionRedis:"
-}

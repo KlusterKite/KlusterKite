@@ -1,0 +1,47 @@
+﻿{
+	ExecutionFramework = ".NETFramework,Version=v4.6"
+
+	Nuget = "http://nuget/"
+	NugetCheckPeriod = 30s
+
+	SeederConfigurations = [
+		"Seeders.Postgres"
+	]
+
+	Seeders {
+		Postgres {
+			RequiredPackages = [
+				"KlusterKite.Data.EF.Npgsql",
+				"KlusterKite.NodeManager.Seeder",
+				"KlusterKite.NodeManager.ConfigurationSource.Seeder"
+			]
+
+			Seeders = [
+				"KlusterKite.NodeManager.ConfigurationSource.Seeder.Seeder, KlusterKite.NodeManager.ConfigurationSource.Seeder"
+			]
+		}
+	}
+
+	KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
+	KlusterKite.NodeManager.ConfigurationDatabaseName = "KlusterKite.NodeManagerConfiguration"
+	KlusterKite.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"
+	KlusterKite.NodeManager.Seeds = [
+		"akka.tcp://KlusterKite@seed:3090"
+	]
+	KlusterKite.NodeManager.NugetFeeds {
+		publicFeed {
+                       address = "/opt/packageCache"
+                       type = public
+               } 
+               privateFeed {
+                       address = "http://nuget/"
+                       type = private
+               } 
+	
+	}
+
+	KlusterKite.NodeManager.SupportedFrameworks = [
+		".NETFramework,Version=v4.6",
+		".NETCoreApp,Version=v1.1"
+	]
+}

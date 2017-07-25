@@ -1,0 +1,64 @@
+.actors-tree {
+}
+
+.node circle {
+  stroke-width: 0;
+  fill: none;
+}
+
+.node text {
+  font: 10px sans-serif;
+}
+
+.node--internal circle {
+  stroke: #555;
+  stroke-width: 2px;
+}
+
+.node--internal text {
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+}
+
+.node--ok circle {
+  fill: #5CB85C;
+}
+
+.node--warning circle {
+  fill: #EC971F;
+}
+
+.node--error circle {
+  fill: #D9534F;
+}
+
+.link {
+  fill: none;
+  stroke: #555;
+  stroke-opacity: 0.4;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #4CAE4C;
+}
+
+.link--warning {
+  stroke: #EEA236;
+}
+
+.link--error {
+  stroke: #D43F3A;
+}
+
+div.tooltip {
+  position: absolute;
+  pointer-events: none;
+}
+
+.wellTooltip {
+  margin: 0;
+}
+
+.text-margined {
+  margin-top: 10px;
+}

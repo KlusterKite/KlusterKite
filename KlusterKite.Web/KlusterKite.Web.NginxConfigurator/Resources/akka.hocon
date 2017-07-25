@@ -1,0 +1,38 @@
+ {
+	KlusterKite {
+ 		Web {
+          
+ 			Nginx {
+ 				// PathToConfig = "[PathToConfig]"
+ 				// ReloadCommand {
+                //  Command = /etc/init.d/nginx
+                //  Arguments = reload
+                //} 
+ 				Configuration {
+ 					//default {
+ 					//	listen: "80" //nginx configuration for listen directive in server part
+ 						//server_name: "localhost" configuration for server_name directive in server part
+ 						//Static { // you can define static content. This part will be just inserted into nginx config
+			            //    "/" = "
+			            //      root /var/www/root
+			            //    ";
+			            //  }
+ 					//}
+ 				}
+ 			}
+ 		}
+ 	}
+
+ 	akka.actor.deployment {
+ 		 /Web {
+            IsNameSpace = true
+        }
+ 		 /Web/Nginx {
+            type = "KlusterKite.Core.NameSpaceActor, KlusterKite.Core"
+        }                
+
+        /Web/Nginx/Configurator {
+            type = "KlusterKite.Web.NginxConfigurator.NginxConfiguratorActor, KlusterKite.Web.NginxConfigurator"
+        }
+ 	}
+ }

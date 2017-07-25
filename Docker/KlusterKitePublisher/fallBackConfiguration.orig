@@ -1,0 +1,40 @@
+{
+  "Configuration": "{\n   KlusterKite {\n     Web {\n       Nginx {\n         PathToConfig = \"/etc/nginx/sites-enabled/klusterkite.config\"\n         ReloadCommand {\n           Command = /etc/init.d/nginx\n           Arguments = reload\n         } \n         Configuration {\n           default {\n             \"location /klusterkite\" { \n               proxy_pass = \"http://monitoringUI/klusterkite\"\n             }\n           }\n         }\n       }\n     }\n   }\n}",
+  "NodeTemplate": "publisher",
+  "ConfigurationId": 1,
+  "Packages": [
+    {
+      "Id": "KlusterKite.Core.Service",
+      "Version": "0.0.0-local"
+    },
+    {
+
+      "Id": "KlusterKite.Web.NginxConfigurator",
+      "Version": "0.0.0-local"
+    },
+    {
+
+      "Id": "KlusterKite.NodeManager.Client",
+      "Version": "0.0.0-local"
+    },
+    {
+
+      "Id": "KlusterKite.Log.Console",
+      "Version": "0.0.0-local"
+    },
+    {
+
+      "Id": "KlusterKite.Log.ElasticSearch",
+      "Version": "0.0.0-local"
+    },
+    {
+
+      "Id": "KlusterKite.Monitoring.Client",
+      "Version": "0.0.0-local"
+    }
+  ],
+  "PackageSource": "http://nuget/",
+  "Seeds": [
+    "akka.tcp://KlusterKite@seed:3090"
+  ]
+}

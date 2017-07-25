@@ -1,0 +1,89 @@
+.buttons-block-margin {
+  margin-top: 15px;
+}
+
+ul.migration-steps {
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  margin: 20px 0 0 0;
+  padding: 0;
+}
+
+ul.migration-steps li {
+  list-style-type: none;
+  display: table-cell;
+  text-align: center;
+}
+
+ul.migration-steps li div {
+  text-align: center;
+}
+
+ul.migration-steps li span.index {
+  border-radius: 20px;
+  border: 1px solid #f35b3e;
+  background-color: #fff;
+  color: #f35b3e;
+  padding: 5px 10px;
+}
+
+ul.migration-steps li.active span.index {
+  border: 1px solid #f35b3e;
+  background-color: #f35b3e;
+  color: #fff;
+}
+
+ul.migration-steps li p.title {
+  margin-top: 10px;
+  color: #f35b3e;
+}
+
+ul.migration-steps li hr {
+  margin-bottom: -11px;
+  border-color: #cccccc;
+  width: 50%;
+  float: left;
+}
+
+ul.migration-steps li hr.active {
+  border-color: #f35b3e;
+}
+
+ul.migration-steps li hr.empty {
+  border-color: #fff;
+}
+
+.migration-controls {
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.migration-controls p {
+  color: #000;
+}
+
+.table>tbody>tr>td.migration-resources {
+  vertical-align: middle;
+}
+
+.migration-upgrade {
+  min-width: 60px;
+  text-align: center;
+  background-color: lightgreen;
+}
+
+.migration-downgrade {
+  min-width: 60px;
+  text-align: center;
+  background-color: lightcoral;
+}
+
+.migration-logs {
+  margin-top: 20px;
+}
+
+.migration-title {
+  margin-top: 30px;
+}

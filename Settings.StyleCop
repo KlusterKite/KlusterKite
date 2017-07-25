@@ -15,6 +15,8 @@
       <Value>Xunit</Value>
       <Value>OAuth</Value>
       <Value>redis</Value>
+      <Value>rollbacked</Value>
+      <Value>rollbacking</Value>
       <Value>serilog</Value>
       <Value>Sharding</Value>
       <Value>sharded</Value>
@@ -22,22 +24,26 @@
       <Value>parameterless</Value>
       <Value>postgres</Value>
       <Value>precompiled</Value>
+      <Value>prioritised</Value>
       <Value>tcp</Value>
       <Value>nginx</Value>
       <Value>Npgsql</Value>
       <Value>nuget</Value>
       <Value>nuspec</Value>
+      <Value>nullable</Value>
+      <Value>migratable</Value>
       <Value>ui</Value>
       <Value>uid</Value>
       <Value>urls</Value>
       <Value>untyped</Value>
       <Value>web-api</Value>
+      <Value>KlusterKite</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>
     <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
       <AnalyzerSettings>
-        <StringProperty Name="CompanyName">ClusterKit</StringProperty>
+        <StringProperty Name="CompanyName">KlusterKite</StringProperty>
         <StringProperty Name="Copyright">All rights reserved</StringProperty>
       </AnalyzerSettings>
     </Analyzer>
@@ -62,11 +68,23 @@
       <AnalyzerSettings />
     </Analyzer>
     <Analyzer AnalyzerId="StyleCop.CSharp.NamingRules">
-      <AnalyzerSettings>
-        <CollectionProperty Name="Hungarian">
-          <!--<Value>tp</Value>-->
-        </CollectionProperty>
-      </AnalyzerSettings>
+      <Rules>
+        <Rule Name="ConstFieldNamesMustBeginWithUpperCaseLetter">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+      </Rules>
+      <AnalyzerSettings />
     </Analyzer>
   </Analyzers>
+  <SourceFileList>
+    <!-- Excluding files with C#7 from style cop in order to stop generating false errors -->
+    <SourceFile>KlusterKite.NodeManager/KlusterKite.NodeManager.ConfigurationSource/ReleaseExtensions.cs</SourceFile>
+    <Settings>
+      <GlobalSettings>
+        <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
+      </GlobalSettings>
+    </Settings>
+  </SourceFileList>
 </StyleCopSettings>

@@ -1,0 +1,1 @@
+﻿Add-Migration Init -StartUpProject KlusterKite.NodeManager.ConfigurationSource.Migrator -Project KlusterKite.NodeManager.ConfigurationSource -Context KlusterKite.NodeManager.ConfigurationSource.ConfigurationContext

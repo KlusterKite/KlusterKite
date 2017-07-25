@@ -1,0 +1,4 @@
+var namespace_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_seeder =
+[
+    [ "Seeder", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_seeder_1_1_seeder.html", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_seeder_1_1_seeder" ]
+];

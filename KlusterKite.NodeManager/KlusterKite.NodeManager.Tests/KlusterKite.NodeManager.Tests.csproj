@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
+    <PackageId>KlusterKite.NodeManager.Tests</PackageId>
+    <Version>0.0.0.0-local</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">1.6.1</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);portable-net45+win8</PackageTargetFallback>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="TempTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Libuv" Version="1.9.2" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="$(XunitVersion)" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="$(XunitVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\KlusterKite.API\KlusterKite.API.Endpoint\KlusterKite.API.Endpoint.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Core\KlusterKite.Core.TestKit\KlusterKite.Core.TestKit.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data.EF.InMemory\KlusterKite.Data.EF.InMemory.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Data\KlusterKite.Data.EF.Npgsql\KlusterKite.Data.EF.Npgsql.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Web\KlusterKite.Web.Authentication\KlusterKite.Web.Authentication.csproj" />
+    <ProjectReference Include="..\..\KlusterKite.Web\KlusterKite.Web.GraphQL.Publisher\KlusterKite.Web.GraphQL.Publisher.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Authentication\KlusterKite.NodeManager.Authentication.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.ConfigurationSource.Seeder\KlusterKite.NodeManager.ConfigurationSource.Seeder.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager.Migrator.Executor\KlusterKite.NodeManager.Migrator.Executor.csproj" />
+    <ProjectReference Include="..\KlusterKite.NodeManager\KlusterKite.NodeManager.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="TempData\config.hocon">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TempData\fallBackConfiguration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="RestSharp.NetCore" Version="105.2.3" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <PackageReference Include="RestSharp" Version="105.2.3" />
+    <PackageReference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel" Version="11.0.0.0" />
+  </ItemGroup>  
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,14 @@
+
+                {
+                    TestMigrator.DefinedMigrationPoints = [
+                        "first",
+                        "second",
+                    ]
+                    TestMigrator.Resources = [
+                        "C:\\Dropbox\\Sources\\Git\\KlusterKite\\KlusterKite.NodeManager\\KlusterKite.NodeManager.Tests\\bin\\Debug\\netcoreapp1.1\\c8e329466147459db17c4ab797974145"
+                    ]
+                    KlusterKite.NodeManager.Migrators = [
+                        "KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests"
+                    ]
+                }
+                

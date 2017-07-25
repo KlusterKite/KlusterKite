@@ -1,0 +1,34 @@
+{	
+	akka.actor.deployment {	
+        /KlusterKite {
+	        IsNameSpace = true
+	    }
+        /KlusterKite/Web {
+	        type = "KlusterKite.Core.NameSpaceActor, KlusterKite.Core"
+	    }
+        /KlusterKite/Web/GraphQLBrowser {
+	        type = "KlusterKite.Web.GraphQL.Publisher.ApiBrowserActor, KlusterKite.Web.GraphQL.Publisher"
+	    }	    	    
+	}
+
+	KlusterKite.Web {
+
+		GraphQL {
+			MaxDepth = 15,
+			MaxComplexity = 1000000
+		}
+
+		Services {
+			GraphQL { 
+				Port = 8080 
+				PublicHostName = default 
+				Route = /api/1.x/graphQL 			
+			}
+
+		}
+	}	
+
+	KlusterKite.Web.Configurators {
+		Cors = "KlusterKite.Web.GraphQL.Publisher.WebHostingConfigurator, KlusterKite.Web.GraphQL.Publisher"
+	}	
+}

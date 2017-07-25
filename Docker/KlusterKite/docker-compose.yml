@@ -1,0 +1,144 @@
+version: '2'
+networks:
+  default:
+    ipam:
+      config:
+       - subnet: 172.18.0.0/24
+         ip_range: 172.18.0.0/24
+         gateway: 172.18.0.1 
+
+services:
+  #set of abstract utility servers
+  vpn:
+    image: klusterkite/vpn
+    networks:
+      default:
+        ipv4_address: 172.18.0.253
+    privileged: true
+    ports:
+     - "1194:1194"
+    environment:
+     - DEBUG=1
+
+
+  nuget:
+    #image: sunside/simple-nuget-server
+    image: klusterkite/nuget
+    ports:
+     - "81:80"
+    environment:
+     - NUGET_API_KEY=KlusterKite
+    networks:
+      default:
+        ipv4_address: 172.18.0.2 
+
+  configDb:
+    image: klusterkite/postgres
+    networks:
+      default:
+        ipv4_address: 172.18.0.3
+  redis:
+    image: klusterkite/redis
+    privileged: true
+    networks:
+      default:
+        ipv4_address: 172.18.0.4
+     
+  entry:
+    image: klusterkite/entry
+    links:
+     - "seed"
+     - "publisher1"
+     - "publisher2"
+    ports:
+     - "80:80"
+    networks:
+      default:
+        ipv4_address: 172.18.0.5     
+
+  #Cluster servers
+  seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes
+    image: klusterkite/seed
+    environment:
+     - NETWORK_NAME=seed
+     - SELF_JOIN=true
+    logging:
+        driver: json-file
+    networks:
+      default:
+        ipv4_address: 172.18.0.6               
+
+  publisher1: 
+    image: klusterkite/publisher
+    environment:
+     - NETWORK_NAME=publisher1
+    logging:
+        driver: json-file
+    networks:
+      default:
+        ipv4_address: 172.18.0.7               
+
+
+  publisher2: 
+    image: klusterkite/publisher
+    environment:
+     - NETWORK_NAME=publisher2
+    logging:
+        driver: json-file
+    networks:
+      default:
+        ipv4_address: 172.18.0.8             
+
+  monitoringUI:
+    image: klusterkite/monitoring-ui
+    ports:
+     - "82:8080"
+    logging:
+        driver: json-file
+    networks:
+      default:
+        ipv4_address: 172.18.0.9 
+  
+  elk:
+    image: klusterkite/elk
+    logging:
+        driver: json-file
+    networks:
+      default:
+        ipv4_address: 172.18.0.12
+  
+  seeder:
+    image: klusterkite/seeder
+    logging:
+        driver: json-file
+    networks:
+      default:
+        ipv4_address: 172.18.0.13
+
+
+  manager:
+    image: klusterkite/manager
+#    environment:
+#     - MONO_LOG_LEVEL=info
+    links:
+     - "seed"
+     - "configDb"
+     - "nuget"
+     - "entry"
+     - "publisher1"
+     - "publisher2"
+    logging:
+        driver: json-file
+
+  worker:
+    image: klusterkite/worker
+    links:
+     - "seed"
+     - "manager"
+     - "nuget"
+     - "configDb"
+     - "entry"
+     - "publisher1"
+     - "publisher2"
+    logging:
+        driver: json-file

@@ -1,0 +1,21 @@
+.form-margin {
+  margin-top: 25px;
+}
+
+.btn-margined {
+  margin-left: 10px;
+}
+
+.row-text {
+  margin-top: 7px;
+  margin-bottom: 0;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.static-modal-center .modal-dialog {
+  /* buggy: margin-top: calc(50% - 200px); */
+  margin-top: 300px;
+}
