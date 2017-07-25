@@ -98,7 +98,8 @@ class MigrationPage extends React.Component {
       <div>
         <Warnings
           klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
-          migrationBrokenWarning={true}
+          migratableResourcesWarning={true}
+          outOfScopeWarning={true}
         />
 
         {this.state.migrationHasFinished &&

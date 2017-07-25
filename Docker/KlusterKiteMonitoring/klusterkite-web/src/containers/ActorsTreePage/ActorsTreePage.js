@@ -4,7 +4,7 @@ import Relay from 'react-relay'
 import delay from 'lodash/delay'
 
 import ActorsTreeButtons from '../../components/ActorsTree/ActorsTreeButtons';
-import ActorsTree from '../../components/ActorsTree/ActorsTree';
+import ActorsTreeFlat from '../../components/ActorsTree/ActorsTreeFlat';
 import InitiateScanMutation from './mutations/InitiateScanMutation'
 
 class ActorsTreePage extends React.Component {
@@ -27,13 +27,7 @@ class ActorsTreePage extends React.Component {
       new InitiateScanMutation({}),
       {
         onSuccess: (response) => {
-          const result = response.klusterKiteMonitoring_klusterKiteMonitoringApi_initiateScan.result;
-
-          console.log('response', response);
-          if (result) {
-            console.log('success');
-          }
-
+          // const result = response.klusterKiteMonitoring_klusterKiteMonitoringApi_initiateScan.result;
           this.setScanning(true);
           this.stopScanningAfterDelay();
         },
@@ -73,10 +67,12 @@ class ActorsTreePage extends React.Component {
     return (
       <div>
         <ActorsTreeButtons handleScan={this.onInitiateScan} handleReload={this.onReload} isLoading={this.state.isScanning} />
-        {this.props.api.klusterKiteMonitoringApi && this.props.api.klusterKiteMonitoringApi.getClusterTree &&  this.props.api.klusterKiteMonitoringApi.getClusterTree.nodes &&
-          <ActorsTree
-            tree={this.props.api.klusterKiteMonitoringApi.getClusterTree.nodes.edges}
-          />
+        {this.props.api.klusterKiteMonitoringApi && this.props.api.klusterKiteMonitoringApi.getClusterTree &&  this.props.api.klusterKiteMonitoringApi.getClusterTree.nodesFlat &&
+          <div>
+            <ActorsTreeFlat
+              tree={this.props.api.klusterKiteMonitoringApi.getClusterTree.nodesFlat.edges}
+            />
+          </div>
         }
       </div>
     )
@@ -92,83 +88,18 @@ export default Relay.createContainer(
           __typename
           klusterKiteMonitoringApi {
             getClusterTree {
-              nodes {
+              nodesFlat {
                 edges {
                   node {
-                    value {
-                      name
-                      actorType
-                      dispatcherType
-                      currentMessage
-                      queueSize
-                      queueSizeSum
-                      maxQueueSize
-                      children {
-                        edges {
-                          node {
-                            name
-                            actorType
-                            dispatcherType
-                            currentMessage
-                            queueSize
-                            queueSizeSum
-                            maxQueueSize
-                            children {
-                              edges {
-                                node {
-                                  name
-                                  actorType
-                                  dispatcherType
-                                  currentMessage
-                                  queueSize
-                                  queueSizeSum
-                                  maxQueueSize
-                                  children {
-                                    edges {
-                                      node {
-                                        name
-                                        actorType
-                                        dispatcherType
-                                        currentMessage
-                                        queueSize
-                                        queueSizeSum
-                                        maxQueueSize
-                                        children {
-                                          edges {
-                                            node {
-                                              name
-                                              actorType
-                                              dispatcherType
-                                              currentMessage
-                                              queueSize
-                                              queueSizeSum
-                                              maxQueueSize
-                                              children {
-                                                edges {
-                                                  node {
-                                                    name
-                                                    actorType
-                                                    dispatcherType
-                                                    currentMessage
-                                                    queueSize
-                                                    queueSizeSum
-                                                    maxQueueSize
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
+                    name
+                    actorType
+                    dispatcherType
+                    currentMessage
+                    queueSize
+                    queueSizeSum
+                    maxQueueSize
+                    address
+                    parentAddress
                   }
                 }
               }

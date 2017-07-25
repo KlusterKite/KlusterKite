@@ -47,7 +47,6 @@ export class UpdateNodes extends React.Component {
         }),
         {
           onSuccess: (response) => {
-            console.log('response', response);
             const responsePayload = response.klusterKiteNodeApi_klusterKiteNodesApi_clusterManagement_migrationNodesUpdate;
 
             if (responsePayload.errors &&
@@ -60,7 +59,6 @@ export class UpdateNodes extends React.Component {
                 processErrors: messages,
               });
             } else {
-              console.log('result update nodes', responsePayload.result);
               // total success
               this.setState({
                 isProcessing: false,

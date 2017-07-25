@@ -2,16 +2,16 @@ import React from 'react';
 import Relay from 'react-relay'
 
 import MigrationInProgressWarning from './MigrationInProgressWarning'
-// import NotInSourcePositionWarning from './NotInSourcePositionWarning'
-// import OperationIsInProgressWarning from './OperationIsInProgressWarning'
-// import OutOfScopeWarning from './OutOfScopeWarning'
+import OperationIsInProgressWarning from './OperationIsInProgressWarning'
+import MigratableResourcesWarning from './MigratableResourcesWarning'
+import OutOfScopeWarning from './OutOfScopeWarning'
 
 export class Warnings extends React.Component {
   static propTypes = {
     migrationWarning: React.PropTypes.bool,
     operationIsInProgressWarning: React.PropTypes.bool,
-    migrationBrokenWarning: React.PropTypes.bool,
-    notInSourcePositionWarning: React.PropTypes.bool,
+    migratableResourcesWarning: React.PropTypes.bool,
+    outOfScopeWarning: React.PropTypes.bool,
   };
 
   render() {
@@ -22,22 +22,19 @@ export class Warnings extends React.Component {
         {this.props.migrationWarning &&
           <MigrationInProgressWarning clusterManagement={klusterKiteNodesApi.clusterManagement} />
         }
+        {this.props.operationIsInProgressWarning &&
+          <OperationIsInProgressWarning resourceState={klusterKiteNodesApi.clusterManagement.resourceState} />
+        }
+        {this.props.migratableResourcesWarning &&
+          <MigratableResourcesWarning resourceState={klusterKiteNodesApi.clusterManagement.resourceState} />
+        }
+        {this.props.outOfScopeWarning &&
+          <OutOfScopeWarning resourceState={klusterKiteNodesApi.clusterManagement.resourceState} />
+        }
       </div>
     );
   }
 }
-
-/*
-        {this.props.operationIsInProgressWarning &&
-          <OperationIsInProgressWarning resourceState={klusterKiteNodesApi.clusterManagement.resourceState} />
-        }
-        {this.props.notInSourcePositionWarning &&
-          <NotInSourcePositionWarning resourceState={klusterKiteNodesApi.clusterManagement.resourceState}/>
-        }
-        {this.props.migrationBrokenWarning &&
-          <OutOfScopeWarning resourceState={klusterKiteNodesApi.clusterManagement.resourceState}/>
-        }
- */
 
 export default Relay.createContainer(
   Warnings,
@@ -46,17 +43,14 @@ export default Relay.createContainer(
       klusterKiteNodesApi: () => Relay.QL`fragment on IKlusterKiteNodeApi_Root {
         clusterManagement {
           ${MigrationInProgressWarning.getFragment('clusterManagement')}
+          resourceState {
+            ${OperationIsInProgressWarning.getFragment('resourceState')},
+            ${MigratableResourcesWarning.getFragment('resourceState')},
+            ${OutOfScopeWarning.getFragment('resourceState')},
+          }
         }
       }
       `,
     },
   },
 )
-
-/*
-          resourceState {
-            ${OperationIsInProgressWarning.getFragment('resourceState')},
-            ${OutOfScopeWarning.getFragment('resourceState')},
-            ${NotInSourcePositionWarning.getFragment('resourceState')},
-
- */

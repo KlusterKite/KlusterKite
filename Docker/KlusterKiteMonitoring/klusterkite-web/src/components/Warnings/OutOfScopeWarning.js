@@ -3,32 +3,29 @@ import Relay from 'react-relay'
 
 export class OutOfScopeWarning extends React.Component {
   render() {
-    let warning = false;
-    if (this.props.resourceState &&
-      this.props.resourceState.migrationState &&
-      this.props.resourceState.migrationState.templateStates &&
-      this.props.resourceState.migrationState.templateStates.edges) {
-
-      const templateStatesNodes = this.props.resourceState.migrationState.templateStates.edges.map(x => x.node);
-      if (templateStatesNodes) {
-        templateStatesNodes.forEach((templateStatesNode) => {
-          const templateStatesNodesMigratorsNodes = templateStatesNode.migrators.edges.map(x => x.node);
-          if (templateStatesNodesMigratorsNodes) {
-            if (templateStatesNodesMigratorsNodes.some(node => node.position === 'OutOfScope')){
-              warning = true;
+    const resourceState = this.props.resourceState;
+    let error = false;
+    if (resourceState && resourceState.configurationState && resourceState.configurationState.states.edges) {
+      const configurationStateNodes = resourceState.configurationState.states.edges.map(x => x.node);
+      configurationStateNodes.forEach(configurationStateNode => {
+        if (configurationStateNode.migratorsStates.edges.length > 0) {
+          const migratorsStatesNodes = configurationStateNode.migratorsStates.edges.map(x => x.node);
+          migratorsStatesNodes.forEach(migratorsStatesNode => {
+            if (migratorsStatesNode.resources.edges.length > 0){
+              error = true;
             }
-          }
-        });
-      }
+          });
+        }
+      });
     }
 
     return (
       <div>
-        {warning &&
-          <div className="alert alert-warning" role="alert">
+        {error &&
+          <div className="alert alert-danger" role="alert">
             <span className="glyphicon glyphicon-alert" aria-hidden="true"></span>
             {' '}
-            At least one resource position is OutOfScope!
+            At least one resource in OutOfScope state found.
           </div>
         }
       </div>
@@ -41,14 +38,20 @@ export default Relay.createContainer(
   {
     fragments: {
       resourceState: () => Relay.QL`fragment on IKlusterKiteNodeApi_ResourceState {
-        migrationState {
-          templateStates {
+        configurationState {
+          states {
             edges {
               node {
-                migrators {
+                migratorsStates {
                   edges {
                     node {
-                      position
+                      resources(filter: { position: OutOfScope }) {
+                        edges {
+                          node {
+                            position
+                          }
+                        }
+                      }
                     }
                   }
                 }

@@ -148,7 +148,8 @@ class ConfigurationPage extends React.Component {
   render () {
     const model = this.props.api.configuration;
     const activeConfiguration = this.props.api.activeConfiguration && this.props.api.activeConfiguration.configurations && this.props.api.activeConfiguration.configurations.edges && this.props.api.activeConfiguration.configurations.edges[0].node;
-    const nodeManagement = this.props.api.klusterKiteNodesApi.clusterManagement;
+    const klusterKiteNodesApi = this.props.api.klusterKiteNodesApi;
+    const nodeManagement = klusterKiteNodesApi.clusterManagement;
 
     const canEdit = !model || model.state === 'Draft';
     return (
@@ -156,8 +157,9 @@ class ConfigurationPage extends React.Component {
         <Warnings
           klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
           migrationWarning={true}
-          migrationBrokenWarning={true}
           notInSourcePositionWarning={true}
+          migratableResourcesWarning={true}
+          outOfScopeWarning={true}
         />
         <ConfigurationForm
           onSubmit={this.onSubmit}
@@ -173,6 +175,7 @@ class ConfigurationPage extends React.Component {
           <ConfigurationOperations
             configuration={model.settings}
             nodeManagement={nodeManagement}
+            klusterKiteNodesApi={klusterKiteNodesApi}
             configurationId={this.props.params.id}
             configurationInnerId={model.__id}
             currentState={model.state}
@@ -275,6 +278,7 @@ export default Relay.createContainer(
             clusterManagement {
               ${ConfigurationOperations.getFragment('nodeManagement')}
             }
+            ${ConfigurationOperations.getFragment('klusterKiteNodesApi')}
             ${Warnings.getFragment('klusterKiteNodesApi')}
           }
         }
