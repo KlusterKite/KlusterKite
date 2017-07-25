@@ -36,7 +36,8 @@ export class ConfigurationsList extends React.Component {
         <Warnings
           klusterKiteNodesApi={this.props.klusterKiteNodesApi}
           migrationWarning={true}
-          migrationBrokenWarning={true}
+          migratableResourcesWarning={true}
+          outOfScopeWarning={true}
         />
         <h3>Configurations list</h3>
         <Link to={`/klusterkite/Configuration/create/exact`} className="btn btn-primary" role="button">Add a new configuration</Link>

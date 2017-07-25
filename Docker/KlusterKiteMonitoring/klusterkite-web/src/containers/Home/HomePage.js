@@ -6,6 +6,7 @@ import delay from 'lodash/delay'
 import NodesList from '../../components/NodesList/NodesList';
 import NodesWithTemplates from '../../components/NodesWithTemplates/index';
 import RecheckState from '../../components/RecheckState/RecheckState';
+import Warnings from '../../components/Warnings/Warnings';
 
 import { hasPrivilege } from '../../utils/privileges';
 
@@ -32,6 +33,13 @@ class HomePage extends React.Component {
       <div>
         <h1>Monitoring <RecheckState /></h1>
 
+        <Warnings
+          klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
+          migrationWarning={true}
+          notInSourcePositionWarning={true}
+          migratableResourcesWarning={true}
+          outOfScopeWarning={true}
+        />
         {hasPrivilege('KlusterKite.NodeManager.GetTemplateStatistics') && this.props.api.klusterKiteNodesApi &&
           <NodesWithTemplates data={this.props.api.klusterKiteNodesApi}/>
         }
@@ -54,6 +62,7 @@ export default Relay.createContainer(
           id
           ${NodesWithTemplates.getFragment('data')},
           ${NodesList.getFragment('nodeDescriptions')},
+          ${Warnings.getFragment('klusterKiteNodesApi')},
         }
       }
       `,

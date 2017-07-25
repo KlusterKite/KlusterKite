@@ -156,8 +156,9 @@ class ConfigurationPage extends React.Component {
         <Warnings
           klusterKiteNodesApi={this.props.api.klusterKiteNodesApi}
           migrationWarning={true}
-          migrationBrokenWarning={true}
           notInSourcePositionWarning={true}
+          migratableResourcesWarning={true}
+          outOfScopeWarning={true}
         />
         <ConfigurationForm
           onSubmit={this.onSubmit}

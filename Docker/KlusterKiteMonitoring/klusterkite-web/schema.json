@@ -976,15 +976,37 @@
               "deprecationReason": null
             },
             {
+              "name": "maxQueueSize",
+              "description": "Gets the maximum queue size among tree nodes",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "nodes",
               "description": "Gets the list of nodes",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1014,6 +1036,29 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "INTERFACE",
+                "name": "IKlusterKiteMonitoring_Pair_System_String_Node__Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "nodesFlat",
+              "description": "Gets the  nodes flat list",
+              "args": [
+                {
                   "name": "limit",
                   "description": null,
                   "type": {
@@ -1032,11 +1077,45 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "KlusterKiteMonitoring_Node_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "KlusterKiteMonitoring_Node_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
                 "kind": "INTERFACE",
-                "name": "IKlusterKiteMonitoring_Pair_System_String_Node__Connection",
+                "name": "IKlusterKiteMonitoring_Node_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1045,18 +1124,6 @@
             {
               "name": "queueSizeSum",
               "description": "Gets the sum of queue size across tree",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "maxQueueSize",
-              "description": "Gets the maximum queue size among tree nodes",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -1335,11 +1402,21 @@
               "description": "the actor's children",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1369,21 +1446,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -1392,6 +1459,30 @@
               "type": {
                 "kind": "INTERFACE",
                 "name": "IKlusterKiteMonitoring_Node_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "address",
+              "description": "the actor's address",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "parentAddress",
+              "description": "the actor's parent's address",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -1595,6 +1686,30 @@
             },
             {
               "name": "queueSizeSum_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "address_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "address_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "parentAddress_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "parentAddress_desc",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -2807,6 +2922,406 @@
                 "ofType": null
               },
               "defaultValue": null
+            },
+            {
+              "name": "address",
+              "description": "address exactly equals to the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_not",
+              "description": "address not equals to the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_in",
+              "description": "address is a substring of the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_not_in",
+              "description": "address is not a substring of the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_contains",
+              "description": "address contains the parameter as substring, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_not_contains",
+              "description": "address doesn't contain the parameter as substring, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_starts_with",
+              "description": "address starts with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_not_starts_with",
+              "description": "address doesn't start with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_ends_with",
+              "description": "address ends with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_not_ends_with",
+              "description": "address doesn't end with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l",
+              "description": "address lowercased equals the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not",
+              "description": "address lowercased doesn't equal the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_in",
+              "description": "address lowercased is a substring of the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_in",
+              "description": "address lowercased is not a substring of the parameter, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_contains",
+              "description": "address lowercased contains the parameter as substring, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_contains",
+              "description": "address lowercased doesn't contain the parameter as substring, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_starts_with",
+              "description": "address lowercased starts with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_starts_with",
+              "description": "address lowercased doesn't start with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_ends_with",
+              "description": "address lowercased ends with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "address_l_not_ends_with",
+              "description": "address lowercased doesn't end with the parameter value, address: the actor's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress",
+              "description": "parentAddress exactly equals to the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_not",
+              "description": "parentAddress not equals to the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_in",
+              "description": "parentAddress is a substring of the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_not_in",
+              "description": "parentAddress is not a substring of the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_contains",
+              "description": "parentAddress contains the parameter as substring, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_not_contains",
+              "description": "parentAddress doesn't contain the parameter as substring, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_starts_with",
+              "description": "parentAddress starts with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_not_starts_with",
+              "description": "parentAddress doesn't start with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_ends_with",
+              "description": "parentAddress ends with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_not_ends_with",
+              "description": "parentAddress doesn't end with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l",
+              "description": "parentAddress lowercased equals the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_not",
+              "description": "parentAddress lowercased doesn't equal the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_in",
+              "description": "parentAddress lowercased is a substring of the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_not_in",
+              "description": "parentAddress lowercased is not a substring of the parameter, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_contains",
+              "description": "parentAddress lowercased contains the parameter as substring, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_not_contains",
+              "description": "parentAddress lowercased doesn't contain the parameter as substring, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_starts_with",
+              "description": "parentAddress lowercased starts with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_not_starts_with",
+              "description": "parentAddress lowercased doesn't start with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_ends_with",
+              "description": "parentAddress lowercased ends with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "parentAddress_l_not_ends_with",
+              "description": "parentAddress lowercased doesn't end with the parameter value, parentAddress: the actor's parent's address",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
             }
           ],
           "interfaces": null,
@@ -3389,11 +3904,21 @@
               "description": "The packages in the Nuget repository",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3423,21 +3948,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3456,11 +3971,21 @@
               "description": "The list of known active nodes",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3490,21 +4015,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3535,7 +4050,17 @@
               "description": "the cluster migration management",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -3569,17 +4094,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -3602,7 +4117,17 @@
               "description": "KlusterKite managing system security roles",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -3636,17 +4161,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -3669,11 +4184,21 @@
               "description": "KlusterKite managing system security roles",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3703,21 +4228,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3736,11 +4251,21 @@
               "description": "KlusterKite managing system users",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -3770,21 +4295,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4029,7 +4544,17 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4063,17 +4588,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4096,7 +4611,17 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4130,17 +4655,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4163,7 +4678,17 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4197,17 +4722,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -4306,11 +4821,21 @@
               "description": "the list of available packages with their versions",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4340,21 +4865,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4373,11 +4888,21 @@
               "description": "the list of configured node templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4407,21 +4932,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4440,11 +4955,21 @@
               "description": "the list of configured cluster migrator templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -4474,21 +4999,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -5355,11 +5870,21 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -5389,21 +5914,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -5422,11 +5937,21 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -5456,21 +5981,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -6233,11 +6748,21 @@
               "description": "Gets a dictionary value",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -6267,21 +6792,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -7867,11 +8382,21 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -7901,21 +8426,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -7934,11 +8449,21 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -7968,21 +8493,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -12752,11 +13267,21 @@
               "description": "the list of migration states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -12786,21 +13311,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -12819,11 +13334,21 @@
               "description": "the list of resources that can be migrated on current stage",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -12853,21 +13378,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13049,11 +13564,21 @@
               "description": "the list of states of migrators",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13083,21 +13608,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13296,11 +13811,21 @@
               "description": "the list of resources states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13330,21 +13855,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -13534,18 +14049,6 @@
               "deprecationReason": null
             },
             {
-              "name": "position",
-              "description": "the resource current position",
-              "args": [],
-              "type": {
-                "kind": "ENUM",
-                "name": "KlusterKiteNodeApi_EnResourcePosition",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "migrationToSourceExecutor",
               "description": "a value indicating what configuration can execute migration to source configuration point",
               "args": [],
@@ -13618,6 +14121,18 @@
               "deprecationReason": null
             },
             {
+              "name": "position",
+              "description": "the resource current position",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "templateCode",
               "description": "The code of migrator template",
               "args": [],
@@ -13655,6 +14170,29 @@
         },
         {
           "kind": "ENUM",
+          "name": "KlusterKiteNodeApi_EnMigrationSide",
+          "description": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "Source",
+              "description": "The source configuration",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "Destination",
+              "description": "The destination configuration",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
           "name": "KlusterKiteNodeApi_EnResourcePosition",
           "description": null,
           "fields": null,
@@ -13674,7 +14212,13 @@
               "deprecationReason": null
             },
             {
-              "name": "Undefined",
+              "name": "InScope",
+              "description": "The migration position of the resource is neither source nor destination",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "OutOfScope",
               "description": "The migration position of the resource is neither source nor destination",
               "isDeprecated": false,
               "deprecationReason": null
@@ -13694,29 +14238,6 @@
             {
               "name": "Obsolete",
               "description": "The resource is no more supported in the target configuration",
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "possibleTypes": null
-        },
-        {
-          "kind": "ENUM",
-          "name": "KlusterKiteNodeApi_EnMigrationSide",
-          "description": null,
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "enumValues": [
-            {
-              "name": "Source",
-              "description": "The source configuration",
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "Destination",
-              "description": "The destination configuration",
               "isDeprecated": false,
               "deprecationReason": null
             }
@@ -13751,18 +14272,6 @@
             },
             {
               "name": "destinationPoint_desc",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "position_asc",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "position_desc",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -13835,6 +14344,18 @@
             },
             {
               "name": "currentPoint_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "position_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "position_desc",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -14288,26 +14809,6 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "position",
-              "description": "position exactly equals to the parameter, position: the resource current position",
-              "type": {
-                "kind": "ENUM",
-                "name": "KlusterKiteNodeApi_EnResourcePosition",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "position_not",
-              "description": "position not equals to the parameter, position: the resource current position",
-              "type": {
-                "kind": "ENUM",
-                "name": "KlusterKiteNodeApi_EnResourcePosition",
                 "ofType": null
               },
               "defaultValue": null
@@ -15148,6 +15649,26 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "position",
+              "description": "position exactly equals to the parameter, position: the resource current position",
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "position_not",
+              "description": "position not equals to the parameter, position: the resource current position",
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
                 "ofType": null
               },
               "defaultValue": null
@@ -16557,11 +17078,21 @@
               "description": "the list of template states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16591,21 +17122,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16624,11 +17145,21 @@
               "description": "the list of resources that can be recovered",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16658,21 +17189,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16830,11 +17351,21 @@
               "description": "the migrator states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16864,21 +17395,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -17064,11 +17585,21 @@
               "description": "the state of defined resources",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -17098,21 +17629,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -17314,6 +17835,18 @@
               "deprecationReason": null
             },
             {
+              "name": "position",
+              "description": "the resource current position",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "templateCode",
               "description": "The code of migrator template",
               "args": [],
@@ -17401,6 +17934,18 @@
             },
             {
               "name": "currentPoint_desc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "position_asc",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "position_desc",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -18254,6 +18799,26 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "position",
+              "description": "position exactly equals to the parameter, position: the resource current position",
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "position_not",
+              "description": "position not equals to the parameter, position: the resource current position",
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
                 "ofType": null
               },
               "defaultValue": null
@@ -19846,7 +20411,17 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -19880,17 +20455,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -21026,11 +21591,21 @@
               "description": "the list of descriptions of installed modules",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -21060,21 +21635,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -22035,11 +22600,21 @@
               "description": "node templates statistics data",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -22069,21 +22644,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -24758,7 +25323,17 @@
               "description": "The list of users assigned to this role",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -24792,17 +25367,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -25029,7 +25594,17 @@
               "description": "The list of roles assigned to this user",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -25063,17 +25638,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -26415,7 +26980,17 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -26449,17 +27024,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -27212,7 +27777,17 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -27246,17 +27821,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -27576,15 +28141,37 @@
           "description": "Global cluster actors tree scan result",
           "fields": [
             {
+              "name": "maxQueueSize",
+              "description": "Gets the maximum queue size among tree nodes",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "nodes",
               "description": "Gets the list of nodes",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27614,6 +28201,29 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "KlusterKiteMonitoring_Pair_System_String_Node__Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "nodesFlat",
+              "description": "Gets the  nodes flat list",
+              "args": [
+                {
                   "name": "limit",
                   "description": null,
                   "type": {
@@ -27632,11 +28242,45 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": null,
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "ENUM",
+                      "name": "KlusterKiteMonitoring_Node_Sort",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "filter",
+                  "description": null,
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "KlusterKiteMonitoring_Node_Filter_Input",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "offset",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
                 "kind": "OBJECT",
-                "name": "KlusterKiteMonitoring_Pair_System_String_Node__Connection",
+                "name": "KlusterKiteMonitoring_Node_Connection",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -27645,18 +28289,6 @@
             {
               "name": "queueSizeSum",
               "description": "Gets the sum of queue size across tree",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "maxQueueSize",
-              "description": "Gets the maximum queue size among tree nodes",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -27945,11 +28577,21 @@
               "description": "the actor's children",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -27979,21 +28621,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28002,6 +28634,30 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "KlusterKiteMonitoring_Node_Connection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "address",
+              "description": "the actor's address",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "parentAddress",
+              "description": "the actor's parent's address",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -28144,11 +28800,21 @@
               "description": "The packages in the Nuget repository",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28178,21 +28844,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28211,11 +28867,21 @@
               "description": "The list of known active nodes",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28245,21 +28911,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28290,7 +28946,17 @@
               "description": "the cluster migration management",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28324,17 +28990,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28357,7 +29013,17 @@
               "description": "KlusterKite managing system security roles",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28391,17 +29057,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28424,11 +29080,21 @@
               "description": "KlusterKite managing system security roles",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28458,21 +29124,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28491,11 +29147,21 @@
               "description": "KlusterKite managing system users",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28525,21 +29191,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Uid",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -28794,7 +29450,17 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28828,17 +29494,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28861,7 +29517,17 @@
               "description": "the list of compatible node templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28895,17 +29561,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28928,7 +29584,17 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -28962,17 +29628,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -29029,11 +29685,21 @@
               "description": "the list of available packages with their versions",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29063,21 +29729,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29096,11 +29752,21 @@
               "description": "the list of configured node templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29130,21 +29796,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29163,11 +29819,21 @@
               "description": "the list of configured cluster migrator templates",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29197,21 +29863,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29622,11 +30278,21 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29656,21 +30322,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29689,11 +30345,21 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -29723,21 +30389,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30044,11 +30700,21 @@
               "description": "Gets a dictionary value",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30078,21 +30744,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30291,11 +30947,21 @@
               "description": "The list of package requirements",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30325,21 +30991,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30358,11 +31014,21 @@
               "description": "The list of packages to install for current template",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -30392,21 +31058,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31145,11 +31801,21 @@
               "description": "the list of migration states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31179,21 +31845,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31212,11 +31868,21 @@
               "description": "the list of resources that can be migrated on current stage",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31246,21 +31912,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31447,11 +32103,21 @@
               "description": "the list of states of migrators",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31481,21 +32147,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31670,11 +32326,21 @@
               "description": "the list of resources states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31704,21 +32370,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -31913,18 +32569,6 @@
               "deprecationReason": null
             },
             {
-              "name": "position",
-              "description": "the resource current position",
-              "args": [],
-              "type": {
-                "kind": "ENUM",
-                "name": "KlusterKiteNodeApi_EnResourcePosition",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "migrationToSourceExecutor",
               "description": "a value indicating what configuration can execute migration to source configuration point",
               "args": [],
@@ -31997,6 +32641,18 @@
               "deprecationReason": null
             },
             {
+              "name": "position",
+              "description": "the resource current position",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "templateCode",
               "description": "The code of migrator template",
               "args": [],
@@ -32059,11 +32715,21 @@
               "description": "the list of template states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32093,21 +32759,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32126,11 +32782,21 @@
               "description": "the list of resources that can be recovered",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32160,21 +32826,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32337,11 +32993,21 @@
               "description": "the migrator states",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32371,21 +33037,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32576,11 +33232,21 @@
               "description": "the state of defined resources",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32610,21 +33276,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -32831,6 +33487,18 @@
               "deprecationReason": null
             },
             {
+              "name": "position",
+              "description": "the resource current position",
+              "args": [],
+              "type": {
+                "kind": "ENUM",
+                "name": "KlusterKiteNodeApi_EnResourcePosition",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "templateCode",
               "description": "The code of migrator template",
               "args": [],
@@ -32953,7 +33621,17 @@
               "description": "the list of migration logs",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -32987,17 +33665,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -33424,11 +34092,21 @@
               "description": "the list of descriptions of installed modules",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -33458,21 +34136,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -33695,11 +34363,21 @@
               "description": "node templates statistics data",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -33729,21 +34407,11 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -34314,7 +34982,17 @@
               "description": "The list of users assigned to this role",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -34348,17 +35026,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -34595,7 +35263,17 @@
               "description": "The list of roles assigned to this user",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -34629,17 +35307,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -35739,7 +36407,17 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -35773,17 +36451,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -37692,7 +38360,17 @@
               "description": "The list of mutation errors",
               "args": [
                 {
-                  "name": "offset",
+                  "name": "limit",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "id",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
@@ -37726,17 +38404,7 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "limit",
-                  "description": null,
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "id",
+                  "name": "offset",
                   "description": null,
                   "type": {
                     "kind": "SCALAR",
