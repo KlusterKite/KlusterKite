@@ -198,54 +198,12 @@ class ActorsTreeFlat extends React.Component {
 
         ReactDom.render(this.getActorToolTip(d.data), div.node());
 
-        const svgOffsetY = this.refs.actorsTree.getBoundingClientRect().top;
-        const offsetX = -20;
-        const offsetY = 20 + svgOffsetY;
-        const positionX = d3Event.layerX;
-        const positionY = d3Event.layerY;
-
-        console.log('positionX', positionX);
-        console.log('positionY', positionY);
-        console.log(this.refs.actorsTree.getBoundingClientRect().top);
-
-        const tooltipWidth = div.node().clientWidth;
-        const tooltipHeight = div.node().clientHeight;
-        const containerWidth = d3Event.path[4].clientWidth;
-        const containerHeight = d3Event.path[4].clientHeight;
-        const containerOffsetX = d3Event.path[4].offsetLeft;
-        const containerOffsetY = d3Event.path[4].offsetTop;
-
-        let tooltipX = offsetX;
-        if ((positionX + offsetX + tooltipWidth) < containerWidth) {
-          tooltipX = positionX + offsetX;
-        } else if ((positionX - offsetX - tooltipWidth) > 0) {
-          tooltipX = positionX - offsetX - tooltipWidth;
-        }
-
-        tooltipX += containerOffsetX;
-
-        let tooltipY = offsetY;
-        if ((positionY - offsetY + tooltipHeight) < containerHeight) {
-          tooltipY = positionY - offsetY;
-          console.log('first case', tooltipY);
-          console.log('positionY', positionY);
-          console.log('offsetY', offsetY);
-          console.log('tooltipHeight', tooltipHeight);
-          console.log('containerHeight', containerHeight);
-
-        } else if ((positionY + offsetY - tooltipHeight) > 0 && positionY + offsetY < containerHeight) {
-          tooltipY = positionY + offsetY - tooltipHeight;
-          console.log('second case', tooltipY);
-        } else if ((positionY - tooltipHeight) > 1) {
-          tooltipY = positionY - tooltipHeight - 1;
-          console.log('third case', tooltipY);
-        }
-
-        tooltipY += containerOffsetY;
+        const positionX = d3Event.layerX - 150;
+        const positionY = d3Event.layerY + 10;
 
         div
-          .style('left', `${tooltipX}px`)
-          .style('top', `${tooltipY}px`);
+          .style('left', `${positionX}px`)
+          .style('top', `${positionY}px`);
       })
       .on('mouseout', () => {
         div.transition()
