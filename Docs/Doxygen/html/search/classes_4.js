@@ -13,6 +13,5 @@ var searchData=
   ['entitynotfoundexception',['EntityNotFoundException',['../class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_exceptions_1_1_entity_not_found_exception.html',1,'KlusterKite::Data::CRUD::Exceptions']]],
   ['enumresolver',['EnumResolver',['../class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_enum_resolver.html',1,'KlusterKite::API::Provider::Resolvers']]],
   ['errordescription',['ErrorDescription',['../class_kluster_kite_1_1_a_p_i_1_1_client_1_1_error_description.html',1,'KlusterKite::API::Client']]],
-  ['executor',['Executor',['../class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor.html',1,'KlusterKite::NodeManager::Migrator']]],
   ['extensions',['Extensions',['../class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_extensions.html',1,'KlusterKite.Data.CRUD.Extensions'],['../class_kluster_kite_1_1_large_objects_1_1_extensions.html',1,'KlusterKite.LargeObjects.Extensions'],['../class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_extensions.html',1,'KlusterKite.API.Provider.Resolvers.Extensions'],['../class_kluster_kite_1_1_a_p_i_1_1_client_1_1_extensions.html',1,'KlusterKite.API.Client.Extensions']]]
 ];

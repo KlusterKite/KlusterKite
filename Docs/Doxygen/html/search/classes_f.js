@@ -19,6 +19,7 @@ var searchData=
   ['resettablevaluegenerator',['ResettableValueGenerator',['../class_kluster_kite_1_1_data_1_1_e_f_1_1_in_memory_1_1_resettable_value_generator.html',1,'KlusterKite::Data::EF::InMemory']]],
   ['resourceconfigurationstate',['ResourceConfigurationState',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states_1_1_resource_configuration_state.html',1,'KlusterKite::NodeManager::Client::MigrationStates']]],
   ['resourceid',['ResourceId',['../class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_resource_id.html',1,'KlusterKite::NodeManager::Migrator']]],
+  ['resourcemigrationcommand',['ResourceMigrationCommand',['../class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_resource_migration_command.html',1,'KlusterKite::NodeManager::RemoteDomain']]],
   ['resourcemigrationstate',['ResourceMigrationState',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states_1_1_resource_migration_state.html',1,'KlusterKite::NodeManager::Client::MigrationStates']]],
   ['resourcestate',['ResourceState',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state.html',1,'KlusterKite::NodeManager::Client::Messages::Migration']]],
   ['resourcestaterequest',['ResourceStateRequest',['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state_request.html',1,'KlusterKite::NodeManager::Client::Messages::Migration']]],

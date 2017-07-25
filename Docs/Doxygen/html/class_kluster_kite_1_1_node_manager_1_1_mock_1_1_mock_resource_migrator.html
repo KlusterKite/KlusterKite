@@ -84,9 +84,11 @@ $(document).ready(function(){initNavTree('class_kluster_kite_1_1_node_manager_1_
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#properties">Properties</a> &#124;
 <a href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">KlusterKite.NodeManager.Mock.MockResourceMigrator Class Reference</div>  </div>
+<div class="title">KlusterKite.NodeManager.Mock.MockResourceMigrator Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -98,7 +100,9 @@ Inheritance diagram for KlusterKite.NodeManager.Mock.MockResourceMigrator:</div>
  <div class="center">
   <img src="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.png" usemap="#KlusterKite.NodeManager.Mock.MockResourceMigrator_map" alt=""/>
   <map id="KlusterKite.NodeManager.Mock.MockResourceMigrator_map" name="KlusterKite.NodeManager.Mock.MockResourceMigrator_map">
-<area href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html" title="Base class for all cluster system migrations " alt="KlusterKite.NodeManager.Migrator.IMigrator" shape="rect" coords="0,0,329,24"/>
+<area href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html" title="Base class for all cluster system migrations " alt="KlusterKite.NodeManager.Migrator.IMigrator" shape="rect" coords="205,0,606,24"/>
+<area href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependence.html" title="The mock resource to implement EnResourceDependencyType.CodeDependsOnResource " alt="KlusterKite.NodeManager.Mock.MockResourceMigratorDependence" shape="rect" coords="0,112,401,136"/>
+<area href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependent.html" title="The mock resource to implement EnResourceDependencyType.ResourceDependsOnCode " alt="KlusterKite.NodeManager.Mock.MockResourceMigratorDependent" shape="rect" coords="411,112,812,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -124,11 +128,30 @@ Public Member Functions</h2></td></tr>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a24ebec6f412157256b890c2b93e0b7a0"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a24ebec6f412157256b890c2b93e0b7a0">LatestPoint</a> =&gt; this.GetAllPoints().Last()</td></tr>
 <tr class="separator:a24ebec6f412157256b890c2b93e0b7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e09f02e643b29c0b2543cf597cb089f"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a5e09f02e643b29c0b2543cf597cb089f">Name</a> =&gt; &quot;The mock resources&quot;</td></tr>
-<tr class="separator:a5e09f02e643b29c0b2543cf597cb089f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefa19d27a47a727b05ed3e64a201fa0a"><td class="memItemLeft" align="right" valign="top">decimal&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#aefa19d27a47a727b05ed3e64a201fa0a">Priority</a> =&gt; 1M</td></tr>
+<tr class="separator:aefa19d27a47a727b05ed3e64a201fa0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a5de09dd83c71b58f8c12b2500fb80ba6"><td class="memItemLeft" align="right" valign="top">abstract string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a5de09dd83c71b58f8c12b2500fb80ba6">GetResourceName</a> (string resourceCode)</td></tr>
+<tr class="memdesc:a5de09dd83c71b58f8c12b2500fb80ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates the resource name for the resource code  <a href="#a5de09dd83c71b58f8c12b2500fb80ba6">More...</a><br /></td></tr>
+<tr class="separator:a5de09dd83c71b58f8c12b2500fb80ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6d6033b5c460a978dee5b3163c1e799"><td class="memItemLeft" align="right" valign="top">abstract string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#af6d6033b5c460a978dee5b3163c1e799">GetRedisKey</a> (<a class="el" href="class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_resource_id.html">ResourceId</a> resourceId)</td></tr>
+<tr class="memdesc:af6d6033b5c460a978dee5b3163c1e799"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the redis key for specified resource  <a href="#af6d6033b5c460a978dee5b3163c1e799">More...</a><br /></td></tr>
+<tr class="separator:af6d6033b5c460a978dee5b3163c1e799"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
+Properties</h2></td></tr>
+<tr class="memitem:ac4fa6e22ae29962581f5768b9c2746f2"><td class="memItemLeft" align="right" valign="top">abstract string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#ac4fa6e22ae29962581f5768b9c2746f2">Name</a><code> [get]</code></td></tr>
+<tr class="separator:ac4fa6e22ae29962581f5768b9c2746f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a048416fbfff1b71ed7e79028dbfb4e38"><td class="memItemLeft" align="right" valign="top">abstract <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_migrator.html#a535524003dc3ff11f85e4705762419cf">EnResourceDependencyType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a048416fbfff1b71ed7e79028dbfb4e38">DependencyType</a><code> [get]</code></td></tr>
+<tr class="separator:a048416fbfff1b71ed7e79028dbfb4e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26525e1c9a01d1e542fcd30c11631bdb"><td class="memItemLeft" align="right" valign="top">abstract string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a26525e1c9a01d1e542fcd30c11631bdb">ResourcePointsConfigPath</a><code> [get]</code></td></tr>
+<tr class="memdesc:a26525e1c9a01d1e542fcd30c11631bdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the config path to the resource points  <a href="#a26525e1c9a01d1e542fcd30c11631bdb">More...</a><br /></td></tr>
+<tr class="separator:a26525e1c9a01d1e542fcd30c11631bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64aea827b2de6d6c570617dd30575ab9"><td class="memItemLeft" align="right" valign="top">abstract string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html#a64aea827b2de6d6c570617dd30575ab9">ResourcesConfigPath</a><code> [get]</code></td></tr>
+<tr class="memdesc:a64aea827b2de6d6c570617dd30575ab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the config path to the resources names  <a href="#a64aea827b2de6d6c570617dd30575ab9">More...</a><br /></td></tr>
+<tr class="separator:a64aea827b2de6d6c570617dd30575ab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td colspan="2" onclick="javascript:toggleInherit('properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator')"><img src="closed.png" alt="-"/>&#160;Properties inherited from <a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html">KlusterKite.NodeManager.Migrator.IMigrator</a></td></tr>
 <tr class="memitem:a2bc2ac96b487353d75aecfa141ad3361 inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#a2bc2ac96b487353d75aecfa141ad3361">LatestPoint</a><code> [get]</code></td></tr>
 <tr class="memdesc:a2bc2ac96b487353d75aecfa141ad3361 inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the latest known migration point identification for this assembly  <a href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#a2bc2ac96b487353d75aecfa141ad3361">More...</a><br /></td></tr>
@@ -136,6 +159,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:aacbb7b707c551184d169660830462cea inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#aacbb7b707c551184d169660830462cea">Name</a><code> [get]</code></td></tr>
 <tr class="memdesc:aacbb7b707c551184d169660830462cea inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the human-readable migrator name  <a href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#aacbb7b707c551184d169660830462cea">More...</a><br /></td></tr>
 <tr class="separator:aacbb7b707c551184d169660830462cea inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac85740451850fb2508c443265ca7d64e inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_migrator.html#a535524003dc3ff11f85e4705762419cf">EnResourceDependencyType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#ac85740451850fb2508c443265ca7d64e">DependencyType</a><code> [get]</code></td></tr>
+<tr class="memdesc:ac85740451850fb2508c443265ca7d64e inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the type of resource dependency  <a href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#ac85740451850fb2508c443265ca7d64e">More...</a><br /></td></tr>
+<tr class="separator:ac85740451850fb2508c443265ca7d64e inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f87092677ace659642429a0e88620de inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="memItemLeft" align="right" valign="top">decimal&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#a2f87092677ace659642429a0e88620de">Priority</a><code> [get]</code></td></tr>
+<tr class="memdesc:a2f87092677ace659642429a0e88620de inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the priority of execution. In case of migration, the migrators will be run in order of priority from largest to lowest  <a href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#a2f87092677ace659642429a0e88620de">More...</a><br /></td></tr>
+<tr class="separator:a2f87092677ace659642429a0e88620de inherit properties_interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_mock.html">Mock</a> resource to test system migrations </p>
@@ -190,7 +219,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#a68d7d41d89baf10c2ebb4c5403f9f47a">KlusterKite.NodeManager.Migrator.IMigrator</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00056">56</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00072">72</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
 
 </div>
 </div>
@@ -214,7 +243,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#aac9c25c89f59668cf60fd3120309130f">KlusterKite.NodeManager.Migrator.IMigrator</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00062">62</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00078">78</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
 
 </div>
 </div>
@@ -237,7 +266,81 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#ae9994ddcc3f6a1ebae2b1a913bec2721">KlusterKite.NodeManager.Migrator.IMigrator</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00072">72</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00088">88</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+
+</div>
+</div>
+<a id="af6d6033b5c460a978dee5b3163c1e799"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6d6033b5c460a978dee5b3163c1e799">&#9670;&nbsp;</a></span>GetRedisKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">abstract string KlusterKite.NodeManager.Mock.MockResourceMigrator.GetRedisKey </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_resource_id.html">ResourceId</a>&#160;</td>
+          <td class="paramname"><em>resourceId</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the redis key for specified resource </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">resourceId</td><td>The resource</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the key in Redis</dd></dl>
+
+<p>Implemented in <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependent.html#ae5c79df5a91a72d221bb3ed400526911">KlusterKite.NodeManager.Mock.MockResourceMigratorDependent</a>, and <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependence.html#ab1f0845fb15100e686c21cadc5551cc0">KlusterKite.NodeManager.Mock.MockResourceMigratorDependence</a>.</p>
+
+</div>
+</div>
+<a id="a5de09dd83c71b58f8c12b2500fb80ba6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5de09dd83c71b58f8c12b2500fb80ba6">&#9670;&nbsp;</a></span>GetResourceName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">abstract string KlusterKite.NodeManager.Mock.MockResourceMigrator.GetResourceName </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>resourceCode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates the resource name for the resource code </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">resourceCode</td><td>The resource code</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The resource name</dd></dl>
+
+<p>Implemented in <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependent.html#a8973f6aac210398387f6b01472d37f57">KlusterKite.NodeManager.Mock.MockResourceMigratorDependent</a>, and <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependence.html#aa2eac05060bcdccb0995e6bf9273ff37">KlusterKite.NodeManager.Mock.MockResourceMigratorDependence</a>.</p>
 
 </div>
 </div>
@@ -271,7 +374,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html#aa66a0830480cf15e5c4df41f7cbb6575">KlusterKite.NodeManager.Migrator.IMigrator</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00079">79</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00095">95</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
 
 </div>
 </div>
@@ -294,21 +397,126 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a5e09f02e643b29c0b2543cf597cb089f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e09f02e643b29c0b2543cf597cb089f">&#9670;&nbsp;</a></span>Name</h2>
+<a id="aefa19d27a47a727b05ed3e64a201fa0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefa19d27a47a727b05ed3e64a201fa0a">&#9670;&nbsp;</a></span>Priority</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">string KlusterKite.NodeManager.Mock.MockResourceMigrator.Name =&gt; &quot;The mock resources&quot;</td>
+          <td class="memname">decimal KlusterKite.NodeManager.Mock.MockResourceMigrator.Priority =&gt; 1M</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p></p>
 
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00059">59</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Property Documentation</h2>
+<a id="a048416fbfff1b71ed7e79028dbfb4e38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a048416fbfff1b71ed7e79028dbfb4e38">&#9670;&nbsp;</a></span>DependencyType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">abstract <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_migrator.html#a535524003dc3ff11f85e4705762419cf">EnResourceDependencyType</a> KlusterKite.NodeManager.Mock.MockResourceMigrator.DependencyType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p></p>
+
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00056">56</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+
+</div>
+</div>
+<a id="ac4fa6e22ae29962581f5768b9c2746f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4fa6e22ae29962581f5768b9c2746f2">&#9670;&nbsp;</a></span>Name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">abstract string KlusterKite.NodeManager.Mock.MockResourceMigrator.Name</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p></p>
+
 <p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00053">53</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+
+</div>
+</div>
+<a id="a26525e1c9a01d1e542fcd30c11631bdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26525e1c9a01d1e542fcd30c11631bdb">&#9670;&nbsp;</a></span>ResourcePointsConfigPath</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">abstract string KlusterKite.NodeManager.Mock.MockResourceMigrator.ResourcePointsConfigPath</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the config path to the resource points </p>
+
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00064">64</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
+
+</div>
+</div>
+<a id="a64aea827b2de6d6c570617dd30575ab9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64aea827b2de6d6c570617dd30575ab9">&#9670;&nbsp;</a></span>ResourcesConfigPath</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">abstract string KlusterKite.NodeManager.Mock.MockResourceMigrator.ResourcesConfigPath</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">get</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the config path to the resources names </p>
+
+<p class="definition">Definition at line <a class="el" href="_mock_resource_migrator_8cs_source.html#l00069">69</a> of file <a class="el" href="_mock_resource_migrator_8cs_source.html">MockResourceMigrator.cs</a>.</p>
 
 </div>
 </div>

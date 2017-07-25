@@ -3,7 +3,6 @@ var searchData=
   ['dataactortests_2ecs',['DataActorTests.cs',['../_data_actor_tests_8cs.html',1,'']]],
   ['databaseinstancename_2ecs',['DatabaseInstanceName.cs',['../_database_instance_name_8cs.html',1,'']]],
   ['datafactory_2ecs',['DataFactory.cs',['../_data_factory_8cs.html',1,'']]],
-  ['datanoprotectionprovider_2ecs',['DataNoProtectionProvider.cs',['../_data_no_protection_provider_8cs.html',1,'']]],
   ['datasourceinnerexception_2ecs',['DatasourceInnerException.cs',['../_datasource_inner_exception_8cs.html',1,'']]],
   ['dataupdater_2ecs',['DataUpdater.cs',['../_data_updater_8cs.html',1,'']]],
   ['dataupdaterconfig_2ecs',['DataUpdaterConfig.cs',['../_data_updater_config_8cs.html',1,'']]],

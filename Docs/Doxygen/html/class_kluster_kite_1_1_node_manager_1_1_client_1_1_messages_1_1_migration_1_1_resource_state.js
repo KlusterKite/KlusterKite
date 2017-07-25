@@ -1,5 +1,6 @@
 var class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state =
 [
+    [ "CleanCanBits", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state.html#affc68570c1188e3325f9a92efb0fd2be", null ],
     [ "CanCancelMigration", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state.html#adacdc143f1d762724d6cb52f190c7d80", null ],
     [ "CanCreateMigration", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state.html#a586d79a2cb4fec038f89e16049b99a19", null ],
     [ "CanFinishMigration", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state.html#a79bc88416803d1c7097856162c5e7b14", null ],

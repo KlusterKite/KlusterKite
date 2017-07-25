@@ -192,13 +192,16 @@ Enumerations</h2></td></tr>
 <tr class="separator:a9ff9c8e6da11ac5ce2ccdd0c37a963c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af195cb63ca84b9747ec68426de29b807"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807">EnMigrationSteps</a> { <br />
 &#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807aa6122a65eaa676f700ae68d393054a37">EnMigrationSteps.Start</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a57503465ff3675093fe18024e54814af">EnMigrationSteps.PreNodesResourcesUpdating</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a7251fab22aa3595a37b6c3a0d29e862e">EnMigrationSteps.PreNodeResourcesUpdated</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a1d6179ee101e1ae8e61fab2021c9adcd">EnMigrationSteps.NodesUpdating</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ad0e3508f9962df90b0a96a057b211aaf">EnMigrationSteps.NodesUpdated</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a52e51cda22be28a757253bc60730894c">EnMigrationSteps.ResourcesUpdating</a>, 
 <br />
-&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807a63347f5368177cc6dfc6c1d4fda102a2">EnMigrationSteps.ResourcesUpdated</a>, 
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ad0e3508f9962df90b0a96a057b211aaf">EnMigrationSteps.NodesUpdated</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807aae4c1d7bfbf9c2b88616e893fff0d2ea">EnMigrationSteps.PostNodesResourcesUpdating</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807aa20ddccbb6f808ec42cd66323e6c6061">EnMigrationSteps.Finish</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ac98dbc22f49f1b4a644307551924f8da">EnMigrationSteps.Broken</a>
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ac98dbc22f49f1b4a644307551924f8da">EnMigrationSteps.Broken</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807ad8afbc541b39d23648c823057cffe3a5">EnMigrationSteps.Recovery</a>
 <br />
  }<tr class="memdesc:af195cb63ca84b9747ec68426de29b807"><td class="mdescLeft">&#160;</td><td class="mdescRight">The list of migration procedure steps  <a href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m.html#af195cb63ca84b9747ec68426de29b807">More...</a><br /></td></tr>
 </td></tr>
@@ -361,7 +364,7 @@ Enumerations</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="_en_migration_log_record_type_8cs_source.html#l00021">21</a> of file <a class="el" href="_en_migration_log_record_type_8cs_source.html">EnMigrationLogRecordType.cs</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_en_migration_log_record_type_8cs_source.html#l00018">18</a> of file <a class="el" href="_en_migration_log_record_type_8cs_source.html">EnMigrationLogRecordType.cs</a>.</p>
 
 </div>
 </div>
@@ -428,17 +431,21 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807aa6122a65eaa676f700ae68d393054a37"></a>Start&#160;</td><td class="fielddoc"><p>The initial migration position, nothing is done </p>
 </td></tr>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a57503465ff3675093fe18024e54814af"></a>PreNodesResourcesUpdating&#160;</td><td class="fielddoc"><p>The resources are in the update stage </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a7251fab22aa3595a37b6c3a0d29e862e"></a>PreNodeResourcesUpdated&#160;</td><td class="fielddoc"><p>The resources were successfully updated </p>
+</td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a1d6179ee101e1ae8e61fab2021c9adcd"></a>NodesUpdating&#160;</td><td class="fielddoc"><p>The nodes are in the update state </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807ad0e3508f9962df90b0a96a057b211aaf"></a>NodesUpdated&#160;</td><td class="fielddoc"><p>The nodes were successfully updated </p>
 </td></tr>
-<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a52e51cda22be28a757253bc60730894c"></a>ResourcesUpdating&#160;</td><td class="fielddoc"><p>The resources are in the update stage </p>
-</td></tr>
-<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807a63347f5368177cc6dfc6c1d4fda102a2"></a>ResourcesUpdated&#160;</td><td class="fielddoc"><p>The resources were successfully updated </p>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807aae4c1d7bfbf9c2b88616e893fff0d2ea"></a>PostNodesResourcesUpdating&#160;</td><td class="fielddoc"><p>The resources are in the update stage </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807aa20ddccbb6f808ec42cd66323e6c6061"></a>Finish&#160;</td><td class="fielddoc"><p>The migration is finished </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807ac98dbc22f49f1b4a644307551924f8da"></a>Broken&#160;</td><td class="fielddoc"><p>The migration is broken </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af195cb63ca84b9747ec68426de29b807ad8afbc541b39d23648c823057cffe3a5"></a>Recovery&#160;</td><td class="fielddoc"><p>The migration is broken, but can be recovered </p>
 </td></tr>
 </table>
 

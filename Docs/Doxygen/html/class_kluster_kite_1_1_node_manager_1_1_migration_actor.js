@@ -7,6 +7,7 @@ var class_kluster_kite_1_1_node_manager_1_1_migration_actor =
       [ "InitializationFailed", "class_kluster_kite_1_1_node_manager_1_1_migration_actor.html#a04468dd6566bc447f52c143df5ccf272ad748cd9cc870c4c5c39577d588f2169c", null ]
     ] ],
     [ "MigrationActor", "class_kluster_kite_1_1_node_manager_1_1_migration_actor.html#a2d4d0df47352288bd63dc2fcfa630479", null ],
+    [ "CreateMigrationState", "class_kluster_kite_1_1_node_manager_1_1_migration_actor.html#a78475bed49225997e47bffd86422f36b", null ],
     [ "PreStart", "class_kluster_kite_1_1_node_manager_1_1_migration_actor.html#a23c912d39aabcca1640ed52023185036", null ],
     [ "Parent", "class_kluster_kite_1_1_node_manager_1_1_migration_actor.html#a518ee71795c8346dd910ccff0fb122cb", null ]
 ];

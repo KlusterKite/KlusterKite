@@ -1,5 +1,9 @@
 var NAVTREEINDEX2 =
 {
+"_i_context_factory_8cs.html":[2,0,2,2,3],
+"_i_context_factory_8cs_source.html":[2,0,2,2,3],
+"_i_crucial_object_8cs.html":[2,0,7,0,7],
+"_i_crucial_object_8cs_source.html":[2,0,7,0,7],
 "_i_crud_action_message_8cs.html":[2,0,2,1,0,5],
 "_i_crud_action_message_8cs_source.html":[2,0,2,1,0,5],
 "_i_large_object_8cs.html":[2,0,2,1,4],
@@ -147,8 +151,8 @@ var NAVTREEINDEX2 =
 "_kluster_kite_8_security_2_kluster_kite_8_security_8_session_redis_2_installer_8cs_source.html":[2,0,7,2,0],
 "_kluster_kite_8_web_2_kluster_kite_8_web_2_installer_8cs.html":[2,0,8,0,1],
 "_kluster_kite_8_web_2_kluster_kite_8_web_2_installer_8cs_source.html":[2,0,8,0,1],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_authentication_2_installer_8cs.html":[2,0,8,1,4],
-"_kluster_kite_8_web_2_kluster_kite_8_web_8_authentication_2_installer_8cs_source.html":[2,0,8,1,4],
+"_kluster_kite_8_web_2_kluster_kite_8_web_8_authentication_2_installer_8cs.html":[2,0,8,1,3],
+"_kluster_kite_8_web_2_kluster_kite_8_web_8_authentication_2_installer_8cs_source.html":[2,0,8,1,3],
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_authorization_2_attributes_2_require_session_attribute_8cs.html":[2,0,8,2,0,1],
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_authorization_2_attributes_2_require_session_attribute_8cs_source.html":[2,0,8,2,0,1],
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_authorization_2_attributes_2_require_user_attribute_8cs.html":[2,0,8,2,0,2],
@@ -169,8 +173,8 @@ var NAVTREEINDEX2 =
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_rest_2_installer_8cs_source.html":[2,0,8,7,1],
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_tests_2_rest_sharp_utils_8cs.html":[2,0,8,8,5],
 "_kluster_kite_8_web_2_kluster_kite_8_web_8_tests_2_rest_sharp_utils_8cs_source.html":[2,0,8,8,5],
-"_kluster_kite_8_web_8_authentication_2_web_hosting_configurator_8cs.html":[2,0,8,1,6],
-"_kluster_kite_8_web_8_authentication_2_web_hosting_configurator_8cs_source.html":[2,0,8,1,6],
+"_kluster_kite_8_web_8_authentication_2_web_hosting_configurator_8cs.html":[2,0,8,1,5],
+"_kluster_kite_8_web_8_authentication_2_web_hosting_configurator_8cs_source.html":[2,0,8,1,5],
 "_kluster_kite_8_web_8_authorization_2_web_hosting_configurator_8cs.html":[2,0,8,2,5],
 "_kluster_kite_8_web_8_authorization_2_web_hosting_configurator_8cs_source.html":[2,0,8,2,5],
 "_kluster_kite_8_web_8_graph_q_l_8_publisher_2_web_hosting_configurator_8cs.html":[2,0,8,5,13],
@@ -245,9 +249,5 @@ var NAVTREEINDEX2 =
 "_migrator_migration_state_8cs_source.html":[2,0,6,2,2,4],
 "_migrator_migrations_command_8cs.html":[2,0,6,0,1,3],
 "_migrator_migrations_command_8cs_source.html":[2,0,6,0,1,3],
-"_migrator_template_8cs.html":[2,0,6,2,3,12],
-"_migrator_template_8cs_source.html":[2,0,6,2,3,12],
-"_migrator_template_configuration_state_8cs.html":[2,0,6,2,2,5],
-"_migrator_template_configuration_state_8cs_source.html":[2,0,6,2,2,5],
-"_migrator_template_migration_state_8cs.html":[2,0,6,2,2,6]
+"_migrator_template_8cs.html":[2,0,6,2,3,12]
 };

@@ -1,5 +1,8 @@
 var class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state =
 [
-    [ "Position", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#a6b598356f80fbdbac4b10a0ebc49e679", null ],
+    [ "GetMigrationSteps", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#a54264abb35b5810a210673cdb723803e", null ],
+    [ "GetPostNodesMigratableResources", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#a97d5c4986880700c1ad13dd0744ab15d", null ],
+    [ "GetPreNodesMigratableResources", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#a869bfdc5c805f9f9baa398c02794b4d7", null ],
+    [ "MigratableResources", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#a5f4d36756af7e751820c09bfc82efc58", null ],
     [ "TemplateStates", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_migration_actor_migration_state.html#ac6dbf71f4a30bf762383c0500b708bd7", null ]
 ];

@@ -22,6 +22,7 @@ var searchData=
   ['enparcelserverresponsecode',['EnParcelServerResponseCode',['../namespace_kluster_kite_1_1_large_objects_1_1_client.html#a4465d9f1b743d469bb379e2fa91b496c',1,'KlusterKite::LargeObjects::Client']]],
   ['enprivilegescope',['EnPrivilegeScope',['../namespace_kluster_kite_1_1_a_p_i_1_1_attributes_1_1_authorization.html#a812e66f68b18b2cc0aa1cf4ba5394fc2',1,'KlusterKite::API::Attributes::Authorization']]],
   ['enprivilegetarget',['EnPrivilegeTarget',['../namespace_kluster_kite_1_1_security_1_1_attributes.html#a4fcd8c8e72a8151d8bcc50fc929d8523',1,'KlusterKite::Security::Attributes']]],
+  ['enresourcedependencytype',['EnResourceDependencyType',['../namespace_kluster_kite_1_1_node_manager_1_1_migrator.html#a535524003dc3ff11f85e4705762419cf',1,'KlusterKite::NodeManager::Migrator']]],
   ['enresourceposition',['EnResourcePosition',['../namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969',1,'KlusterKite::NodeManager::Client::MigrationStates']]],
   ['enscalartype',['EnScalarType',['../namespace_kluster_kite_1_1_a_p_i_1_1_client.html#a845959c5ead66d3fd44f4b60df2b9cb9',1,'KlusterKite::API::Client']]],
   ['ensecuritylogtype',['EnSecurityLogType',['../namespace_kluster_kite_1_1_security_1_1_attributes.html#a54974bb01e8e0efdfd27844d10d93af0',1,'KlusterKite::Security::Attributes']]],

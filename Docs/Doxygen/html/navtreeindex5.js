@@ -1,5 +1,16 @@
 var NAVTREEINDEX5 =
 {
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_error_description.html#abdc336d19659f5d9a1694cd7d60d1cb7":[1,0,0,0,1,10,4],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_error_description.html#ae123266811bb1953bb3375407cfd6eb0":[1,0,0,0,1,10,0],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_extensions.html":[1,0,0,0,1,11],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_extensions.html#aa21f3416473fd27e108cf7160ea30d00":[1,0,0,0,1,11,0],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_api_discover_request.html":[1,0,0,0,1,1,0],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_api_discover_response.html":[1,0,0,0,1,1,1],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_api_discover_response.html#ac22b7f452a90c12333d53864648b69aa":[1,0,0,0,1,1,1,1],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_api_discover_response.html#adfa2ff70a35222a706a6dff8b0bac29c":[1,0,0,0,1,1,1,0],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_surrogatable_j_object.html":[1,0,0,0,1,1,2],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_surrogatable_j_object.html#a543191fe420a081b7d94547da034a616":[1,0,0,0,1,1,2,3],
+"class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_surrogatable_j_object.html#a88977b26242db72c0cb1a6245d4937ff":[1,0,0,0,1,1,2,1],
 "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_surrogatable_j_object.html#aa58a1c67fa408ce8fba99f8ac32b5dc0":[1,0,0,0,1,1,2,0],
 "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_surrogatable_j_object.html#acb5f2cefaddd6f817de3b5a2dbf6a612":[1,0,0,0,1,1,2,2],
 "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_messages_1_1_surrogate_j_object.html":[1,0,0,0,1,1,3],
@@ -111,6 +122,7 @@ var NAVTREEINDEX5 =
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_resolve_tests.html#af5f6434d9101ac286e02a647ddefbcdd":[1,0,0,0,4,2,16],
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_tests.html":[1,0,0,0,4,3],
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_tests.html#a1b12a18d51e3d48dfeb52c1e8939e6ca":[1,0,0,0,4,3,4],
+"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_tests.html#a1fdaa51bd2531dbf9b976e1deb172da6":[1,0,0,0,4,3,6],
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_tests.html#a79136f7897e1f55b08e5561b42d0fc95":[1,0,0,0,4,3,5],
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_tests_1_1_demo_api.html":[1,0,0,0,4,3,0],
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_api_provider_tests_1_1_demo_api.html#a1c46f4a58d5cec328bc7835e263c0d56":[1,0,0,0,4,3,0,1],
@@ -237,17 +249,5 @@ var NAVTREEINDEX5 =
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#aec7db41782702c5be1ebf709a59e525f":[1,0,0,0,4,0,7,26],
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#aee7d5388e1733701667469fed92d7f04":[1,0,0,0,4,0,7,44],
 "class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#af2ab6a0e3956b7132a0b98c8a29f10e9":[1,0,0,0,4,0,7,29],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#af3475592e2a1402c6af49b5173f7f045":[1,0,0,0,4,0,7,16],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#af5d518e86e85cdd1d7dfbcda951c3124":[1,0,0,0,4,0,7,33],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#af6b6c94719da7fffb2ab055147c961b9":[1,0,0,0,4,0,7,12],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#af8222daea7fea78d79299424361d5041":[1,0,0,0,4,0,7,7],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#afd5343d35b915bef60dededdad567dd3":[1,0,0,0,4,0,7,5],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#afeda962647019075ba0f16cdd1c440f8":[1,0,0,0,4,0,7,21],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#affc2320b9adecbf951d7094cb73b59d5":[1,0,0,0,4,0,7,47],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_second_provider.html":[1,0,0,0,4,0,8],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_second_provider.html#a9a03c7be0f8447670d110bde31fa97a3":[1,0,0,0,4,0,8,0],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_third_party_object.html":[1,0,0,0,4,0,9],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_third_party_object.html#a05bb6cf8e0b6d70d56533a9d71312974":[1,0,0,0,4,0,9,1],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_third_party_object.html#a37031c252f3bd0ab1aef571fe76459f0":[1,0,0,0,4,0,9,2],
-"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_third_party_object.html#ae8e8839200cba51f293f037aee7ce940":[1,0,0,0,4,0,9,3]
+"class_kluster_kite_1_1_a_p_i_1_1_tests_1_1_mock_1_1_test_provider.html#af3475592e2a1402c6af49b5173f7f045":[1,0,0,0,4,0,7,16]
 };

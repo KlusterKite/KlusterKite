@@ -261,7 +261,6 @@ var hierarchy =
       ] ],
       [ "KlusterKite.NodeManager.Launcher.Utils.Exceptions.PackageNotFoundException", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_exceptions_1_1_package_not_found_exception.html", null ]
     ] ],
-    [ "KlusterKite.NodeManager.Migrator.Executor", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor.html", null ],
     [ "ExpressionVisitor", null, [
       [ "KlusterKite.API.Provider.Resolvers.SwapVisitor", "class_kluster_kite_1_1_a_p_i_1_1_provider_1_1_resolvers_1_1_swap_visitor.html", null ]
     ] ],
@@ -315,9 +314,6 @@ var hierarchy =
     [ "KlusterKite.Data.CRUD.ActionMessages.ICrudActionMessage", "interface_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_action_messages_1_1_i_crud_action_message.html", [
       [ "KlusterKite.Data.CRUD.ActionMessages.CrudActionMessage< TData, TId >", "class_kluster_kite_1_1_data_1_1_c_r_u_d_1_1_action_messages_1_1_crud_action_message.html", null ]
     ] ],
-    [ "IDataProtectionProvider", null, [
-      [ "KlusterKite.Web.Authentication.DataNoProtectionProvider", "class_kluster_kite_1_1_web_1_1_authentication_1_1_data_no_protection_provider.html", null ]
-    ] ],
     [ "IDbContextFactory", null, [
       [ "KlusterKite.NodeManager.ConfigurationSource.Migrator.ConfigurationDbContextFactory", "class_kluster_kite_1_1_node_manager_1_1_configuration_source_1_1_migrator_1_1_configuration_db_context_factory.html", null ]
     ] ],
@@ -354,8 +350,14 @@ var hierarchy =
     ] ],
     [ "KlusterKite.NodeManager.Migrator.IMigrator", "interface_kluster_kite_1_1_node_manager_1_1_migrator_1_1_i_migrator.html", [
       [ "KlusterKite.NodeManager.Migrator.EF.BaseDatabaseMigrator< TContext >", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_e_f_1_1_base_database_migrator.html", null ],
-      [ "KlusterKite.NodeManager.Mock.MockResourceMigrator", "class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html", null ],
-      [ "KlusterKite.NodeManager.Tests.Migrations.TestMigrator", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator.html", null ]
+      [ "KlusterKite.NodeManager.Mock.MockResourceMigrator", "class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator.html", [
+        [ "KlusterKite.NodeManager.Mock.MockResourceMigratorDependence", "class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependence.html", null ],
+        [ "KlusterKite.NodeManager.Mock.MockResourceMigratorDependent", "class_kluster_kite_1_1_node_manager_1_1_mock_1_1_mock_resource_migrator_dependent.html", null ]
+      ] ],
+      [ "KlusterKite.NodeManager.Tests.Migrations.TestMigrator", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator.html", [
+        [ "KlusterKite.NodeManager.Tests.Migrations.TestMigrator.Dependence", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator_1_1_dependence.html", null ],
+        [ "KlusterKite.NodeManager.Tests.Migrations.TestMigrator.Dependent", "class_kluster_kite_1_1_node_manager_1_1_tests_1_1_migrations_1_1_test_migrator_1_1_dependent.html", null ]
+      ] ]
     ] ],
     [ "KlusterKite.API.Client.INodeConnection< T >", "interface_kluster_kite_1_1_a_p_i_1_1_client_1_1_i_node_connection.html", null ],
     [ "KlusterKite.API.Client.INodeConnection< KlusterKite.API.Tests.ApiProviderTests.NodeObject >", "interface_kluster_kite_1_1_a_p_i_1_1_client_1_1_i_node_connection.html", null ],
@@ -505,17 +507,17 @@ var hierarchy =
     [ "KlusterKite.Core.Ping.PongMessage", "class_kluster_kite_1_1_core_1_1_ping_1_1_pong_message.html", null ],
     [ "KlusterKite.Security.Attributes.PrivilegeDescription", "class_kluster_kite_1_1_security_1_1_attributes_1_1_privilege_description.html", null ],
     [ "KlusterKite.Security.Tests.PrivilegeDescriptionTests", "class_kluster_kite_1_1_security_1_1_tests_1_1_privilege_description_tests.html", null ],
-    [ "KlusterKite.Web.Authorization.Privileges", "class_kluster_kite_1_1_web_1_1_authorization_1_1_privileges.html", null ],
     [ "KlusterKite.NodeManager.Client.Privileges", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_privileges.html", null ],
     [ "KlusterKite.Monitoring.Client.Privileges", "class_kluster_kite_1_1_monitoring_1_1_client_1_1_privileges.html", null ],
+    [ "KlusterKite.Web.Authorization.Privileges", "class_kluster_kite_1_1_web_1_1_authorization_1_1_privileges.html", null ],
     [ "KlusterKite.NodeManager.Launcher.Utils.ProcessHelper", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_utils_1_1_process_helper.html", null ],
     [ "KlusterKite.NodeManager.Client.Messages.Migration.ProcessingTheRequest", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_processing_the_request.html", null ],
-    [ "KlusterKite.NodeManager.FallbackPackageFixer.Program", "class_kluster_kite_1_1_node_manager_1_1_fallback_package_fixer_1_1_program.html", null ],
-    [ "KlusterKite.NodeManager.Migrator.Executor.Program", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor_1_1_program.html", null ],
-    [ "KlusterKite.NodeManager.Seeder.Program", "class_kluster_kite_1_1_node_manager_1_1_seeder_1_1_program.html", null ],
-    [ "KlusterKite.NodeManager.Seeder.Launcher.Program", "class_kluster_kite_1_1_node_manager_1_1_seeder_1_1_launcher_1_1_program.html", null ],
     [ "KlusterKite.Core.Service.Program", "class_kluster_kite_1_1_core_1_1_service_1_1_program.html", null ],
+    [ "KlusterKite.NodeManager.Seeder.Program", "class_kluster_kite_1_1_node_manager_1_1_seeder_1_1_program.html", null ],
+    [ "KlusterKite.NodeManager.FallbackPackageFixer.Program", "class_kluster_kite_1_1_node_manager_1_1_fallback_package_fixer_1_1_program.html", null ],
     [ "KlusterKite.NodeManager.Launcher.Program", "class_kluster_kite_1_1_node_manager_1_1_launcher_1_1_program.html", null ],
+    [ "KlusterKite.NodeManager.Migrator.Executor.Program", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_executor_1_1_program.html", null ],
+    [ "KlusterKite.NodeManager.Seeder.Launcher.Program", "class_kluster_kite_1_1_node_manager_1_1_seeder_1_1_launcher_1_1_program.html", null ],
     [ "KlusterKite.Web.GraphQL.Publisher.Queries", "class_kluster_kite_1_1_web_1_1_graph_q_l_1_1_publisher_1_1_queries.html", null ],
     [ "KlusterKite.API.Client.QueryApiRequest", "class_kluster_kite_1_1_a_p_i_1_1_client_1_1_query_api_request.html", null ],
     [ "KlusterKite.Web.GraphQL.Publisher.EndpointController.QueryRequest", "class_kluster_kite_1_1_web_1_1_graph_q_l_1_1_publisher_1_1_endpoint_controller_1_1_query_request.html", null ],
@@ -551,6 +553,7 @@ var hierarchy =
       [ "KlusterKite.NodeManager.Client.MigrationStates.ResourceMigrationState", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states_1_1_resource_migration_state.html", null ]
     ] ],
     [ "KlusterKite.NodeManager.Migrator.ResourceId", "class_kluster_kite_1_1_node_manager_1_1_migrator_1_1_resource_id.html", null ],
+    [ "KlusterKite.NodeManager.RemoteDomain.ResourceMigrationCommand", "class_kluster_kite_1_1_node_manager_1_1_remote_domain_1_1_resource_migration_command.html", null ],
     [ "KlusterKite.NodeManager.Client.Messages.Migration.ResourceState", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state.html", null ],
     [ "KlusterKite.NodeManager.Client.Messages.Migration.ResourceStateRequest", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_state_request.html", null ],
     [ "KlusterKite.NodeManager.Client.Messages.Migration.ResourceUpgrade", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_messages_1_1_migration_1_1_resource_upgrade.html", null ],

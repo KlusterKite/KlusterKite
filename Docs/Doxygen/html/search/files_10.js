@@ -18,6 +18,7 @@ var searchData=
   ['resettablevaluegenerator_2ecs',['ResettableValueGenerator.cs',['../_resettable_value_generator_8cs.html',1,'']]],
   ['resourceconfigurationstate_2ecs',['ResourceConfigurationState.cs',['../_resource_configuration_state_8cs.html',1,'']]],
   ['resourceid_2ecs',['ResourceId.cs',['../_resource_id_8cs.html',1,'']]],
+  ['resourcemigrationcommand_2ecs',['ResourceMigrationCommand.cs',['../_resource_migration_command_8cs.html',1,'']]],
   ['resourcemigrationstate_2ecs',['ResourceMigrationState.cs',['../_resource_migration_state_8cs.html',1,'']]],
   ['resourcestate_2ecs',['ResourceState.cs',['../_resource_state_8cs.html',1,'']]],
   ['resourcestaterequest_2ecs',['ResourceStateRequest.cs',['../_resource_state_request_8cs.html',1,'']]],

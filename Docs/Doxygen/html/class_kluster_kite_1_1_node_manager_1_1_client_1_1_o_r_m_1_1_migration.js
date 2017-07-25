@@ -1,7 +1,6 @@
 var class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_migration =
 [
     [ "GetId", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_migration.html#a0a61a6846793a403d402e1df28252b45", null ],
-    [ "Direction", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_migration.html#a814960dd7c85b5bc5c7703b7d763a3f5", null ],
     [ "Finished", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_migration.html#a2039544e0e70a940425700a824713ff9", null ],
     [ "FromConfiguration", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_migration.html#a579b97da3524569a17b5feeed577f915", null ],
     [ "FromConfigurationId", "class_kluster_kite_1_1_node_manager_1_1_client_1_1_o_r_m_1_1_migration.html#a48bbff8c1bdcdd53d196ba4967808a34", null ],

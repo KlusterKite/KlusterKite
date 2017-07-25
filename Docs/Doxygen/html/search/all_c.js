@@ -31,7 +31,7 @@ var searchData=
   ['graphtypes',['GraphTypes',['../namespace_kluster_kite_1_1_web_1_1_graph_q_l_1_1_publisher_1_1_graph_types.html',1,'KlusterKite::Web::GraphQL::Publisher']]],
   ['inmemory',['InMemory',['../namespace_kluster_kite_1_1_data_1_1_e_f_1_1_in_memory.html',1,'KlusterKite::Data::EF']]],
   ['internals',['Internals',['../namespace_kluster_kite_1_1_web_1_1_graph_q_l_1_1_publisher_1_1_internals.html',1,'KlusterKite::Web::GraphQL::Publisher']]],
-  ['key',['Key',['../class_kluster_kite_1_1_a_p_i_1_1_client_1_1_converters_1_1_pair.html#a7bc05df36f5d4408bf89cac50dfc951d',1,'KlusterKite::API::Client::Converters::Pair']]],
+  ['key',['Key',['../class_kluster_kite_1_1_a_p_i_1_1_client_1_1_converters_1_1_pair.html#a7bc05df36f5d4408bf89cac50dfc951d',1,'KlusterKite.API.Client.Converters.Pair.Key()'],['../class_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states_1_1_resource_configuration_state.html#aa11ee97e293609a0478c1ff35f2d0eef',1,'KlusterKite.NodeManager.Client.MigrationStates.ResourceConfigurationState.Key()']]],
   ['klusterkite',['KlusterKite',['../namespace_kluster_kite.html',1,'']]],
   ['klusterkiteclientprivileges',['KlusterKiteClientPrivileges',['../class_kluster_kite_1_1_node_manager_1_1_web_api_1_1_current_user_api.html#a3da35b655f47f8e55b01c00167ac7960',1,'KlusterKite::NodeManager::WebApi::CurrentUserApi']]],
   ['klusterkitemonitoringapi',['KlusterKiteMonitoringApi',['../class_kluster_kite_1_1_monitoring_1_1_monitoring_api_provider.html#a9bf3237ea871f8b8b98b7b66819eb4ef',1,'KlusterKite::Monitoring::MonitoringApiProvider']]],

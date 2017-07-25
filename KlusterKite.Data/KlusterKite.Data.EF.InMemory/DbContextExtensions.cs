@@ -3,7 +3,7 @@
 //   All rights reserved
 // </copyright>
 // <summary>
-//   Fixing the <see href="https://github.com/aspnet/EntityFramework/issues/6872#issuecomment-258025241" />
+//   Fixing the https://github.com/aspnet/EntityFramework/issues/6872#issuecomment-258025241
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 

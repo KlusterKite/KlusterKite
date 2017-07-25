@@ -118,7 +118,7 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr class="separator:a023ac50a14815a8e352ca251069947f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4578914b3acc87ad07fe4ac859493d9e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#a4578914b3acc87ad07fe4ac859493d9e">EnMigratorPosition</a> { <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#a4578914b3acc87ad07fe4ac859493d9ea03c2e7e41ffc181a4e84080b4710e81e">EnMigratorPosition.New</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#a4578914b3acc87ad07fe4ac859493d9ea63911b0b34ebf2a1fbc8f960d1d5cbcb">EnMigratorPosition.Merged</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#a4578914b3acc87ad07fe4ac859493d9eadd058df87f5c88e3285a28ad7406a3c6">EnMigratorPosition.Present</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#a4578914b3acc87ad07fe4ac859493d9eaec30c235d0eb792797af1aa1d11759a7">EnMigratorPosition.Obsolete</a>
  }<tr class="memdesc:a4578914b3acc87ad07fe4ac859493d9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The IMigrator or MigratorTemplateMigrationState position in the migration  <a href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#a4578914b3acc87ad07fe4ac859493d9e">More...</a><br /></td></tr>
 </td></tr>
@@ -126,10 +126,11 @@ Enumerations</h2></td></tr>
 <tr class="memitem:ae343f150f3a37211155023d157cfb969"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969">EnResourcePosition</a> { <br />
 &#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969af1ee8f4398bb0d5a935b3fe7ed398802">EnResourcePosition.NotCreated</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969af31bbdd1b3e85bccd652680e16935819">EnResourcePosition.Source</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969aec0fc0100c4fc1ce4eea230c3dc10360">EnResourcePosition.Undefined</a>, 
-<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969a12007e1d59f4d09c87dbe2c438256244">EnResourcePosition.Destination</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969a480f292844cd7712c4bdff3bd91d0a78">EnResourcePosition.InScope</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969af94efd3512d02700ee98dda773a27938">EnResourcePosition.OutOfScope</a>, 
 <br />
-&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969acaf2e64cbf30ef709f363a3f73a4dd1a">EnResourcePosition.SourceAndDestination</a>, 
+&#160;&#160;<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969a12007e1d59f4d09c87dbe2c438256244">EnResourcePosition.Destination</a>, 
+<a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969acaf2e64cbf30ef709f363a3f73a4dd1a">EnResourcePosition.SourceAndDestination</a>, 
 <a class="el" href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969aec30c235d0eb792797af1aa1d11759a7">EnResourcePosition.Obsolete</a>
 <br />
  }<tr class="memdesc:ae343f150f3a37211155023d157cfb969"><td class="mdescLeft">&#160;</td><td class="mdescRight">The possible resource migration position according to current migration  <a href="namespace_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states.html#ae343f150f3a37211155023d157cfb969">More...</a><br /></td></tr>
@@ -191,9 +192,9 @@ Enumerations</h2></td></tr>
 
 <p>The IMigrator or <a class="el" href="class_kluster_kite_1_1_node_manager_1_1_client_1_1_migration_states_1_1_migrator_template_migration_state.html" title="The migrator template state according to the migration ">MigratorTemplateMigrationState</a> position in the migration </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a4578914b3acc87ad07fe4ac859493d9ea03c2e7e41ffc181a4e84080b4710e81e"></a>New&#160;</td><td class="fielddoc"><p>This entity was introduce in the destination configuration </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a4578914b3acc87ad07fe4ac859493d9ea03c2e7e41ffc181a4e84080b4710e81e"></a>New&#160;</td><td class="fielddoc"><p>This entity was introduced in the destination configuration </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a4578914b3acc87ad07fe4ac859493d9ea63911b0b34ebf2a1fbc8f960d1d5cbcb"></a>Merged&#160;</td><td class="fielddoc"><p>This entity is located in both source and destination configuration </p>
+<tr><td class="fieldname"><a id="a4578914b3acc87ad07fe4ac859493d9eadd058df87f5c88e3285a28ad7406a3c6"></a>Present&#160;</td><td class="fielddoc"><p>This entity is located in both source and destination configuration </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a4578914b3acc87ad07fe4ac859493d9eaec30c235d0eb792797af1aa1d11759a7"></a>Obsolete&#160;</td><td class="fielddoc"><p>This entity is not present in the destination configuration </p>
 </td></tr>
@@ -229,7 +230,9 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="ae343f150f3a37211155023d157cfb969af31bbdd1b3e85bccd652680e16935819"></a>Source&#160;</td><td class="fielddoc"><p>The resource is in the source point migration </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ae343f150f3a37211155023d157cfb969aec0fc0100c4fc1ce4eea230c3dc10360"></a>Undefined&#160;</td><td class="fielddoc"><p>The migration position of the resource is neither source nor destination </p>
+<tr><td class="fieldname"><a id="ae343f150f3a37211155023d157cfb969a480f292844cd7712c4bdff3bd91d0a78"></a>InScope&#160;</td><td class="fielddoc"><p>The migration position of the resource is neither source nor destination, but can be updated to source or destination </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae343f150f3a37211155023d157cfb969af94efd3512d02700ee98dda773a27938"></a>OutOfScope&#160;</td><td class="fielddoc"><p>The migration position of the resource is neither source nor destination and cannot be updated to source or destination </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ae343f150f3a37211155023d157cfb969a12007e1d59f4d09c87dbe2c438256244"></a>Destination&#160;</td><td class="fielddoc"><p>The resource is in the destination point migration </p>
 </td></tr>
