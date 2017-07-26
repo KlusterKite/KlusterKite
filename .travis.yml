@@ -25,6 +25,7 @@ before install:
 
 mono:
   - latest
+dotnet: 1.0.4
 
 script: 
   - fake run build.fsx
