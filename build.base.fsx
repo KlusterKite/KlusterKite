@@ -383,7 +383,7 @@ module  Base =
             ExecProcess(fun info ->
                 info.FileName <- "dotnet"
                 info.WorkingDirectory <- (Directory.GetParent project).FullName
-                info.Arguments <- (sprintf "xunit -parallel none -teamcity -xml %s/%s_xunit.xml" outputTests (Path.GetFileNameWithoutExtension project))) (TimeSpan.FromMinutes 30.) 
+                info.Arguments <- (sprintf "xunit -parallel none -xml %s/%s_xunit.xml" outputTests (Path.GetFileNameWithoutExtension project))) (TimeSpan.FromMinutes 30.) 
                 |> ignore
 
         filesInDirMatchingRecursive "*.csproj" (new DirectoryInfo(sourcesDir))

@@ -23,9 +23,8 @@ before install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl      ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew link --force openssl ; fi
 
-mono:
-  - latest
+mono: latest
 dotnet: 1.0.4
 
 script: 
-  - fake run build.fsx
+  - fake run -t "Tests" build.fsx
