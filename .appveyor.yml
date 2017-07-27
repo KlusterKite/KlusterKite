@@ -1,4 +1,6 @@
 image: Visual Studio 2017
+environment:
+  version: '0.0.{build}-{branch}'
 install:
   - choco install fake -pre
 build_script:
