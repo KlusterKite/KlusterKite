@@ -1,6 +1,6 @@
 image: Visual Studio 2017
 install:
-  - cinst fake
+  - choco install fake -pre
 build_script:
   - fake run build.fsx
 test_script:
