@@ -12,5 +12,5 @@ module Config =
     let packagePushDir = Path.GetFullPath("./packagePush")
     let packageThirdPartyDir = Path.GetFullPath("./packageThirdPartyDir")
 
-    let envVersion = environVarOrDefault "version" null
-    let mutable version = if envVersion <> null then envVersion else "0.0.0-local"
+    let envVersion = environVarOrDefault "version" (environVarOrDefault "APPVEYOR_BUILD_VERSION" "0.0.0-local")
+    let mutable version = envVersion
