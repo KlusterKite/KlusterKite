@@ -7,3 +7,5 @@ test_script:
   - fake run -t "Tests" build.fsx
 artifacts:
   - path: packageOut
+nuget:
+  project_feed: true
