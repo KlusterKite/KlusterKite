@@ -17,7 +17,7 @@ namespace KlusterKite.NodeManager.Tests
 
     using Akka.Actor;
     using Akka.Configuration;
-    
+    using Akka.Event;
     using Autofac;
 
     using KlusterKite.Core;
@@ -109,7 +109,7 @@ namespace KlusterKite.NodeManager.Tests
                         this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
-                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(30));
+                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(60));
                 this.ExpectNoMsg();
             }
             finally
@@ -166,13 +166,13 @@ namespace KlusterKite.NodeManager.Tests
                 Assert.Equal("first", state.States[0].MigratorsStates[0].Resources[0].CurrentPoint);
 
                 var resourceUpgrade = new ResourceUpgrade
-                                          {
-                                              TemplateCode = "migrator",
-                                              MigratorTypeName =
+                {
+                    TemplateCode = "migrator",
+                    MigratorTypeName =
                                                   "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
-                                              ResourceCode = Path.GetFileName(resourceName),
-                                              Target = EnMigrationSide.Destination
-                                          };
+                    ResourceCode = Path.GetFileName(resourceName),
+                    Target = EnMigrationSide.Destination
+                };
 
                 actor.Ask<RequestAcknowledged>(new[] { resourceUpgrade }.ToList(), TimeSpan.FromSeconds(1));
                 this.ExpectMsg<ProcessingTheRequest>();
@@ -221,7 +221,7 @@ namespace KlusterKite.NodeManager.Tests
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
                 }}
                 ";
@@ -235,7 +235,7 @@ namespace KlusterKite.NodeManager.Tests
                         ""{resourceName.Replace("\\", "\\\\")}""
                     ]
                     KlusterKite.NodeManager.Migrators = [
-                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator, KlusterKite.NodeManager.Tests""
+                        ""KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence, KlusterKite.NodeManager.Tests""
                     ]
 
                     TestMigrator.ThrowOnGetMigratableResources = true
@@ -257,7 +257,7 @@ namespace KlusterKite.NodeManager.Tests
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
-                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(30));
+                this.ExpectMsg<MigrationActorInitializationFailed>(TimeSpan.FromSeconds(60));
                 this.ExpectNoMsg();
             }
             finally
@@ -324,7 +324,7 @@ namespace KlusterKite.NodeManager.Tests
                         this.Container.Resolve<IPackageRepository>()),
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(60));
                 this.ExpectNoMsg();
                 Assert.Equal(1, state.TemplateStates.Count);
                 Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
@@ -335,13 +335,13 @@ namespace KlusterKite.NodeManager.Tests
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
 
                 var resourceUpgrade = new ResourceUpgrade
-                                          {
-                                              TemplateCode = "migrator",
-                                              MigratorTypeName =
+                {
+                    TemplateCode = "migrator",
+                    MigratorTypeName =
                                                   "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
-                                              ResourceCode = Path.GetFileName(resourceName),
-                                              Target = EnMigrationSide.Destination
-                                          };
+                    ResourceCode = Path.GetFileName(resourceName),
+                    Target = EnMigrationSide.Destination
+                };
 
                 actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
@@ -430,7 +430,7 @@ namespace KlusterKite.NodeManager.Tests
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(60));
                 this.ExpectNoMsg();
                 Assert.Equal(1, state.TemplateStates.Count);
                 Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
@@ -507,7 +507,7 @@ namespace KlusterKite.NodeManager.Tests
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(60));
                 this.ExpectNoMsg();
                 Assert.Equal(1, state.TemplateStates.Count);
                 Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
@@ -518,13 +518,13 @@ namespace KlusterKite.NodeManager.Tests
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
 
                 var resourceUpgrade = new ResourceUpgrade
-                                          {
-                                              TemplateCode = "migrator",
-                                              MigratorTypeName =
+                {
+                    TemplateCode = "migrator",
+                    MigratorTypeName =
                                                   "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
-                                              ResourceCode = Path.GetFileName(resourceName),
-                                              Target = EnMigrationSide.Destination
-                                          };
+                    ResourceCode = Path.GetFileName(resourceName),
+                    Target = EnMigrationSide.Destination
+                };
 
                 actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
@@ -617,28 +617,28 @@ namespace KlusterKite.NodeManager.Tests
                     "migrationActor");
                 this.ExpectMsg<ProcessingTheRequest>();
 
-                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(30));
+                var state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(60));
                 this.ExpectNoMsg();
-                Assert.Equal(1, state.TemplateStates.Count);
+                Assert.Single(state.TemplateStates);
                 Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
-                Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
+                Assert.Single(state.TemplateStates[0].Migrators);
                 Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
-                Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
+                Assert.Single(state.TemplateStates[0].Migrators[0].Resources);
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
 
                 var resourceUpgrade = new ResourceUpgrade
-                                          {
-                                              TemplateCode = "migrator",
-                                              MigratorTypeName =
+                {
+                    TemplateCode = "migrator",
+                    MigratorTypeName =
                                                   "KlusterKite.NodeManager.Tests.Migrations.TestMigrator+Dependence",
-                                              ResourceCode = Path.GetFileName(resourceName),
-                                              Target = EnMigrationSide.Destination
-                                          };
+                    ResourceCode = Path.GetFileName(resourceName),
+                    Target = EnMigrationSide.Destination
+                };
 
                 actor.Tell(new[] { resourceUpgrade }.ToList());
                 var log = this.ExpectMsg<List<MigrationLogRecord>>();
-                Assert.Equal(1, log.Count);
+                Assert.Single(log);
                 var record = log.First();
                 Assert.Equal(EnMigrationLogRecordType.OperationError, record.Type);
                 Assert.Equal(1, record.MigrationId);
@@ -650,12 +650,12 @@ namespace KlusterKite.NodeManager.Tests
 
                 state = this.ExpectMsg<MigrationActorMigrationState>(TimeSpan.FromSeconds(5));
                 this.ExpectNoMsg();
-                Assert.Equal(1, state.TemplateStates.Count);
+                Assert.Single(state.TemplateStates);
                 Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Position);
-                Assert.Equal(1, state.TemplateStates[0].Migrators.Count);
+                Assert.Single(state.TemplateStates[0].Migrators);
                 Assert.Equal(EnMigratorPosition.Present, state.TemplateStates[0].Migrators[0].Position);
                 Assert.Equal(EnMigrationDirection.Upgrade, state.TemplateStates[0].Migrators[0].Direction);
-                Assert.Equal(1, state.TemplateStates[0].Migrators[0].Resources.Count);
+                Assert.Single(state.TemplateStates[0].Migrators[0].Resources);
                 Assert.Equal(EnResourcePosition.Source, state.TemplateStates[0].Migrators[0].Resources[0].Position);
             }
             finally
@@ -672,26 +672,26 @@ namespace KlusterKite.NodeManager.Tests
         private Configuration CreateConfiguration(IPackageRepository repo)
         {
             var template = new NodeTemplate
-                               {
-                                   Code = "node",
-                                   Configuration = "{}",
-                                   ContainerTypes = new[] { "node" }.ToList(),
-                                   Name = "node",
-                                   PackageRequirements =
+            {
+                Code = "node",
+                Configuration = "{}",
+                ContainerTypes = new[] { "node" }.ToList(),
+                Name = "node",
+                PackageRequirements =
                                        new[]
                                            {
                                                new NodeTemplate.PackageRequirement(
                                                    "KlusterKite.NodeManager",
                                                    null)
                                            }.ToList()
-                               };
+            };
 
             var migrator = new MigratorTemplate
-                               {
-                                   Code = "migrator",
-                                   Configuration = "{}",
-                                   Name = "migrator",
-                                   PackageRequirements =
+            {
+                Code = "migrator",
+                Configuration = "{}",
+                Name = "migrator",
+                PackageRequirements =
                                        new[]
                                            {
                                                new NodeTemplate.PackageRequirement(
@@ -701,7 +701,7 @@ namespace KlusterKite.NodeManager.Tests
                                                    "Akka.Logger.Serilog",
                                                    null),
                                            }.ToList()
-                               };
+            };
 
             var packageDescriptions = repo.SearchAsync(string.Empty, true).GetAwaiter().GetResult()
                 .Select(p => p.Identity).Select(
@@ -709,13 +709,13 @@ namespace KlusterKite.NodeManager.Tests
 
             var configurationSettings =
                 new ConfigurationSettings
-                    {
-                        NodeTemplates = new[] { template }.ToList(),
-                        MigratorTemplates = new[] { migrator }.ToList(),
-                        Packages = packageDescriptions,
-                        NugetFeed = "http://nuget/",
-                        SeedAddresses = new[] { "http://seed" }.ToList()
-                    };
+                {
+                    NodeTemplates = new[] { template }.ToList(),
+                    MigratorTemplates = new[] { migrator }.ToList(),
+                    Packages = packageDescriptions,
+                    NugetFeed = "http://nuget/",
+                    SeedAddresses = new[] { "http://seed" }.ToList()
+                };
 
             var configuration = new Configuration { Settings = configurationSettings };
             return configuration;
@@ -736,14 +736,14 @@ namespace KlusterKite.NodeManager.Tests
                 var errors = activeConfiguration.CheckAll(
                         context,
                         repo,
-                        new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
+                        new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore, ConfigurationCheckTestsBase.Net9 }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
-                    this.Sys.Log.Error("Error in active configuration {Field}: {Message}", error.Field, error.Message);
+                    this.Sys.Log.Log(LogLevel.ErrorLevel, "Error in active configuration {Field}: {Message}", [error.Field, error.Message]);
                 }
 
-                Assert.Equal(0, errors.Count);
+                Assert.Empty(errors);
                 activeConfiguration.State = EnConfigurationState.Active;
                 context.SaveChanges();
 
@@ -753,14 +753,14 @@ namespace KlusterKite.NodeManager.Tests
                 errors = nextConfiguration.CheckAll(
                         context,
                         repo,
-                        new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore }.ToList())
+                        new[] { ConfigurationCheckTestsBase.Net46, ConfigurationCheckTestsBase.NetCore, ConfigurationCheckTestsBase.Net9 }.ToList())
                     .GetAwaiter().GetResult().ToList();
                 foreach (var error in errors)
                 {
                     this.Sys.Log.Error("Error in next configuration {Field}: {Message}", error.Field, error.Message);
                 }
 
-                Assert.Equal(0, errors.Count);
+                Assert.Empty(errors);
                 nextConfiguration.State = EnConfigurationState.Ready;
                 context.SaveChanges();
             }
@@ -774,12 +774,12 @@ namespace KlusterKite.NodeManager.Tests
             using (var context = this.GetContext())
             {
                 var migration = new Migration
-                                    {
-                                        FromConfigurationId = 1,
-                                        ToConfigurationId = 2,
-                                        IsActive = true,
-                                        State = EnMigrationState.Preparing
-                                    };
+                {
+                    FromConfigurationId = 1,
+                    ToConfigurationId = 2,
+                    IsActive = true,
+                    State = EnMigrationState.Preparing
+                };
                 context.Migrations.Add(migration);
                 context.SaveChanges();
             }

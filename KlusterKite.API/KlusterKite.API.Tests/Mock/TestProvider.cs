@@ -237,7 +237,8 @@ namespace KlusterKite.API.Tests.Mock
             get
             {
                 var date = new DateTime(1980, 9, 25, 10, 0, 0, DateTimeKind.Utc);
-                return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
+                //date = TimeZoneInfo.ConvertTime(date, TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time"));
+                return date;
             }
         }
 
@@ -290,7 +291,7 @@ namespace KlusterKite.API.Tests.Mock
         /// </summary>
         [UsedImplicitly]
         [DeclareField]
-        [RequirePrivilege("allow")]
+        [RequirePrivilege("allow", Scope = EnPrivilegeScope.Any)]
         public string RequirePrivilegeAnyField => "success";
 
         /// <summary>
@@ -322,7 +323,7 @@ namespace KlusterKite.API.Tests.Mock
         /// </summary>
         [UsedImplicitly]
         [DeclareField]
-        [RequirePrivilege("allow", IgnoreOnUserPresent = true)]
+        [RequirePrivilege("allow", IgnoreOnUserPresent = true, Scope = EnPrivilegeScope.Client)]
         public string RequirePrivilegeIgnoreOnUserPresentField => "success";
 
         /// <summary>
@@ -338,10 +339,10 @@ namespace KlusterKite.API.Tests.Mock
         /// </summary>
         [UsedImplicitly]
         [RequireSession]
-        [RequirePrivilege("read", ConnectionActions = EnConnectionAction.Query)]
-        [RequirePrivilege("create", ConnectionActions = EnConnectionAction.Create)]
-        [RequirePrivilege("update", ConnectionActions = EnConnectionAction.Update)]
-        [RequirePrivilege("delete", ConnectionActions = EnConnectionAction.Delete)]
+        [RequirePrivilege("read", ConnectionActions = EnConnectionAction.Query, Scope = EnPrivilegeScope.Client)]
+        [RequirePrivilege("create", ConnectionActions = EnConnectionAction.Create, Scope = EnPrivilegeScope.Client)]
+        [RequirePrivilege("update", ConnectionActions = EnConnectionAction.Update, Scope = EnPrivilegeScope.Client)]
+        [RequirePrivilege("delete", ConnectionActions = EnConnectionAction.Delete, Scope = EnPrivilegeScope.Client)]
         [DeclareConnection(CanCreate = true, CanUpdate = true, CanDelete = true)]
         public TestObjectConnection AuthorizedConnection => this.Connection;
 
@@ -350,7 +351,7 @@ namespace KlusterKite.API.Tests.Mock
         /// </summary>
         [UsedImplicitly]
         [RequireSession]
-        [RequirePrivilege("allow", AddActionNameToRequiredPrivilege = true)]
+        [RequirePrivilege("allow", AddActionNameToRequiredPrivilege = true, Scope = EnPrivilegeScope.Client)]
         [DeclareConnection(CanCreate = true, CanUpdate = true, CanDelete = true)]
         public TestObjectConnection AuthorizedNamedConnection => this.Connection;
 

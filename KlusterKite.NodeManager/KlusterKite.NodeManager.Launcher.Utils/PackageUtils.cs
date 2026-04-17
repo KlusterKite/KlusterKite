@@ -17,11 +17,15 @@ namespace KlusterKite.NodeManager.Launcher.Utils
     using System.Threading;
     using System.Threading.Tasks;
 
+    using System.Net.Http;
+    using System.Xml.Linq;
+
     using NuGet.Client;
     using NuGet.Common;
     using NuGet.Configuration;
     using NuGet.ContentModel;
     using NuGet.Frameworks;
+    using NuGet.Packaging;
     using NuGet.Packaging.Core;
     using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
@@ -48,6 +52,65 @@ namespace KlusterKite.NodeManager.Launcher.Utils
             runtimeGraph = JsonRuntimeFormat.ReadRuntimeGraph(
                 typeof(PackageUtils).GetTypeInfo().Assembly
                     .GetManifestResourceStream("KlusterKite.NodeManager.Launcher.Utils.Resources.runtimes.json"));
+        }
+
+        /// <summary>
+        /// Shared HTTP client for V2 feed queries.
+        /// </summary>
+        private static readonly HttpClient HttpClient = new HttpClient();
+
+        /// <summary>
+        /// Gets the latest version of a package by exact ID using the V2 FindPackagesById endpoint directly.
+        /// More reliable than text search for packages whose IDs don't match search tokenization
+        /// (e.g. StackExchange.Redis, Serilog).
+        /// </summary>
+        /// <param name="nugetUrl">The nuget server address (V2)</param>
+        /// <param name="id">The exact package ID</param>
+        /// <returns>The package metadata, or null if not found</returns>
+        public static async Task<IPackageSearchMetadata> GetByIdAsync(string nugetUrl, string id)
+        {
+            var baseUrl = nugetUrl.TrimEnd('/');
+            var url = $"{baseUrl}/FindPackagesById()?id='{Uri.EscapeDataString(id)}'";
+            var response = await HttpClient.GetAsync(url).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var xml = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var doc = XDocument.Parse(xml);
+            XNamespace d = "http://schemas.microsoft.com/ado/2007/08/dataservices";
+            XNamespace m = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
+            XNamespace atom = "http://www.w3.org/2005/Atom";
+
+            // Pick the latest version from all entries in the feed
+            var entry = doc.Descendants(atom + "entry")
+                .Select(e => new { e, v = NuGetVersion.TryParse(e.Element(m + "properties")?.Element(d + "NormalizedVersion")?.Value ?? e.Element(m + "properties")?.Element(d + "Version")?.Value ?? string.Empty, out var ver) ? ver : null })
+                .Where(x => x.v != null)
+                .OrderByDescending(x => x.v)
+                .FirstOrDefault()?.e;
+            if (entry == null)
+            {
+                return null;
+            }
+
+            var props = entry.Element(m + "properties");
+            if (props == null)
+            {
+                return null;
+            }
+
+            var packageId = props.Element(d + "Id")?.Value ?? entry.Element(atom + "title")?.Value ?? id;
+            var versionStr = props.Element(d + "NormalizedVersion")?.Value ?? props.Element(d + "Version")?.Value;
+            if (versionStr == null || !NuGetVersion.TryParse(versionStr, out var version))
+            {
+                return null;
+            }
+
+            var dependencyStr = props.Element(d + "Dependencies")?.Value ?? string.Empty;
+            var dependencySets = ParseV2DependencyString(dependencyStr);
+
+            return new V2DirectMetadata(new PackageIdentity(packageId, version), dependencySets);
         }
 
         /// <summary>
@@ -83,8 +146,8 @@ namespace KlusterKite.NodeManager.Launcher.Utils
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(tempDir);
 
-            var source = new PackageSource(nugetUrl);
-            var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
+            var source = new PackageSource(nugetUrl) { AllowInsecureConnections = true };
+            var sourceRepository = Repository.Factory.GetCoreV3(source);
             var sourceCacheContext = new SourceCacheContext();
             
             var downloadResource = await sourceRepository.GetResourceAsync<DownloadResource>().ConfigureAwait(false);
@@ -165,8 +228,8 @@ namespace KlusterKite.NodeManager.Launcher.Utils
         /// </returns>
         public static async Task<IPackageSearchMetadata> Search(string nugetUrl, string id, NuGetVersion version)
         {
-            var source = new PackageSource(nugetUrl);
-            var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
+            var source = new PackageSource(nugetUrl) { AllowInsecureConnections = true };
+            var sourceRepository = Repository.Factory.GetCoreV3(source);
             var resource = await sourceRepository.GetResourceAsync<PackageSearchResource>().ConfigureAwait(false);
             var result = new List<IPackageSearchMetadata>();
 
@@ -213,8 +276,8 @@ namespace KlusterKite.NodeManager.Launcher.Utils
         /// <returns>The list of package descriptions</returns>
         public static async Task<List<IPackageSearchMetadata>> Search(string repository, string terms)
         {
-            var source = new PackageSource(repository);
-            var sourceRepository = Repository.Factory.GetCoreV3(source.Source);
+            var source = new PackageSource(repository) { AllowInsecureConnections = true };
+            var sourceRepository = Repository.Factory.GetCoreV3(source);
             var resource = await sourceRepository.GetResourceAsync<PackageSearchResource>().ConfigureAwait(false);
             var result = new List<IPackageSearchMetadata>();
 
@@ -260,6 +323,109 @@ namespace KlusterKite.NodeManager.Launcher.Utils
         /// <returns>
         /// The list of extracted files
         /// </returns>
+        /// <summary>
+        /// Parses the NuGet V2 dependency string format: "id:version:framework|id:version:framework|..."
+        /// into a list of PackageDependencyGroup objects.
+        /// </summary>
+        private static IEnumerable<PackageDependencyGroup> ParseV2DependencyString(string dependencyStr)
+        {
+            if (string.IsNullOrWhiteSpace(dependencyStr))
+            {
+                yield break;
+            }
+
+            // Group entries by framework
+            var byFramework = new Dictionary<string, List<PackageDependency>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var entry in dependencyStr.Split('|'))
+            {
+                var parts = entry.Split(':');
+                if (parts.Length < 1 || string.IsNullOrWhiteSpace(parts[0]))
+                {
+                    continue;
+                }
+
+                var depId = parts[0];
+                VersionRange range = null;
+                if (parts.Length >= 2 && !string.IsNullOrWhiteSpace(parts[1]))
+                {
+                    VersionRange.TryParse(parts[1], out range);
+                }
+
+                var framework = parts.Length >= 3 ? parts[2] : string.Empty;
+                if (!byFramework.TryGetValue(framework, out var list))
+                {
+                    list = new List<PackageDependency>();
+                    byFramework[framework] = list;
+                }
+
+                list.Add(new PackageDependency(depId, range));
+            }
+
+            foreach (var kv in byFramework)
+            {
+                NuGetFramework fw;
+                if (string.IsNullOrEmpty(kv.Key))
+                {
+                    fw = NuGetFramework.AnyFramework;
+                }
+                else
+                {
+                    // V2 framework moniker uses short form e.g. "net90", "netcoreapp31"
+                    fw = NuGetFramework.ParseFolder(kv.Key);
+                    if (fw == NuGetFramework.UnsupportedFramework)
+                    {
+                        fw = NuGetFramework.ParseFrameworkName(kv.Key, DefaultFrameworkNameProvider.Instance);
+                    }
+                }
+
+                yield return new PackageDependencyGroup(fw, kv.Value);
+            }
+        }
+
+        /// <summary>
+        /// Minimal IPackageSearchMetadata backed by data parsed directly from V2 Atom feed.
+        /// Only Identity and DependencySets are meaningful; all other members return defaults.
+        /// </summary>
+        private class V2DirectMetadata : IPackageSearchMetadata
+        {
+            private readonly IEnumerable<PackageDependencyGroup> dependencySets;
+
+            public V2DirectMetadata(PackageIdentity identity, IEnumerable<PackageDependencyGroup> dependencySets)
+            {
+                this.Identity = identity;
+                this.dependencySets = dependencySets.ToList();
+            }
+
+            public PackageIdentity Identity { get; }
+
+            public IEnumerable<PackageDependencyGroup> DependencySets => this.dependencySets;
+
+            public string Authors => null;
+            public string Description => null;
+            public long? DownloadCount => null;
+            public Uri IconUrl => null;
+            public bool IsListed => true;
+            public LicenseMetadata LicenseMetadata => null;
+            public Uri LicenseUrl => null;
+            public string Owners => null;
+            public Uri PackageDetailsUrl => null;
+            public bool PrefixReserved => false;
+            public Uri ProjectUrl => null;
+            public DateTimeOffset? Published => null;
+            public Uri ReadmeUrl => null;
+            public Uri ReportAbuseUrl => null;
+            public bool RequireLicenseAcceptance => false;
+            public string Summary => null;
+            public string Tags => null;
+            public string Title => null;
+            public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities => null;
+            public string ReadmeFileUrl => null;
+            public IReadOnlyList<string> OwnersList => null;
+
+            public Task<PackageDeprecationMetadata> GetDeprecationMetadataAsync() => Task.FromResult<PackageDeprecationMetadata>(null);
+            public Task<IEnumerable<VersionInfo>> GetVersionsAsync() => Task.FromResult(Enumerable.Empty<VersionInfo>());
+        }
+
         private static IEnumerable<string> ExtractPackage(
             DownloadResourceResult package,
             string runtime,

@@ -16,7 +16,7 @@ namespace KlusterKite.Web.Tests.GraphQL
     using System.Threading.Tasks;
 
     using global::GraphQL;
-    using global::GraphQL.Http;
+    using global::GraphQL.NewtonsoftJson;
     using global::GraphQL.Utilities;
 
     using KlusterKite.API.Client;
@@ -85,15 +85,15 @@ namespace KlusterKite.Web.Tests.GraphQL
                 Description = api,
                 Data = @"{
 	                    ""viewer"": {
-		                    ""__id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
+		                    ""_id"": ""FD73BAFB-3698-4FA1-81F5-27C8C83BB4F0"", 
 		                    ""name"": ""test name"",
 		                    ""numbers"": [1, 2, 3]
 	                    }, 
 	                    ""object"": {
 		                    ""count"": 2, 
 		                    ""edges"": [
-			                    {""__id"": 10, ""node___id"": 10}, 
-			                    {""__id"": 20, ""node___id"": 20}
+			                    {""_id"": 10, ""node__id"": 10}, 
+			                    {""_id"": 20, ""node__id"": 20}
 		                    ]
 	                    }
                     }"
@@ -101,13 +101,12 @@ namespace KlusterKite.Web.Tests.GraphQL
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
+
+            var description = schema.Print();
+            this.output.WriteLine("-------- Schema -----------");
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            
 
             Assert.NotNull(schema.Query);
             Assert.Equal(3, schema.Query.Fields.Count());
@@ -117,11 +116,12 @@ namespace KlusterKite.Web.Tests.GraphQL
                              r =>
                                  {
                                      r.Schema = schema;
+                                     r.ThrowOnUnhandledException = true;
                                      r.Query = @"
                                 query {
                                     api {
                                         viewer {
-                                            __id,
+                                            _id,
                                             name,
                                             numbers
                                         },
@@ -130,7 +130,7 @@ namespace KlusterKite.Web.Tests.GraphQL
                                             edges {
                                                 cursor,                                                
                                                 node {
-                                                    __id
+                                                    _id
                                                 }
                                             }
                                         }
@@ -140,14 +140,15 @@ namespace KlusterKite.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
+
+            var response = new GraphQLSerializer(true).Serialize(result);
             this.output.WriteLine(response);
 
             var expectedResponse = @"{
                                       ""data"": {
                                         ""api"": {
                                           ""viewer"": {
-                                            ""__id"": ""fd73bafb-3698-4fa1-81f5-27c8c83bb4f0"",
+                                            ""_id"": ""fd73bafb-3698-4fa1-81f5-27c8c83bb4f0"",
                                             ""name"": ""test name"",
 		                                    ""numbers"": [1, 2, 3]
                                           },
@@ -155,15 +156,15 @@ namespace KlusterKite.Web.Tests.GraphQL
                                             ""count"": 2,
                                             ""edges"": [
                                               {
-                                                ""cursor"": 10,
+                                                ""cursor"": ""10"",
                                                 ""node"": {
-                                                  ""__id"": 10
+                                                  ""_id"": 10
                                                 }
                                               },
                                               {
-                                                ""cursor"": 20,
+                                                ""cursor"": ""20"",
                                                 ""node"": {
-                                                  ""__id"": 20
+                                                  ""_id"": 20
                                                 }
                                               }
                                             ]
@@ -193,13 +194,12 @@ namespace KlusterKite.Web.Tests.GraphQL
             var provider = new MoqProvider { Description = api, Data = "{\"enumField\": \"item2\"}" };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
+
+            var description = schema.Print();
+            this.output.WriteLine("-------- Schema -----------");
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            
 
             Assert.NotNull(schema.Query);
             Assert.Equal(3, schema.Query.Fields.Count());
@@ -209,11 +209,12 @@ namespace KlusterKite.Web.Tests.GraphQL
                              r =>
                                  {
                                      r.Schema = schema;
+                                     r.ThrowOnUnhandledException = true;
                                      r.Query = "query { api { enumField } } ";
                                  }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
+            var response = new GraphQLSerializer(true).Serialize(result); 
             this.output.WriteLine(response);
 
             var expectedResponse = @"{
@@ -243,13 +244,12 @@ namespace KlusterKite.Web.Tests.GraphQL
             var provider = new MoqProvider { Description = api, Data = "{\"boolField\": true}" };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
+
+            var description = schema.Print();
+            this.output.WriteLine("-------- Schema -----------");
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            
 
             Assert.NotNull(schema.Query);
             Assert.Equal(3, schema.Query.Fields.Count());
@@ -263,7 +263,7 @@ namespace KlusterKite.Web.Tests.GraphQL
                              }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
+            var response = new GraphQLSerializer(true).Serialize(result); 
             this.output.WriteLine(response);
 
             var expectedResponse = @"{
@@ -311,25 +311,24 @@ namespace KlusterKite.Web.Tests.GraphQL
                                 {
                                     Description = api1,
                                     Data =
-                                        "{\"viewer\": {\"__id\": 1, \"name\": \"test name\"}, \"object1\": {\"__id\": 10}}"
+                                        "{\"viewer\": {\"_id\": 1, \"name\": \"test name\"}, \"object1\": {\"_id\": \"10\"}}"
                                 };
 
             var provider2 = new MoqProvider
                                 {
                                     Description = api2,
                                     Data =
-                                        "{\"viewer\": {\"description\": \"test description\"}, \"object2\": {\"__id\": 123}}"
+                                        "{\"viewer\": {\"description\": \"test description\"}, \"object2\": {\"_id\": \"123\"}}"
                                 };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider1, provider2 });
 
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
+
+            var description = schema.Print();
+            this.output.WriteLine("-------- Schema -----------");
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            
 
             Assert.NotNull(schema.Query);
             Assert.Equal(3, schema.Query.Fields.Count());
@@ -339,19 +338,20 @@ namespace KlusterKite.Web.Tests.GraphQL
                              r =>
                                  {
                                      r.Schema = schema;
+                                     r.ThrowOnUnhandledException = true;
                                      r.Query = @"
                                 query {
                                     api {
                                         viewer {
-                                            __id,
+                                            _id,
                                             name,
                                             description
                                         },
                                         object1 {
-                                            __id
+                                            _id
                                         },
                                         object2 {
-                                            __id
+                                            _id
                                         }
                                     }
                                 }            
@@ -359,21 +359,21 @@ namespace KlusterKite.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
+            var response = new GraphQLSerializer(true).Serialize(result); 
             this.output.WriteLine(response);
             var expectedResponse = @"{
                                       ""data"": {
                                         ""api"": {
                                           ""viewer"": {
-                                            ""__id"": 1,
+                                            ""_id"": 1,
                                             ""name"": ""test name"",
                                             ""description"": ""test description""
                                           },
                                           ""object1"": {
-                                            ""__id"": 10
+                                            ""_id"": ""10""
                                           },
                                           ""object2"": {
-                                            ""__id"": 123
+                                            ""_id"": ""123""
                                           }
                                         }
                                       }
@@ -401,18 +401,17 @@ namespace KlusterKite.Web.Tests.GraphQL
             var provider = new MoqProvider
                                {
                                    Description = api,
-                                   Data = "{\"viewer\": {\"__id\": 1, \"name\": \"test name\"}}"
+                                   Data = "{\"viewer\": {\"_id\": 1, \"name\": \"test name\"}}"
                                };
 
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
+
+            var description = schema.Print();
+            this.output.WriteLine("-------- Schema -----------");
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            
 
             Assert.NotNull(schema.Query);
             Assert.Equal(3, schema.Query.Fields.Count());
@@ -426,7 +425,7 @@ namespace KlusterKite.Web.Tests.GraphQL
                                 query {
                                     api {
                                         viewer {
-                                            __id,
+                                            _id,
                                             name
                                         }
                                     }
@@ -435,13 +434,13 @@ namespace KlusterKite.Web.Tests.GraphQL
                                  }).ConfigureAwait(true);
 
             this.output.WriteLine("-------- Response -----------");
-            var response = new DocumentWriter(true).Write(result);
+            var response = new GraphQLSerializer(true).Serialize(result); 
             this.output.WriteLine(response);
             var expectedResponse = @"{
                                       ""data"": {
                                         ""api"": {
                                           ""viewer"": {
-                                            ""__id"": 1,
+                                            ""_id"": 1,
                                             ""name"": ""test name""
                                           }
                                         }
@@ -522,13 +521,12 @@ namespace KlusterKite.Web.Tests.GraphQL
                 this.output.WriteLine(error);
             }
 
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine("-------- Schema -----------");
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
+
+            var description = schema.Print();
+            this.output.WriteLine("-------- Schema -----------");
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            
 
             Assert.False(hasErrors);
             var query = BaseInstaller.ReadTextResource(
@@ -542,7 +540,7 @@ namespace KlusterKite.Web.Tests.GraphQL
                                      
                                      r.Query = query;
                                  }).ConfigureAwait(true);
-            var response = new DocumentWriter(true).Write(result);
+            var response = new GraphQLSerializer(true).Serialize(result); 
             this.output.WriteLine(response);
 
             var expectedResponse = BaseInstaller.ReadTextResource(
@@ -568,12 +566,10 @@ namespace KlusterKite.Web.Tests.GraphQL
             var provider = new MoqProvider { Description = api };
             var schema = SchemaGenerator.Generate(new List<ApiProvider> { provider });
 
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrWhiteSpace(description));
-            }
+            var description = schema.Print();
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrWhiteSpace(description));
+            
 
             Assert.NotNull(schema.Query);
             Assert.Equal(3, schema.Query.Fields.Count());
@@ -588,12 +584,11 @@ namespace KlusterKite.Web.Tests.GraphQL
         {
             var schema = SchemaGenerator.Generate(new List<ApiProvider>());
 
-            using (var printer = new SchemaPrinter(schema))
-            {
-                var description = printer.Print();
-                this.output.WriteLine(description);
-                Assert.False(string.IsNullOrEmpty(description));
-            }
+
+            var description = schema.Print();
+            this.output.WriteLine(description);
+            Assert.False(string.IsNullOrEmpty(description));
+            
         }
 
         /// <summary>
@@ -617,9 +612,9 @@ namespace KlusterKite.Web.Tests.GraphQL
             public string Data { get; set; }
 
             /// <inheritdoc />
-            public override Task<JObject> GetData(List<ApiRequest> requests, RequestContext context)
+            public override ValueTask<JObject> GetData(List<ApiRequest> requests, RequestContext context)
             {
-                return Task.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
+                return ValueTask.FromResult(JsonConvert.DeserializeObject<JObject>(this.Data));
             }
         }
     }

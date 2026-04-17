@@ -11,7 +11,9 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Linq;
+    using System.Threading.Tasks;
+    using global::GraphQL;
     using global::GraphQL.Types;
 
     using KlusterKite.API.Client;
@@ -64,27 +66,39 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
                     return new DecimalGraphType();
                 case EnScalarType.Integer:
                     return new IntGraphType();
+                case EnScalarType.Long:
+                    return new LongGraphType();
                 case EnScalarType.String:
                     return new StringGraphType();
                 case EnScalarType.Guid:
                     return new GuidGraphType();
                 case EnScalarType.DateTime:
-                    return new DateGraphType();
+                    return new DateTimeGraphType();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
         /// <inheritdoc />
-        public override object Resolve(ResolveFieldContext context)
+        public override async ValueTask<object> ResolveAsync(IResolveFieldContext context)
         {
-            var resolve = base.Resolve(context);
+            var resolve = await base.ResolveAsync(context);
             if (resolve is JArray)
             {
-                return resolve;
+                return ((JArray)resolve).Select(element => (element as JValue)?.Value).ToArray();
             }
 
-            return (resolve as JValue)?.Value;
+            switch (this.ScalarType)
+            {
+                case EnScalarType.Guid:
+                    return Guid.Parse(resolve.ToString());
+                case EnScalarType.DateTime:
+                    return ((resolve as JValue)?.Value as DateTime?)?.ToUniversalTime();
+                default:
+                    return (resolve as JValue)?.Value;
+            }
+
+            
         }
     }
 }

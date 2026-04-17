@@ -11,7 +11,6 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
 {
     using System.Collections.Generic;
     using System.Linq;
-
     using global::GraphQL.Types;
 
     using KlusterKite.Web.GraphQL.Publisher.GraphTypes;
@@ -38,9 +37,17 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
         /// <inheritdoc />
         public override IGraphType GenerateGraphType(NodeInterface nodeInterface, List<TypeInterface> interfaces)
         {
-            var fields = this.Fields.Select(this.ConvertApiField);
+            var fields = this.Fields
+                .Select(this.ConvertApiField
+                ).Select(field => {
+                    field.Type = typeof(VirtualInputGraphType);
+                    field.Resolver = null;
+                    return field;
+                });
+
             var inputGraphType = new VirtualInputGraphType(this.ComplexTypeName) { Description = this.Description };
             inputGraphType.AddFields(fields);
+            
             return inputGraphType;
         }
     }

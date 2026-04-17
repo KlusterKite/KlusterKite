@@ -10,17 +10,25 @@
 namespace KlusterKite.Web.GraphQL.Publisher
 {
     using System;
+    using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Text;
+    using System.Text.Json;
     using System.Threading.Tasks;
 
     using global::GraphQL;
-    using global::GraphQL.Http;
+    using global::GraphQL.Server.Transports.AspNetCore;
+    using global::GraphQL.Server.Ui.GraphiQL;
+    using global::GraphQL.Transport;
+    using global::GraphQL.Types;
+    using global::GraphQL.Validation;
 
     using JetBrains.Annotations;
 
     using KlusterKite.Web.Authorization;
-
+    using KlusterKite.Web.GraphQL.Publisher.Internals;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
     using Newtonsoft.Json.Linq;
@@ -44,7 +52,7 @@ namespace KlusterKite.Web.GraphQL.Publisher
         /// <summary>
         /// The writer.
         /// </summary>
-        private readonly IDocumentWriter writer;
+        private readonly IGraphQLTextSerializer writer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EndpointController"/> class.
@@ -61,12 +69,12 @@ namespace KlusterKite.Web.GraphQL.Publisher
         public EndpointController(
             SchemaProvider schemaProvider,
                                   IDocumentExecuter executor,
-                                  IDocumentWriter writer)
+                                  IGraphQLTextSerializer writer)
         {
             this.schemaProvider = schemaProvider;
             this.executor = executor;
             this.writer = writer;
-            
+  
             /*
             this.complexityConfiguration = new ComplexityConfiguration
                                                {
@@ -81,74 +89,87 @@ namespace KlusterKite.Web.GraphQL.Publisher
                                                */
         }
 
+
         /// <summary>
         /// Processes the GraphQL post request
         /// </summary>
-        /// <param name="query">The query data</param>
         /// <returns>GraphQL response</returns>
         [HttpPost]
         [HttpOptions]
         [Route("")]
-        public async Task<IActionResult> Post([FromBody] JObject query)
+        public async Task<IActionResult> Post()
         {
-            var queryToExecute =
-                (string)
-                (query.Properties()
-                         .FirstOrDefault(p => p.Name.Equals("query", StringComparison.OrdinalIgnoreCase))
-                         ?.Value as JValue);
-
-            if (string.IsNullOrWhiteSpace(queryToExecute))
+            if (HttpContext.Request.HasFormContentType)
             {
-                return this.BadRequest();
+                var form = await HttpContext.Request.ReadFormAsync(HttpContext.RequestAborted);
+                return await ExecuteGraphQLRequestAsync(BuildRequest(form["query"].ToString(), form["operationName"].ToString(), form["variables"].ToString(), form["extensions"].ToString()));
             }
-
-            var operationName =
-                (string)
-                (query.Properties()
-                     .FirstOrDefault(p => p.Name.Equals("OperationName", StringComparison.OrdinalIgnoreCase))
-                     ?.Value as JValue);
-
-            var variablesToken =
-                query.Properties()
-                    .FirstOrDefault(
-                        p => p.Name.Equals("variables", StringComparison.OrdinalIgnoreCase))?.Value;
-
-            Inputs inputs = null;
-            if (variablesToken is JObject)
+            else if (HttpContext.Request.HasJsonContentType())
             {
-                inputs = variablesToken.ToString().ToInputs();
+                string body;
+                using (var sr = new StreamReader(HttpContext.Request.Body))
+                {
+                    body = await sr.ReadToEndAsync();
+                }
+
+                GraphQLRequest request;
+                try
+                {
+                    request = this.writer.Deserialize<GraphQLRequest>(body);
+                }
+                catch (Newtonsoft.Json.JsonException)
+                {
+                    return BadRequest("Could not parse request");
+                }
+                return await ExecuteGraphQLRequestAsync(request);
             }
-            else if (variablesToken is JValue)
-            {
-                inputs = ((JValue)variablesToken).ToObject<string>()?.ToInputs();
-            }
-
-            var requestContext = this.GetRequestDescription();
-            var schema = this.schemaProvider.CurrentSchema;
-            if (schema == null)
-            {
-                return new StatusCodeResult(503);
-            }
-
-            var result = await this.executor.ExecuteAsync(
-                             options =>
-                                 {
-                                     options.Schema = schema;
-                                     options.Query = queryToExecute;
-                                     options.OperationName = operationName;
-                                     options.Inputs = inputs;
-                                     options.UserContext = requestContext;
-
-                                     // options.ComplexityConfiguration = this.complexityConfiguration;
-                                     // options.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-                                 }).ConfigureAwait(false);
-
-            var json = this.writer.Write(result);
-            var contentResult = this.Content(json, "application/json", Encoding.UTF8);
-
-            contentResult.StatusCode = result.Errors?.Count > 0 ? 400 : 200;
-            return contentResult;
+            return BadRequest();
         }
+
+        private GraphQLRequest BuildRequest(string query, string operationName, string variables = null, string extensions = null)
+        {
+            return new GraphQLRequest
+            {
+                Query = query == "" ? null : query,
+                OperationName = operationName == "" ? null : operationName,
+                Variables = this.writer.Deserialize<Inputs>(variables == "" ? null : variables),
+                Extensions = this.writer.Deserialize<Inputs>(extensions == "" ? null : extensions),
+            };
+        }
+
+        private async Task<IActionResult> ExecuteGraphQLRequestAsync(GraphQLRequest? request)
+        {
+            try
+            {
+                var requestContext = this.GetRequestDescription();
+                var opts = new ExecutionOptions
+                {
+                    Query = request?.Query,
+                    OperationName = request?.OperationName,
+                    Variables = request?.Variables,
+                    Extensions = request?.Extensions,
+                    CancellationToken = HttpContext.RequestAborted,
+                    RequestServices = HttpContext.RequestServices,                   
+                    Schema = this.schemaProvider.CurrentSchema,
+                    UserContext = requestContext.ToExecutionOptionsUserContext(),
+                    //ThrowOnUnhandledException = true,
+                };
+                IValidationRule rule = HttpMethods.IsGet(HttpContext.Request.Method) ? new HttpGetValidationRule() : new HttpPostValidationRule();
+                opts.ValidationRules = DocumentValidator.CoreRules.Append(rule);
+                opts.CachedDocumentValidationRules = [rule];
+                var result = await this.executor.ExecuteAsync(opts);
+                if (!result.Executed && result.Errors.Count == 1 && result.Errors.First().Code == "INVALID_OPERATION")
+                {
+                    return this.Problem(result.Errors.First().Message, statusCode: (int)HttpStatusCode.ServiceUnavailable);
+                }
+                return new ExecutionResultActionResult(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
 
         /// <summary>
         /// The GraphQL http request body description 

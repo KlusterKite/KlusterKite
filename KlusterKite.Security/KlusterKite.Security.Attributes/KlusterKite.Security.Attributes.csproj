@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <PackageId>KlusterKite.Security.Attributes</PackageId>
     <Version>0.0.0.0-local</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -9,17 +9,17 @@
     <PackageTags>$(KlusterKitePackageTags)</PackageTags>    
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|x64'" />
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="System.Runtime" Version="4.3.0" />    
   </ItemGroup>  
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
     <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">

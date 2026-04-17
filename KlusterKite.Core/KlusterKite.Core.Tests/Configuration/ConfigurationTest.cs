@@ -80,7 +80,7 @@ namespace KlusterKite.Core.Tests.Configuration
             /*
             var cluster = Akka.Cluster.Cluster.Get(this.Sys);
             cluster.Join(cluster.SelfAddress);
-            */
+            //*/
 
             this.Sys.StartNameSpaceActorsFromConfiguration();
             this.ExpectNoMsg();
@@ -198,6 +198,9 @@ namespace KlusterKite.Core.Tests.Configuration
 
             /// <inheritdoc />
             public string ShardId(object message) => message.GetType().GetTypeInfo().Assembly.FullName;
+
+            /// <inheritdoc />
+            public string ShardId(string entityId, object messageHint = null) => messageHint?.GetType().GetTypeInfo().Assembly.FullName ?? entityId;
         }
     }
 }

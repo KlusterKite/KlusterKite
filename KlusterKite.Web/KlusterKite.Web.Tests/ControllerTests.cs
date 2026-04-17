@@ -15,7 +15,7 @@ namespace KlusterKite.Web.Tests
     using System.Threading.Tasks;
 
     using Akka.Configuration;
-
+    using Akka.Event;
     using Autofac;
 
     using KlusterKite.Core;
@@ -51,15 +51,16 @@ namespace KlusterKite.Web.Tests
         {
             this.ExpectNoMsg();
 
-            var client = new RestClient($"http://localhost:{this.Port}/testController") { Timeout = 5000 };
-            var request = new RestRequest { Method = Method.GET, Resource = "method" };
+            var options = new RestClientOptions($"http://localhost:{this.Port}/testController") { Timeout = new System.TimeSpan(0,0,5) };
+            var client = new RestClient(options);
+            var request = new RestRequest { Method = Method.Get, Resource = "method" };
             request.AddHeader("Accept", "application/json, text/json");
-            var result = await client.ExecuteTaskAsync(request);
+            var result = await client.ExecuteAsync(request);
 
             Assert.Equal(ResponseStatus.Completed, result.ResponseStatus);
-            this.Sys.Log.Info("Response: {Response}", result.Content);
+            this.Sys.Log.Log(LogLevel.InfoLevel, "Response: {Response}", [result.Content]);
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal("Hello world", result.Content);
+            Assert.Equal("\"Hello world\"", result.Content);
         }
 
         /// <summary>

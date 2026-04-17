@@ -12,18 +12,25 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
     using System.Collections.Generic;
     using System.Linq;
 
-    using Akka;
+    using KlusterKite.Core.Utils;
 
-    using global::GraphQL.Language.AST;
-    using global::GraphQL.Types;
+    using global::GraphQL;
 
     using Newtonsoft.Json.Linq;
+    using GraphQLParser.AST;
+    using KlusterKite.Security.Attributes;
+    using System.Globalization;
 
     /// <summary>
     /// Provides converter methods
     /// </summary>
-    internal static class Converter
+    public static class Converter
     {
+        /// <summary>
+        /// The key to dictionary used to pass the request context to the execution options
+        /// </summary>
+        private const string RequestContextKey = "RequestContext";
+
         /// <summary>
         /// Converts arguments to JSON object
         /// </summary>
@@ -36,20 +43,25 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
         /// <returns>
         /// The corresponding JSON
         /// </returns>
-        public static JObject ToJson(this IEnumerable<Argument> arguments, ResolveFieldContext context)
+        public static JObject ToJson(this IEnumerable<GraphQLArgument> arguments, IResolveFieldContext context)
         {
             var result = new JObject();
+            if (arguments == null)
+            {
+                return result;
+            }
+
             foreach (var argument in arguments)
             {
                 var value = ToJson(argument.Value, context);
-                result.Add(argument.Name, value);
+                result.Add(argument.Name.ToString(), value);
             }
 
             return result;
         }
 
         /// <summary>
-        /// Converts <see cref="ObjectValue"/> to JSON object
+        /// Converts <see cref="GraphQLObjectValue"/> to JSON object
         /// </summary>
         /// <param name="objectValue">
         /// The object value.
@@ -60,20 +72,20 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
         /// <returns>
         /// The <see cref="JToken"/>.
         /// </returns>
-        private static JToken ToJson(ObjectValue objectValue, ResolveFieldContext context)
+        private static JToken ToJson(GraphQLObjectValue objectValue, IResolveFieldContext context)
         {
             var result = new JObject();
-            foreach (var field in objectValue.ObjectFields)
+            foreach (var field in objectValue.Fields)
             {
                 var value = ToJson(field.Value, context);
-                result.Add(field.Name, value);
+                result.Add(field.Name.ToString(), value);
             }
 
             return result;
         }
 
         /// <summary>
-        /// Converts <see cref="ObjectValue"/> to JSON object
+        /// Converts <see cref="GraphQLValue"/> to JSON object
         /// </summary>
         /// <param name="value">
         /// The abstract value.
@@ -84,26 +96,62 @@ namespace KlusterKite.Web.GraphQL.Publisher.Internals
         /// <returns>
         /// The <see cref="JToken"/>.
         /// </returns>
-        private static JToken ToJson(IValue value, ResolveFieldContext context)
+        private static JToken ToJson(GraphQLValue value, IResolveFieldContext context)
         {
             return value.Match<JToken>()
-                    .With<VariableReference>(r =>
+                    .With<GraphQLVariable>(r =>
                     {
-                        var variableValue = context.Variables.ValueFor(r.Name);
-                        var token = JToken.FromObject(variableValue);
+                        context.Variables.ValueFor(r.Name, out var variableValue);
+                        var token = JToken.FromObject(variableValue.Value);
                         return token;
                     })
-                    .With<IntValue>(v => new JValue(v.Value))
-                    .With<FloatValue>(v => new JValue(v.Value))
-                    .With<StringValue>(v => new JValue(v.Value))
-                    .With<DecimalValue>(v => new JValue(v.Value))
-                    .With<FloatValue>(v => new JValue(v.Value))
-                    .With<BooleanValue>(v => new JValue(v.Value))
-                    .With<LongValue>(v => new JValue(v.Value))
-                    .With<EnumValue>(v => new JValue(v.Name))
-                    .With<ListValue>(v => new JArray(v.Values.Select(sv => ToJson(sv, context))))
-                    .With<ObjectValue>(sv => ToJson(sv, context))
+                    .With<GraphQLIntValue>(v => new JValue(int.Parse(v.Value.ToString(), CultureInfo.InvariantCulture)))
+                    .With<GraphQLFloatValue>(v => new JValue(v.Value))
+                    .With<GraphQLStringValue>(v => new JValue(v.Value.ToString()))
+                   // .With<GraphQLDecimalValue>(v => new JValue(v.Value))
+                    .With<GraphQLFloatValue>(v => new JValue(v.Value))
+                    .With<GraphQLBooleanValue>(v => new JValue(v.Value))
+                    //.With<GraphQLLongValue>(v => new JValue(v.Value))
+                    .With<GraphQLEnumValue>(v => new JValue(v.Name.StringValue))
+                    .With<GraphQLListValue>(v => {
+                        var values = v.Values ?? new List<GraphQLValue>();
+                        return new JArray(values.Select(sv => ToJson(sv, context)));
+                        }                    )
+                    .With<GraphQLObjectValue>(sv => ToJson(sv, context))
                     .ResultOrDefault(v => null);
+        }
+
+        /// <summary>
+        /// Converts the request context to the execution options user context
+        /// </summary>
+        /// <param name="context">The context to convert</param>
+        /// <returns>GrqphQL execution options user context</returns>
+        public static IDictionary<string, object?> ToExecutionOptionsUserContext(this RequestContext context)
+        {
+            return new Dictionary<string, object?>
+                       {
+                           { RequestContextKey, context },
+                       };
+        }
+
+        /// <summary>
+        /// Converts the execution options user context to the request context
+        /// </summary>
+        /// <param name="dict">The execution options user context to convert</param>
+        /// <returns>the request context</returns>
+        public static RequestContext? ToRequestContext(this IDictionary<string, object?> dict)
+        {
+            if (dict == null)
+            {
+                return null;
+            }
+
+            if (dict.TryGetValue(RequestContextKey, out var value) && value is RequestContext context)
+            {
+                return context;
+            }
+
+            return null;
         }
     }
 }

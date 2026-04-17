@@ -138,8 +138,18 @@ namespace KlusterKite.NodeManager.Seeder.Launcher
 #endif
                         process.Start();
                         process.WaitForExit();
+                        var exitCode = process.ExitCode;
                         process.Dispose();
-                        Console.WriteLine("Seeder stopped");
+                        Console.WriteLine($"Seeder stopped with exit code {exitCode}");
+                        if (exitCode != 0)
+                        {
+                            // Non-zero exit may indicate missing assemblies (timing race during package push).
+                            // Retry the full cycle: re-resolve packages and re-run the seeder subprocess.
+                            Console.WriteLine("Seeder subprocess failed; retrying package resolution after delay.");
+                            Thread.Sleep(configuration.NugetCheckPeriod);
+                            continue;
+                        }
+
                         break;
                     }
                     catch (Exception e)
@@ -215,7 +225,10 @@ namespace KlusterKite.NodeManager.Seeder.Launcher
                         packageToInstall = await repository.GetAsync(dependency.Id);
                         if (packageToInstall == null)
                         {
-                            throw new PackageNotFoundException(dependency.Id);
+                            // Framework packages (System.*, Microsoft.NETCore.*) are provided by the
+                            // .NET runtime and won't be on the local NuGet server — skip them.
+                            Console.WriteLine($"Skipping framework/unavailable dependency: {dependency.Id}");
+                            continue;
                         }
 
                         packagesToInstall.Add(dependency.Id, packageToInstall);
