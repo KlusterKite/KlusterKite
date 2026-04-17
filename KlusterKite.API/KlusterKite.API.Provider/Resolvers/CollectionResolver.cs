@@ -312,7 +312,7 @@ namespace KlusterKite.API.Provider.Resolvers
                 rule.Severity,
                 context,
                 rule.LogMessage,
-                ((JObject)request.Arguments).ToString(Formatting.None));
+                ((JObject)request.Arguments)?.ToString(Formatting.None));
         }
 
         /// <summary>
@@ -525,7 +525,9 @@ namespace KlusterKite.API.Provider.Resolvers
 
                 var filterableFields = nodeType.Fields.Where(f => f.Flags.HasFlag(EnFieldFlags.IsFilterable));
 
-                var stringContains = typeof(string).GetMethod("Contains");
+
+
+                var stringContains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                 var stringStartsWith = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
                 var stringEndsWith = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
                 var stringToLower = typeof(string).GetMethod("ToLower", new Type[0]);

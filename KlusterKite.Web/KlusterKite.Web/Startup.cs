@@ -14,6 +14,7 @@ namespace KlusterKite.Web
     using System.Threading.Tasks;
 
     using Akka.Actor;
+    using Akka.Event;
     using Akka.Configuration;
 
     using Autofac;
@@ -24,13 +25,12 @@ namespace KlusterKite.Web
     using KlusterKite.Core;
 
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
-    using Microsoft.Extensions.Logging;
 
-    using Serilog;
+    using Newtonsoft.Json.Converters;
+    using Newtonsoft.Json.Serialization;
 
     /// <summary>
     /// The web hosting startup class.
@@ -96,22 +96,11 @@ namespace KlusterKite.Web
         /// <param name="appBuilder">
         /// The builder
         /// </param>
-        /// <param name="env">
-        /// The env.
-        /// </param>
-        /// <param name="loggerFactory">
-        /// The logger Factory.
-        /// </param>
         [UsedImplicitly]
-        public void Configure(IApplicationBuilder appBuilder, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder appBuilder)
         {
             try
             {
-                if (Config.GetBoolean("KlusterKite.Web.Debug.Trace"))
-                {
-                    loggerFactory.AddSerilog();
-                }
-
                 var startupConfigurators = this.GetConfigurators(Config);
                 foreach (var configurator in startupConfigurators)
                 {
@@ -139,15 +128,23 @@ namespace KlusterKite.Web
             try
             {
                 services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                
 
-                var builder = services.AddMvcCore();
+                var builder = services.AddMvcCore(options => options.EnableEndpointRouting = false);
+                
                 foreach (var assembly in ActorSystemUtils.GetLoadedAssemblies())
                 {
                     builder.AddApplicationPart(assembly);
                 }
 
+                builder.AddNewtonsoftJson(o =>
+                {
+                    o.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    o.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                });
+
                 // builder.AddControllersAsServices();
-                builder.AddJsonFormatters();
+                // builder.AddJsonFormatters();
 
                 var startupConfigurators = this.GetConfigurators(Config);
                 foreach (var configurator in startupConfigurators)
@@ -160,7 +157,8 @@ namespace KlusterKite.Web
                 var container = ContainerWaiter.Task.Result;
                 var system = container.Resolve<ActorSystem>();
                 system.Log.Info("{Type}: ConfigureServices done", this.GetType().Name);
-                return new AutofacServiceProvider(container);
+                // TODO: replace IComponentContext with IContainer
+                return new AutofacServiceProvider(((IContainer)container).BeginLifetimeScope());
             }
             catch (Exception exception)
             {
