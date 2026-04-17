@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>net46;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <PackageId>KlusterKite.NodeManager.Launcher.Utils</PackageId>
     <Version>0.0.0.0-local</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -10,7 +10,7 @@
     <Description>KlusterKite cluster management: utilities to assemble services from configuration</Description>
     <PackageTags>$(KlusterKitePackageTags);configuration;migration</PackageTags>    
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|x64'" />
   <ItemGroup>
     <None Remove="Resources\runtimeconfig.json" />
     <None Remove="Resources\runtimes.json" />
@@ -20,22 +20,16 @@
     <EmbeddedResource Include="Resources\runtimes.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NuGet.Commands" Version="4.0.0" />
-    <PackageReference Include="NuGet.ProjectModel" Version="4.0.0" />
-    <PackageReference Include="NuGet.Protocol.Core.v3" Version="4.0.0" />
-    <PackageReference Include="NuGet.RuntimeModel" Version="4.0.0" />
+    <PackageReference Include="NuGet.Commands" Version="6.14.0" />
+    <PackageReference Include="NuGet.ProjectModel" Version="6.14.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="RestSharp.NetCore" Version="105.2.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.2" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <PackageReference Include="RestSharp" Version="105.2.3" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.0" />
   </ItemGroup>
   
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <DefineConstants>$(DefineConstants);APPDOMAIN</DefineConstants>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
