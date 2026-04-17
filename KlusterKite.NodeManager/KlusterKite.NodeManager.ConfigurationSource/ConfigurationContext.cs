@@ -14,6 +14,8 @@ namespace KlusterKite.NodeManager.ConfigurationSource
     using KlusterKite.NodeManager.Client.ORM;
 
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Diagnostics;
+    using Microsoft.EntityFrameworkCore.Infrastructure;
 
     /// <summary>
     /// Configuration database context
@@ -75,23 +77,32 @@ namespace KlusterKite.NodeManager.ConfigurationSource
         public DbSet<MigrationLogRecord> MigrationLogs { get; set; }
 
         /// <inheritdoc />
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        }
+
+        /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Configuration>().Property(r => r.Id).ValueGeneratedOnAdd();
 
             modelBuilder.Entity<User>().HasIndex(u => u.Login);
 
-            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.Configuration)
-                .WithMany(r => r.CompatibleTemplatesBackward).HasForeignKey(t => t.ConfigurationId);
-
-            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.CompatibleConfiguration)
-                .WithMany(r => r.CompatibleTemplatesForward).HasForeignKey(t => t.CompatibleConfigurationId);
-
+            /*
             modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Migration).WithMany(m => m.Logs)
                 .HasForeignKey(r => r.MigrationId);
 
             modelBuilder.Entity<MigrationLogRecord>().HasOne(r => r.Configuration).WithMany(m => m.MigrationLogs)
                 .HasForeignKey(r => r.ConfigurationId);
+
+            
+            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.CompatibleConfiguration)
+                .WithMany(r => r.CompatibleTemplatesForward).HasForeignKey(t => t.CompatibleConfigurationId);
+
+            modelBuilder.Entity<CompatibleTemplate>().HasOne(t => t.Configuration)
+                .WithMany(r => r.CompatibleTemplatesBackward).HasForeignKey(t => t.ConfigurationId);
+            */
 
             modelBuilder.Entity<RoleUser>().HasKey(t => new { t.UserUid, t.RoleUid });
         }

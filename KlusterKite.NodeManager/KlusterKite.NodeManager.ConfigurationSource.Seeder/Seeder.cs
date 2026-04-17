@@ -11,8 +11,10 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text.Json;
     using System.Threading.Tasks;
 
     using Akka.Configuration;
@@ -92,6 +94,43 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
         /// <inheritdoc />
         public override void Seed()
         {
+            var supportedFrameworks = this.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks").ToList();
+
+            // Build configuration settings (needed for both fallback generation and DB seeding)
+            var configSettings = new ConfigurationSettings
+            {
+                NodeTemplates = this.GetNodeTemplates().ToList(),
+                MigratorTemplates = this.GetMigratorTemplates().ToList(),
+                Packages = this.GetPackageDescriptions().GetAwaiter().GetResult(),
+                SeedAddresses = this.GetSeeds().ToList(),
+                NugetFeed = this.Config.GetString("KlusterKite.NodeManager.PackageRepository")
+            };
+
+            var resolvedConfiguration = new Configuration
+            {
+                State = EnConfigurationState.Active,
+                Name = "Initial configuration",
+                Started = DateTimeOffset.Now,
+                Settings = configSettings
+            };
+
+            var resolutionErrors =
+                resolvedConfiguration.SetPackagesDescriptionsForTemplates(this.packageRepository, supportedFrameworks)
+                    .GetAwaiter().GetResult();
+
+            foreach (var errorDescription in resolutionErrors)
+            {
+                Console.WriteLine($@"package resolution error in {errorDescription.Field} - {errorDescription.Message}");
+            }
+
+            // Always write fallback configs so nodes can bootstrap even on fresh volumes
+            var fallbackDir = this.Config.GetString("KlusterKite.NodeManager.FallbackOutputDir", string.Empty);
+            if (!string.IsNullOrWhiteSpace(fallbackDir))
+            {
+                this.WriteFallbackConfigs(configSettings, fallbackDir);
+            }
+
+            // Seed the database only if it does not already exist
             var connectionString = this.Config.GetString(ConfigConnectionStringPath);
             var databaseName = this.Config.GetString(ConfigDatabaseNamePath);
             var databaseProviderName = this.Config.GetString(ConfigDatabaseProviderNamePath);
@@ -120,38 +159,51 @@ namespace KlusterKite.NodeManager.ConfigurationSource.Seeder
                 }
 
                 this.SetupUsers(context);
-                var configuration =
-                    new ConfigurationSettings
-                        {
-                            NodeTemplates = this.GetNodeTemplates().ToList(),
-                            MigratorTemplates = this.GetMigratorTemplates().ToList(),
-                            Packages = this.GetPackageDescriptions().GetAwaiter().GetResult(),
-                            SeedAddresses = this.GetSeeds().ToList(),
-                            NugetFeed = this.Config.GetString("KlusterKite.NodeManager.PackageRepository")
-                        };
-
-                var initialConfiguration = new Configuration
-                                         {
-                                             State = EnConfigurationState.Active,
-                                             Name = "Initial configuration",
-                                             Started = DateTimeOffset.Now,
-                                             Settings = configuration
-                                         };
-
-                var supportedFrameworks = this.Config.GetStringList("KlusterKite.NodeManager.SupportedFrameworks");
-                var initialErrors =
-                    initialConfiguration.SetPackagesDescriptionsForTemplates(this.packageRepository, supportedFrameworks.ToList()).GetAwaiter().GetResult();
-
-                foreach (var errorDescription in initialErrors)
-                {
-                    Console.WriteLine($@"error in {errorDescription.Field} - {errorDescription.Message}");
-                }
-
-                context.Configurations.Add(initialConfiguration);
+                context.Configurations.Add(resolvedConfiguration);
                 context.SaveChanges();
             }
 
             Console.WriteLine(@"KlusterKite configuration database created");
+        }
+
+        /// <summary>
+        /// Writes NodeStartUpConfiguration fallback JSON files for each node template so launchers
+        /// can bootstrap without calling the NodeManager API on first cluster start.
+        /// </summary>
+        /// <param name="configSettings">Resolved configuration settings (PackagesToInstall must be populated)</param>
+        /// <param name="outputDir">Directory path to write the JSON files into</param>
+        private void WriteFallbackConfigs(ConfigurationSettings configSettings, string outputDir)
+        {
+            Directory.CreateDirectory(outputDir);
+
+            var frameworkKey = PackageRepositoryExtensions.Net9;
+
+            foreach (var template in configSettings.NodeTemplates)
+            {
+                if (template.PackagesToInstall == null
+                    || !template.PackagesToInstall.TryGetValue(frameworkKey, out var packages)
+                    || packages == null
+                    || packages.Count == 0)
+                {
+                    Console.WriteLine($"Skipping fallback for template '{template.Code}': packages not resolved for {frameworkKey}");
+                    continue;
+                }
+
+                var fallback = new NodeStartUpConfiguration
+                {
+                    Configuration = template.Configuration,
+                    NodeTemplate = template.Code,
+                    ConfigurationId = 1,
+                    Packages = packages,
+                    PackageSource = configSettings.NugetFeed,
+                    Seeds = configSettings.SeedAddresses
+                };
+
+                var filePath = Path.Combine(outputDir, $"{template.Code}.json");
+                var json = JsonSerializer.Serialize(fallback);
+                File.WriteAllText(filePath, json);
+                Console.WriteLine($"Wrote fallback config for template '{template.Code}' ({packages.Count} packages) to {filePath}");
+            }
         }
 
         /// <summary>

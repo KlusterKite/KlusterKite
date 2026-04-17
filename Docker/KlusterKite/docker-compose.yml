@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 networks:
   default:
     ipam:
@@ -34,6 +34,8 @@ services:
 
   configDb:
     image: klusterkite/postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
     networks:
       default:
         ipv4_address: 172.18.0.3
@@ -46,6 +48,9 @@ services:
      
   entry:
     image: klusterkite/entry
+    depends_on:
+      - publisher1
+      - publisher2
     links:
      - "seed"
      - "publisher1"
@@ -54,7 +59,7 @@ services:
      - "80:80"
     networks:
       default:
-        ipv4_address: 172.18.0.5     
+        ipv4_address: 172.18.0.5
 
   #Cluster servers
   seed: #seeds should be limited and with fixed addresses preknown to other cluster nodes
@@ -68,47 +73,84 @@ services:
       default:
         ipv4_address: 172.18.0.6               
 
-  publisher1: 
+  publisher1:
     image: klusterkite/publisher
     environment:
      - NETWORK_NAME=publisher1
+    depends_on:
+      seeder:
+        condition: service_completed_successfully
+    volumes:
+      - bootstrap:/fallback:ro
     logging:
         driver: json-file
     networks:
       default:
-        ipv4_address: 172.18.0.7               
+        ipv4_address: 172.18.0.7
 
 
-  publisher2: 
+  publisher2:
     image: klusterkite/publisher
     environment:
      - NETWORK_NAME=publisher2
+    depends_on:
+      seeder:
+        condition: service_completed_successfully
+    volumes:
+      - bootstrap:/fallback:ro
     logging:
         driver: json-file
     networks:
       default:
-        ipv4_address: 172.18.0.8             
+        ipv4_address: 172.18.0.8
 
   monitoringUI:
     image: klusterkite/monitoring-ui
+    depends_on:
+      - entry
     ports:
-     - "82:8080"
+     - "82:80"
     logging:
         driver: json-file
     networks:
       default:
-        ipv4_address: 172.18.0.9 
+        ipv4_address: 172.18.0.9
   
-  elk:
-    image: klusterkite/elk
+  elasticsearch:
+    image: klusterkite/elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
     logging:
         driver: json-file
     networks:
       default:
         ipv4_address: 172.18.0.12
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.28
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    logging:
+        driver: json-file
+    networks:
+      default:
+        ipv4_address: 172.18.0.14
   
   seeder:
     image: klusterkite/seeder
+    depends_on:
+      - configDb
+      - nuget
+    volumes:
+      - bootstrap:/fallback
     logging:
         driver: json-file
     networks:
@@ -118,8 +160,11 @@ services:
 
   manager:
     image: klusterkite/manager
-#    environment:
-#     - MONO_LOG_LEVEL=info
+    environment:
+     - NETWORK_NAME=manager
+    depends_on:
+      seeder:
+        condition: service_completed_successfully
     links:
      - "seed"
      - "configDb"
@@ -127,11 +172,18 @@ services:
      - "entry"
      - "publisher1"
      - "publisher2"
+    volumes:
+      - bootstrap:/fallback:ro
     logging:
         driver: json-file
 
   worker:
     image: klusterkite/worker
+    environment:
+     - NETWORK_NAME=worker
+    depends_on:
+      seeder:
+        condition: service_completed_successfully
     links:
      - "seed"
      - "manager"
@@ -140,5 +192,10 @@ services:
      - "entry"
      - "publisher1"
      - "publisher2"
+    volumes:
+      - bootstrap:/fallback:ro
     logging:
         driver: json-file
+
+volumes:
+  bootstrap:

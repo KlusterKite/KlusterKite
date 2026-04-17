@@ -1,5 +1,5 @@
 ﻿{
-	Runtime = "ubuntu.14.04-x64"
+	Runtime = "linux-x64"
 
 	NugetCheckPeriod = 30s
 
@@ -23,6 +23,7 @@
 		}
 	}
 
+	KlusterKite.NodeManager.FallbackOutputDir = "/fallback/"
 	KlusterKite.NodeManager.ConfigurationDatabaseConnectionString = "User ID=postgres;Host=configDb;Port=5432;Pooling=true"
 	KlusterKite.NodeManager.ConfigurationDatabaseName = "KlusterKite.NodeManagerConfiguration"
         KlusterKite.NodeManager.ConfigurationDatabaseProviderName = "Npgsql"
@@ -43,8 +44,7 @@
 	}
 
 	KlusterKite.NodeManager.SupportedFrameworks = [
-		".NETFramework,Version=v4.6",
-		".NETCoreApp,Version=v1.1"
+		".NETCoreApp,Version=v9.0"
 	]
 
 	KlusterKite.NodeManager.Mock {

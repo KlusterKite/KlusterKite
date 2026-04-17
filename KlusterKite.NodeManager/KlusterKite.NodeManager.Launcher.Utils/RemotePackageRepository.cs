@@ -41,10 +41,9 @@ namespace KlusterKite.NodeManager.Launcher.Utils
         }
 
         /// <inheritdoc />
-        public async Task<IPackageSearchMetadata> GetAsync(string id)
+        public Task<IPackageSearchMetadata> GetAsync(string id)
         {
-            var packages = await PackageUtils.Search(this.url, id);
-            return packages.Where(p => p.Identity.Id == id).OrderByDescending(p => p.Identity.Version).FirstOrDefault();
+            return PackageUtils.GetByIdAsync(this.url, id);
         }
 
         /// <inheritdoc />

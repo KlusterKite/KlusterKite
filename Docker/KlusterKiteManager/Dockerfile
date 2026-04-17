@@ -1,4 +1,4 @@
 FROM klusterkite/worker:latest
-MAINTAINER Mikhail Kantarovskiy <kantoramob@gmail.com>
-COPY ["fallBackConfiguration.json", "config.hocon", "./"]
+LABEL maintainer="Mikhail Kantarovskiy <kantoramob@gmail.com>"
+COPY ["config.hocon", "./"]
 CMD bash ./start.sh
